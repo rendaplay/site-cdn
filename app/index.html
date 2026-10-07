@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#031610">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Renda Play</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="marca/simbolo-pequeno.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="marca/icone-512.png">
+<link rel="stylesheet" href="marca/tokens.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<!-- Entrar / ativar -->
+<main id="tela-entrar" class="tela tela-entrar" hidden>
+  <img class="logo" src="marca/logo-horizontal.svg" alt="Renda Play">
+  <form id="form-entrar" class="cartao form" novalidate>
+    <h1 id="entrar-titulo">Entrar</h1>
+    <p id="entrar-sub" class="apagado">Use o e-mail e a senha da sua conta Renda Play.</p>
+    <label>E-mail<input id="campo-email" type="email" autocomplete="email" inputmode="email" required></label>
+    <label id="rotulo-pedido" hidden>Código do pedido<input id="campo-pedido" autocomplete="off" placeholder="está no e-mail da compra"></label>
+    <label>Senha<input id="campo-senha" type="password" autocomplete="current-password" required minlength="6"></label>
+    <p id="entrar-erro" class="erro" role="alert" hidden></p>
+    <button id="botao-entrar" class="rp-botao largo" type="submit">Entrar</button>
+    <button id="trocar-modo" class="link" type="button">Primeira vez? Ativar com o código da compra</button>
+  </form>
+</main>
+
+<!-- Início -->
+<main id="tela-inicio" class="tela tela-inicio" hidden>
+  <header class="topo">
+    <img class="logo-pequena" src="marca/logo-horizontal.svg" alt="Renda Play">
+    <button id="botao-conta" class="botao-conta" type="button" aria-label="Conta"><span id="conta-inicial">R</span></button>
+  </header>
+
+  <section id="aviso-conta" class="cartao aviso" hidden></section>
+
+  <section class="cartao tiktok">
+    <label for="campo-tiktok">Seu @ do TikTok</label>
+    <div class="arroba"><span>@</span><input id="campo-tiktok" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="seu_usuario" maxlength="24"></div>
+  </section>
+
+  <h2 class="titulo-secao">Escolha o jogo</h2>
+  <ul id="lista-jogos" class="jogos"></ul>
+
+  <footer class="acoes">
+    <button id="botao-testar" class="botao-secundario" type="button">Testar sem live</button>
+    <button id="botao-iniciar" class="rp-botao" type="button">Iniciar live</button>
+  </footer>
+</main>
+
+<!-- Como entrar ao vivo -->
+<div id="folha-como" class="folha-fundo" hidden>
+  <section class="folha" role="dialog" aria-labelledby="como-titulo">
+    <h2 id="como-titulo">Pronto. Agora entre ao vivo</h2>
+    <ol class="passos">
+      <li>Toque em <b>Abrir o jogo</b> aqui embaixo. Ele fica em tela cheia.</li>
+      <li>Vá no app do <b>TikTok</b>, toque em <b>+</b> e depois em <b>LIVE</b>.</li>
+      <li>Escolha <b>Jogos para celular</b> (transmitir a tela) e entre ao vivo.</li>
+      <li>Volte pra Renda Play. Quando o jogo mostrar <b>conectado</b>, o chat já mexe nele.</li>
+    </ol>
+    <p class="apagado pequeno">Deixe o som do celular ligado: o som do jogo vai junto pra live.</p>
+    <button id="botao-abrir-jogo" class="rp-botao largo" type="button">Abrir o jogo</button>
+    <button id="botao-cancelar" class="link" type="button">Agora não</button>
+  </section>
+</div>
+
+<!-- Conta -->
+<div id="folha-conta" class="folha-fundo" hidden>
+  <section class="folha" role="dialog" aria-labelledby="conta-email">
+    <h2 id="conta-email"></h2>
+    <p id="conta-plano" class="apagado"></p>
+    <button id="botao-sair" class="botao-secundario largo" type="button">Sair da conta</button>
+    <button id="botao-fechar-conta" class="link" type="button">Fechar</button>
+  </section>
+</div>
+
+<!-- Jogo em tela cheia -->
+<div id="tela-jogo" class="tela-jogo" hidden>
+  <iframe id="quadro-jogo" title="Jogo" allow="autoplay; fullscreen"></iframe>
+  <button id="selo-jogo" class="selo" type="button"><span class="ponto"></span><span id="selo-texto">conectando</span></button>
+  <div id="menu-jogo" class="menu-jogo" hidden>
+    <button id="botao-sair-jogo" class="botao-secundario" type="button">Parar e sair</button>
+    <button id="botao-voltar-jogo" class="link" type="button">Continuar</button>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

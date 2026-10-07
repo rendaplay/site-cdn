@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Racha da Live · Renda Play</title>
+<link rel="stylesheet" href="racha.css">
+</head>
+<body>
+<div id="palco" class="palco vertical">
+  <canvas id="cena" aria-hidden="true"></canvas>
+  <div class="hud-pista"></div>
+
+  <header class="topo">
+    <div class="marca-jogo"><span class="m1">RACHA</span><span class="m2">DA LIVE</span></div>
+    <div class="rodada"></div>
+  </header>
+  <section class="placar"></section>
+  <section class="espera" hidden></section>
+  <section class="podio" hidden></section>
+  <section class="feed" aria-live="polite"></section>
+  <section class="cardapio"></section>
+  <div class="surpresa" hidden></div>
+  <div class="anuncios"></div>
+  <div class="cartoes"></div>
+  <div class="contagem" hidden></div>
+  <div class="progresso"></div>
+  <div class="marca-site">rendaplay.com.br</div>
+  <div class="avisos"></div>
+
+  <div class="sem-sinal" hidden></div>
+  <div class="pausa" hidden>Pausado</div>
+  <form class="painel" hidden></form>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="../comum/live.js"></script>
+<script src="preset.js"></script>
+<script src="config.js"></script>
+<script src="regras.js"></script>
+<script src="texturas.js"></script>
+<script src="carros.js"></script>
+<script src="cena.js"></script>
+<script src="hud.js"></script>
+<script src="som.js"></script>
+<script src="painel.js"></script>
+<script src="jogo.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Escalada · Renda Play</title>
+<link rel="stylesheet" href="escalada.css">
+</head>
+<body>
+<div id="palco" class="palco vertical">
+  <canvas id="cena" aria-hidden="true"></canvas>
+
+  <header class="placar"></header>
+  <div class="altura"><span class="num">0</span><span class="un">m</span></div>
+  <p class="sub"></p>
+  <div class="surpresa" hidden></div>
+  <div class="pendentes"></div>
+
+  <aside class="coluna c0"></aside>
+  <aside class="coluna c1"></aside>
+  <aside class="painel-lado recordes"></aside>
+  <aside class="painel-lado ultimos"></aside>
+
+  <div class="voos"></div>
+  <div class="anuncios" aria-live="polite"></div>
+  <div class="avisos"></div>
+
+  <div class="sem-sinal" hidden></div>
+  <div class="pausa" hidden>Pausado</div>
+  <form class="painel" hidden></form>
+</div>
+
+<script src="../comum/live.js"></script>
+<script src="preset.js"></script>
+<script src="config.js"></script>
+<script src="regras.js"></script>
+<script src="ze.js"></script>
+<script src="cena.js"></script>
+<script src="hud.js"></script>
+<script src="som.js"></script>
+<script src="painel.js"></script>
+<script src="jogo.js"></script>
+</body>
+</html>

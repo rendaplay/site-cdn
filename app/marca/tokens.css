@@ -1,0 +1,69 @@
+/* Renda Play: tokens da marca v2 (logo neon). Origem de cada cor em MARCA.md. */
+
+@font-face {
+  font-family: "Lexend";
+  src: url("fontes/Lexend-Variable.woff2") format("woff2"),
+       url("fontes/Lexend-Variable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  /* Verde da logo: ação principal, destaque, sucesso */
+  --rp-verde: #17F864;          /* principal (mediana do símbolo) */
+  --rp-verde-luz: #61FC78;      /* realce, hover, brilho */
+  --rp-verde-medio: #03DD63;    /* face em sombra leve, estado ativo */
+  --rp-verde-sombra: #01AC50;   /* espessura do botão, dobra do símbolo */
+  --rp-verde-fundo: #0A6B33;    /* espessura do botão sobre fundo claro, bordas fortes */
+  --rp-verde-tinta: #08823F;    /* verde para texto e símbolo sobre fundo claro (4,9:1 no branco) */
+  --rp-brilho: rgba(23, 248, 100, 0.45);
+
+  /* Fundo: preto-esverdeado da logo */
+  --rp-breu: #010606;           /* o mais escuro (canto da original) */
+  --rp-noite: #031610;          /* fundo principal (atrás do nome na original) */
+  --rp-noite-2: #0A2219;        /* cartões */
+  --rp-noite-3: #16382A;        /* bordas, divisores */
+  --rp-branco: #F4F8F3;         /* texto (branco do nome na original) */
+  --rp-apagado: #9DB8A9;        /* texto secundário no escuro (8,8:1 na noite) */
+
+  /* Cores de apoio, com função fixa */
+  --rp-ouro: #FFC81E;           /* só dinheiro e moedas do TikTok */
+  --rp-presente: #FF3D7F;       /* só evento ao vivo: presente chegando, AO VIVO */
+
+  /* Tipografia: Lexend em tudo (é a fonte do nome) */
+  --rp-fonte: "Lexend", "Segoe UI", system-ui, sans-serif;
+  --rp-peso-titulo: 700;
+  --rp-peso-texto: 400;
+  --rp-peso-leve: 300;          /* o "Play" do logo; use pouco */
+
+  /* Forma */
+  --rp-raio-botao: 999px;
+  --rp-raio-card: 18px;
+  --rp-espessura: 6px;          /* o botão "fica de pé" e afunda ao clicar */
+}
+
+/* Botão principal: verde com espessura em verde mais escuro, sem sombra difusa. */
+.rp-botao {
+  font-family: var(--rp-fonte);
+  font-weight: 700;
+  color: var(--rp-noite);
+  background: var(--rp-verde);
+  border: 0;
+  border-radius: var(--rp-raio-botao);
+  padding: 0.75em 1.6em;
+  box-shadow: 0 var(--rp-espessura) 0 var(--rp-verde-sombra);
+  cursor: pointer;
+  transition: transform 80ms ease, box-shadow 80ms ease, background-color 120ms ease;
+}
+
+.rp-botao:hover { background: var(--rp-verde-luz); }
+
+.rp-botao:active {
+  transform: translateY(var(--rp-espessura));
+  box-shadow: 0 0 0 var(--rp-verde-sombra);
+}
+
+.rp-botao:focus-visible {
+  outline: 3px solid var(--rp-branco);
+  outline-offset: 4px;
+}

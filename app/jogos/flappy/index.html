@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Voa, Tuca! · Renda Play</title>
+<link rel="stylesheet" href="flappy.css">
+</head>
+<body>
+<div id="palco" class="palco" aria-live="polite">
+  <canvas id="voo" aria-hidden="true"></canvas>
+
+  <header class="topo">
+    <div class="card recorde">
+      <div class="rotulo">Recorde da live</div>
+      <div class="num">0</div>
+      <div class="sub"></div>
+    </div>
+    <div class="placar">
+      <div class="pontos">0</div>
+      <div class="faltam"></div>
+    </div>
+    <div class="card moedas">
+      <div class="rotulo">Moedas na live</div>
+      <div class="num">0</div>
+      <div class="sub"></div>
+    </div>
+  </header>
+
+  <div class="status">
+    <div class="controle"></div>
+    <div class="vidas"></div>
+    <ol class="efeitos"></ol>
+  </div>
+  <div class="evento"></div>
+  <div class="anuncio"></div>
+  <div class="dica"></div>
+
+  <section class="quiosque">
+    <h3 class="titulo-jogo"></h3>
+    <div class="cabeca"><span class="faixa">moedas</span><span class="caos">2 · sabotar</span><span class="ajuda">1 · ajudar</span></div>
+    <ol class="faixas"></ol>
+    <div class="barras">
+      <div class="barra ajuda"><span class="rot">Bolha do chat</span><i></i><b></b></div>
+      <div class="barra caos"><span class="rot">Chinelada do chat</span><i></i><b></b></div>
+    </div>
+  </section>
+  <section class="feed"><h3>Na live</h3><ol></ol></section>
+  <section class="ranking"><h3>Quem mais derrubou</h3><ol></ol></section>
+
+  <div class="morte"></div>
+  <div class="sem-sinal" hidden></div>
+  <div class="pausa" hidden>Pausado</div>
+  <form class="painel" hidden></form>
+</div>
+
+<script src="../comum/live.js"></script>
+<script src="preset.js"></script>
+<script src="config.js"></script>
+<script src="mundo.js"></script>
+<script src="piloto.js"></script>
+<script src="regras.js"></script>
+<script src="cenario.js"></script>
+<script src="cena.js"></script>
+<script src="hud.js"></script>
+<script src="som.js"></script>
+<script src="painel.js"></script>
+<script src="jogo.js"></script>
+</body>
+</html>

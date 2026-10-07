@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pipa Combate · Renda Play</title>
+<link rel="stylesheet" href="pipa.css">
+</head>
+<body>
+<div id="palco" class="palco" aria-live="polite">
+  <canvas id="ceu" aria-hidden="true"></canvas>
+
+  <header class="topo">
+    <div class="rei">
+      <div class="rotulo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18l-1.5-10-4.5 4-3-7-3 7-4.5-4z"/></svg>Rei do céu</div>
+      <div class="quem"></div>
+      <div class="tempo"></div>
+    </div>
+    <div class="marca"><span class="titulo-jogo"></span></div>
+    <div class="moedas">
+      <div class="rotulo">Moedas na live</div>
+      <div class="num">0</div>
+      <div class="maior"></div>
+    </div>
+  </header>
+
+  <div class="chamada"></div>
+  <div class="evento"></div>
+
+  <section class="feed"><h3 class="fita-titulo">Quem cortou quem</h3><ol></ol></section>
+  <section class="ranking"><h3 class="fita-titulo">Ranking de cortes</h3><ol></ol></section>
+  <section class="cardapio"><h3 class="fita-titulo">Presente na pipa</h3><ol></ol></section>
+
+  <div class="anuncio"></div>
+  <div class="sem-sinal" hidden></div>
+  <div class="pausa" hidden>Pausado</div>
+  <form class="painel" hidden></form>
+</div>
+
+<script src="../comum/live.js"></script>
+<script src="preset.js"></script>
+<script src="config.js"></script>
+<script src="regras.js"></script>
+<script src="fisica.js"></script>
+<script src="cenario.js"></script>
+<script src="ceu.js"></script>
+<script src="hud.js"></script>
+<script src="som.js"></script>
+<script src="painel.js"></script>
+<script src="jogo.js"></script>
+</body>
+</html>

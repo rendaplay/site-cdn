@@ -1,0 +1,670 @@
+/* Batalha de Torres: palco fixo (1080×1920 ou 1920×1080) escalado pra caber na
+   janela, pra captura sair igual em qualquer tamanho. Tudo é posicionado
+   em px do palco. As cores de cada lado chegam do preset como variáveis. */
+
+@font-face {
+  font-family: "Big Shoulders Display";
+  src: url("fontes/BigShouldersDisplay.ttf") format("truetype");
+  font-weight: 100 900;
+  font-display: block;
+}
+@font-face {
+  font-family: "Figtree";
+  src: url("fontes/Figtree.ttf") format("truetype");
+  font-weight: 300 900;
+  font-display: block;
+}
+
+:root {
+  --tinta: #0A1530;
+  --tinta-2: #16244A;
+  --branco: #FFFFFF;
+  --papel: #F2F4F8;
+  --display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --texto: "Figtree", "Segoe UI", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: antialiased; }
+
+.palco {
+  position: absolute; left: 0; top: 0;
+  overflow: hidden;
+  transform-origin: 0 0;
+  background: var(--a-escura);
+  --x: 540px;
+}
+.palco.vertical { width: 1080px; height: 1920px; }
+.palco.horizontal { width: 1920px; height: 1080px; }
+
+/* ───────── fundo ───────── */
+
+.cenario { position: absolute; inset: 0; overflow: hidden; background: #8CCBFA; }
+.cenario svg, .cenario-img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; }
+/* No horizontal o desenho vertical mostra a faixa do horizonte, não o meio. */
+.horizontal .cenario svg { height: 3413px; top: -900px; }
+/* A foto do cenário é clara no alto: sem esse véu o placar e a instrução lavam. */
+.cenario::after {
+  content: ""; position: absolute; inset: 0 0 auto; height: 46%;
+  background: linear-gradient(180deg, rgba(6, 16, 42, .5), rgba(6, 16, 42, .22) 60%, transparent);
+}
+
+/* Cor de cada lado só no alto, atrás do placar: o resto é o cenário. */
+.campo { position: absolute; top: 0; height: 330px; width: 50%; overflow: hidden; opacity: .78; }
+.campo-a { left: 0; background: linear-gradient(180deg, var(--a-escura) 0%, var(--a) 30%, transparent 100%); }
+.campo-b { right: 0; background: linear-gradient(180deg, var(--b-escura) 0%, var(--b) 30%, transparent 100%); }
+.horizontal .campo { height: 380px; }
+.retina {
+  position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(0, 0, 0, .3) 26%, transparent 30%);
+  background-size: 16px 16px;
+  mix-blend-mode: multiply;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 70%);
+  mask-image: linear-gradient(180deg, #000 0%, transparent 70%);
+}
+
+#torres { position: absolute; inset: 0; pointer-events: none; }
+.palco.em-vitoria #torres { z-index: 1; }
+
+/* ───────── topo: relógio e série ───────── */
+
+.placar-topo {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  transform-origin: 50% 0;
+  transition: transform .35s cubic-bezier(.3, 1.4, .5, 1);
+  display: flex; align-items: stretch;
+  filter: drop-shadow(0 14px 24px rgba(0, 0, 0, .4));
+}
+.vertical .placar-topo { top: 112px; }
+.horizontal .placar-topo { top: 18px; }
+
+.relogio {
+  background: var(--tinta);
+  min-width: 230px;
+  padding: 8px 26px 10px;
+  display: flex; flex-direction: column; align-items: center;
+  border-block: 4px solid var(--branco);
+}
+.tempo { font: 800 84px/0.95 var(--display); font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+.rodada { font: 600 25px/1.1 var(--texto); color: rgba(255, 255, 255, .78); margin-top: 2px; }
+.serie {
+  min-width: 78px;
+  display: grid; place-items: center;
+  font: 900 66px/1 var(--display);
+  border-block: 4px solid var(--branco);
+}
+.serie-a { background: var(--a); border-left: 4px solid var(--branco); border-radius: 18px 0 0 18px; }
+.serie-b { background: var(--b); border-right: 4px solid var(--branco); border-radius: 0 18px 18px 0; color: var(--b-acento); }
+.palco.prorrogacao .relogio, .palco.final .relogio { background: #fff; color: var(--tinta); }
+.palco.prorrogacao .rodada, .palco.final .rodada { color: var(--tinta); }
+.palco.final .placar-topo { transform: translateX(-50%) scale(1.3); }
+.palco.final .tempo { animation: bate 1s ease-out infinite; }
+
+/* ───────── os dois lados ───────── */
+
+.lado { position: absolute; text-shadow: 0 4px 0 rgba(0, 0, 0, .22); }
+.lado-a { text-align: left; }
+.lado-b { text-align: right; }
+.vertical .lado { top: 104px; width: 300px; }
+.vertical .lado-a { left: 36px; }
+.vertical .lado-b { right: 36px; }
+.horizontal .lado { top: 20px; width: 520px; }
+.horizontal .lado-a { left: 40px; }
+.horizontal .lado-b { right: 40px; }
+
+/* Folga em cima pro acento (FLÁVIO): com line-height .9 o overflow cortava o Á. */
+.nome {
+  display: inline-block; max-width: 100%;
+  font: 900 48px/0.9 var(--display); text-transform: uppercase; letter-spacing: .02em; white-space: nowrap; overflow: hidden;
+  padding: 12px 18px 5px; border-radius: 14px; border: 4px solid var(--branco);
+  box-shadow: 0 8px 18px rgba(6, 16, 42, .35);
+}
+.lado-a .nome { background: var(--a); }
+.lado-b .nome { background: var(--b); color: var(--b-acento); }
+/* Contorno branco por sombra, não por text-stroke: o CEF antigo do OBS pinta o
+   stroke por cima do preenchimento. */
+.altura {
+  --contorno: 5px 0 #fff, -5px 0 #fff, 0 5px #fff, 0 -5px #fff, 4px 4px #fff, -4px 4px #fff, 4px -4px #fff, -4px -4px #fff;
+  white-space: nowrap;
+  font: 900 150px/0.84 var(--display); font-variant-numeric: tabular-nums; letter-spacing: -.01em; margin-top: 4px; transition: transform .35s cubic-bezier(.3, 1.6, .5, 1); transform-origin: left center; }
+.lado-b .altura { transform-origin: right center; }
+.lado-a .altura { color: var(--a); text-shadow: var(--contorno), 0 0 46px var(--a), 0 12px 30px rgba(6, 16, 42, .45); }
+.lado-b .altura { color: var(--b); text-shadow: var(--contorno), 0 0 46px var(--b), 0 12px 30px rgba(6, 16, 42, .45); }
+.lado.longa .altura { font-size: 108px; }
+.horizontal .altura { font-size: 120px; }
+.altura-m { font-size: .4em; margin-left: .08em; }
+.lado.atras .altura { transform: scale(.82); opacity: .88; }
+.info { display: flex; gap: 14px; margin-top: 14px; font: 600 24px/1.1 var(--texto); text-shadow: 0 2px 4px rgba(6, 16, 42, .85), 0 0 14px rgba(6, 16, 42, .6); white-space: nowrap; }
+.lado-b .info { justify-content: flex-end; }
+.info b { font-weight: 800; }
+.torcida { opacity: .85; position: relative; }
+.seq { font-weight: 800; opacity: 0; transition: opacity .3s; }
+.seq.on { opacity: 1; }
+
+/* ───────── como escolher o lado ───────── */
+
+.instrucao { position: absolute; left: 0; right: 0; z-index: 0; }
+.vertical .instrucao { top: 330px; height: 100px; }
+/* No vertical a legenda das bordas faz o papel das chaves de presente. */
+.vertical .chave { display: none; }
+.horizontal .instrucao { top: 0; height: 0; }
+
+.so-presente {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  background: var(--branco); color: var(--tinta);
+  font: 900 30px/1 var(--display); letter-spacing: .08em; text-transform: uppercase;
+  padding: 9px 26px 8px; border-radius: 999px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .35);
+  white-space: nowrap; z-index: 1;
+}
+.so-presente { font-size: 32px; padding: 6px 24px 5px; }
+.so-presente .n {
+  display: inline-block; min-width: 46px; margin: 0 4px; padding: 2px 10px 0;
+  border-radius: 12px; color: #fff; text-align: center; font-size: 40px;
+}
+.so-presente .n-a { background: var(--a); }
+.so-presente .n-b { background: var(--b); }
+.vertical .so-presente { top: -8px; }
+.horizontal .so-presente { top: 172px; }
+
+.chave {
+  position: absolute;
+  display: flex; align-items: center; gap: 18px;
+  padding: 12px 22px 12px 12px;
+  border-radius: 24px;
+  border: 4px solid var(--branco);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, .38);
+}
+.chave-a { background: var(--a); }
+.chave-b { background: var(--b); flex-direction: row-reverse; padding: 12px 12px 12px 22px; }
+.vertical .chave { top: 24px; width: 492px; height: 130px; }
+.vertical .chave-a { left: 36px; }
+.vertical .chave-b { right: 36px; }
+.horizontal .chave { top: 250px; width: 520px; height: 124px; }
+.horizontal .chave-a { left: 40px; }
+.horizontal .chave-b { right: 40px; }
+
+.presente-icone {
+  flex: none;
+  display: grid; place-items: center;
+  width: 98px; height: 98px;
+  border-radius: 20px;
+  background: var(--branco);
+  box-shadow: inset 0 -7px 0 rgba(0, 0, 0, .12);
+  font: 900 60px/1 var(--display);
+}
+.presente-icone img { width: 84px; height: 84px; display: block; }
+.chave-a .presente-icone { color: var(--a); }
+.chave-b .presente-icone { color: var(--b); }
+.chave-txt { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; font: 600 23px/1.15 var(--texto); }
+.chave-b .chave-txt { text-align: right; }
+.chave-txt b { display: block; font: 900 62px/0.92 var(--display); text-transform: uppercase; letter-spacing: .01em; }
+.chave-txt small { display: block; font: 800 22px/1 var(--texto); text-transform: uppercase; letter-spacing: .14em; opacity: .9; margin-bottom: 6px; }
+
+.linha-ajuda {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  white-space: nowrap;
+  font: 600 25px/46px var(--texto);
+  color: rgba(255, 255, 255, .88);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, .55);
+}
+.vertical .linha-ajuda { top: 52px; background: rgba(10, 21, 48, .72); padding: 0 22px; border-radius: 999px; }
+.horizontal .linha-ajuda { top: 1018px; }
+.linha-ajuda b { font-weight: 800; color: #fff; }
+.linha-ajuda b.forte { font: 900 34px/1 var(--display); letter-spacing: .04em; color: #FFD45A; }
+
+/* ───────── ataque na torre rival ───────── */
+
+.ataque { position: absolute; inset: 0; pointer-events: none; display: grid; place-items: center; z-index: 5; }
+/* Mesmo lugar da faixa de presente, logo abaixo dos rostos: mais alto
+   cobriria a cara de quem está na arte. */
+.vertical .ataque { align-items: start; padding-top: 990px; }
+.horizontal .ataque { align-items: start; padding-top: 520px; }
+.golpe {
+  display: flex; align-items: center; gap: 24px;
+  padding: 18px 40px 18px 22px;
+  background: var(--tinta);
+  border: 6px solid var(--cor-lado);
+  border-radius: 30px;
+  box-shadow: 0 0 0 6px #fff, 0 30px 80px rgba(0, 0, 0, .55);
+  max-width: 1000px;
+}
+.golpe-icone { font-size: 96px; line-height: 1; }
+.golpe-tipo { font: 900 34px/1 var(--display); letter-spacing: .1em; text-transform: uppercase; color: #FFD45A; }
+.golpe-txt { font: 600 36px/1.15 var(--texto); margin-top: 6px; max-width: 800px; }
+.golpe-txt b { font-weight: 900; }
+.golpe-txt em { font: 900 64px/0.9 var(--display); font-style: normal; color: #FFD45A; }
+.linha-ajuda.alerta {
+  background: var(--branco); color: var(--tinta); text-shadow: none;
+  padding: 0 24px; border-radius: 999px; font-weight: 700;
+  animation: bate 1s ease-in-out infinite;
+}
+.linha-ajuda.alerta b { color: var(--tinta); }
+.cmd { display: inline-block; min-width: 38px; padding: 0 9px; margin: 0 2px; border-radius: 9px; background: rgba(10, 21, 48, .7); color: #fff; font: 800 25px/36px var(--texto); text-align: center; }
+.linha-ajuda.alerta .cmd { background: var(--tinta); }
+
+/* ───────── falta, 2×, empate ───────── */
+
+.falta, .empate, .dobro {
+  position: absolute; left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  text-align: center;
+}
+.falta {
+  font: 700 34px/1 var(--texto);
+  background: var(--tinta);
+  padding: 13px 26px 15px;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .35);
+  transition: opacity .25s;
+}
+.falta b { font: 900 46px/0.8 var(--display); color: var(--cor-lado, #fff); letter-spacing: .01em; }
+.vertical .falta { top: 446px; }
+.horizontal .falta { top: 946px; font-size: 30px; }
+.falta.pisca { animation: pisca-falta 1.1s ease-in-out infinite; }
+.palco.com-dobro .falta { opacity: 0; }
+
+.dobro {
+  display: none;
+  background: #FFD45A; color: var(--tinta);
+  border: 5px solid var(--tinta);
+  border-radius: 22px;
+  padding: 10px 26px 14px;
+  box-shadow: 0 0 0 5px var(--cor-lado, #fff), 0 18px 40px rgba(0, 0, 0, .45);
+  overflow: hidden;
+}
+.palco.com-dobro .dobro { display: block; animation: bate .9s ease-in-out infinite; }
+.vertical .dobro { top: 430px; }
+.horizontal .dobro { top: 236px; }
+.dobro .grande { display: block; font: 900 50px/0.95 var(--display); text-transform: uppercase; letter-spacing: .01em; }
+.dobro .sub { display: block; font: 700 24px/1.2 var(--texto); margin-top: 2px; }
+.dobro i { position: absolute; left: 0; bottom: 0; height: 7px; background: var(--tinta); width: 100%; transform-origin: left; }
+
+.empate {
+  font: 800 32px/1 var(--texto);
+  color: var(--tinta);
+  background: var(--branco);
+  padding: 10px 22px;
+  border-radius: 999px;
+  opacity: 0;
+  transition: opacity .25s;
+}
+.vertical .empate { top: 530px; }
+.horizontal .empate { top: 880px; }
+.palco.cravado .empate { opacity: 1; animation: bate .8s ease-in-out infinite; }
+.palco.cravado.igual .empate, .palco.com-dobro .empate { opacity: 0; animation: none; }
+
+/* ───────── embaixo: maior presente e top 3 ───────── */
+
+.maior {
+  position: absolute; left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: rgba(10, 21, 48, .82);
+  border-radius: 999px;
+  padding: 6px 20px 6px 8px;
+  font: 600 25px/1 var(--texto);
+  display: flex; align-items: center; gap: 12px;
+  opacity: 0; transition: opacity .3s;
+}
+.maior.on { opacity: 1; }
+.maior .txt { max-width: 560px; overflow: hidden; text-overflow: ellipsis; }
+.maior b { font-weight: 800; }
+.maior .valor { font: 800 30px/1 var(--display); color: var(--cor-lado); }
+.maior .avatar { width: 36px; height: 36px; font-size: 16px; border-width: 2px; }
+.vertical .maior { top: 1668px; }
+.horizontal .maior { display: none; }
+
+.top { position: absolute; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.vertical .top { top: 1720px; width: 486px; }
+.vertical .top-a { left: 36px; }
+.vertical .top-b { right: 36px; }
+.horizontal .top { top: 410px; width: 520px; }
+.horizontal .top-a { left: 40px; }
+.horizontal .top-b { right: 40px; }
+.top li {
+  display: flex; align-items: center; gap: 12px;
+  height: 54px; padding: 0 18px 0 6px;
+  background: rgba(10, 21, 48, .62);
+  border-radius: 999px;
+  font: 700 25px/1 var(--texto);
+}
+.top-b li { flex-direction: row-reverse; padding: 0 6px 0 18px; }
+.top li .pos { font: 900 30px/1 var(--display); width: 22px; text-align: center; opacity: .7; }
+.top li .quem { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.top-b li .quem { text-align: right; }
+.top li .valor { font: 800 30px/1 var(--display); font-variant-numeric: tabular-nums; }
+.top li.primeiro { background: var(--branco); color: var(--tinta); }
+.top li.vazio { background: rgba(10, 21, 48, .35); color: rgba(255, 255, 255, .6); font-weight: 600; }
+.top li .avatar { width: 44px; height: 44px; font-size: 19px; }
+
+.avatar {
+  flex: none;
+  width: 50px; height: 50px; border-radius: 50%;
+  display: grid; place-items: center;
+  font: 800 22px/1 var(--texto); color: #fff;
+  background: var(--avatar-cor, var(--tinta-2)) center / cover no-repeat;
+  border: 3px solid rgba(255, 255, 255, .9);
+  overflow: hidden;
+}
+
+/* ───────── meta, créditos, sinal ───────── */
+
+.meta { position: absolute; transition: opacity .3s; display: flex; flex-direction: column; gap: 4px; text-align: center; font: 700 21px/1 var(--texto); text-shadow: 0 2px 6px rgba(0, 0, 0, .5); }
+.meta[hidden] { display: none; }
+.vertical .meta { top: 262px; left: 350px; right: 350px; }
+.horizontal .meta { top: 228px; left: 820px; right: 820px; }
+.palco.horizontal.com-dobro .meta { opacity: 0; }
+.palco.final .meta { opacity: 0; }
+.meta-barra { height: 12px; background: rgba(10, 21, 48, .6); border-radius: 99px; overflow: hidden; border: 2px solid rgba(255, 255, 255, .7); }
+.meta-barra i { display: block; height: 100%; width: 0; background: var(--branco); transition: width .6s ease; }
+.meta.batida .meta-barra i { background: repeating-linear-gradient(115deg, #fff 0 14px, #dfe6f5 14px 24px); }
+.meta-txt { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+.creditos { position: absolute; font: 500 14px/1.2 var(--texto); color: rgba(255, 255, 255, .6); white-space: nowrap; }
+.vertical .creditos { left: 50%; transform: translateX(-50%); bottom: 4px; }
+.horizontal .creditos { right: 14px; bottom: 6px; font-size: 13px; }
+.horizontal .sem-sinal { top: auto; bottom: 70px; left: 40px; transform: none; }
+
+.sem-sinal {
+  position: absolute; left: 50%; transform: translateX(-50%); top: 40px;
+  background: var(--branco); color: var(--tinta);
+  font: 700 22px/1.2 var(--texto); z-index: 1;
+  padding: 10px 16px; border-radius: 12px; white-space: nowrap;
+}
+
+/* ───────── presente chegando ───────── */
+
+.bolhas { position: absolute; inset: 0; pointer-events: none; }
+.bolha { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; will-change: transform; }
+.bolha .avatar { width: 92px; height: 92px; font-size: 38px; border-width: 5px; box-shadow: 0 10px 24px rgba(0, 0, 0, .4); }
+.bolha .mais { font: 900 68px/0.9 var(--display); text-shadow: 0 5px 0 rgba(0, 0, 0, .3); margin-bottom: 6px; }
+.bolha .quem { font: 700 28px/1 var(--texto); margin-top: 8px; background: var(--tinta); padding: 6px 12px; border-radius: 99px; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mais-torcida { position: absolute; font: 900 34px/1 var(--display); pointer-events: none; }
+
+.destaque { position: absolute; inset: 0; pointer-events: none; display: grid; place-items: center; }
+/* No vertical a faixa sobe pro placar: embaixo o chat do TikTok cobre. */
+.vertical .destaque { align-items: start; padding-top: 990px; }
+.horizontal .destaque { align-items: start; padding-top: 520px; }
+.faixa {
+  display: flex; align-items: center; gap: 30px;
+  padding: 22px 44px 22px 22px;
+  background: var(--cor-lado);
+  border: 6px solid var(--branco);
+  border-radius: 36px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .5);
+  max-width: 940px;
+}
+.faixa .avatar { width: 128px; height: 128px; font-size: 54px; border-width: 6px; }
+.faixa .quem { font: 800 46px/1 var(--texto); max-width: 600px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.faixa .oque { font: 600 28px/1.2 var(--texto); margin-top: 6px; }
+.faixa .valor { font: 900 108px/0.82 var(--display); margin-top: 10px; text-shadow: 0 6px 0 rgba(0, 0, 0, .25); }
+
+/* ───────── últimos 10 segundos ───────── */
+
+.contagem { position: absolute; inset: 0; pointer-events: none; display: grid; place-items: center; }
+.palco.final::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  box-shadow: inset 0 0 220px 60px rgba(0, 0, 0, .75);
+  animation: vinheta 1s ease-out infinite;
+}
+.contagem .n {
+  font: 900 640px/0.8 var(--display);
+  color: var(--branco);
+  -webkit-text-stroke: 14px var(--tinta);
+  paint-order: stroke fill;
+  text-shadow: 0 24px 0 rgba(10, 21, 48, .55);
+  font-variant-numeric: tabular-nums;
+}
+.vertical .contagem { align-items: start; padding-top: 900px; }
+.vertical .contagem .n { font-size: 440px; }
+.horizontal .contagem .n { font-size: 400px; }
+.horizontal .contagem { align-items: start; padding-top: 330px; }
+
+/* ───────── virada ───────── */
+
+.virada { position: absolute; inset: 0; pointer-events: none; overflow: hidden; display: none; }
+.virada.on { display: block; }
+.virada .flash { position: absolute; inset: 0; background: radial-gradient(circle at 50% 40%, #fff 0%, var(--cor-lado) 70%); }
+.virada .faixas { position: absolute; inset: -20%; display: flex; flex-direction: column; justify-content: center; gap: 30px; transform: rotate(-12deg); }
+.virada .faixas i { display: block; height: 120px; background: var(--cor-lado); box-shadow: 0 0 0 8px #fff; }
+.virada .palavra {
+  position: absolute; left: 0; right: 0; text-align: center;
+  font: 900 330px/0.8 var(--display);
+  font-style: italic;
+  text-transform: uppercase;
+  color: #fff;
+  -webkit-text-stroke: 10px var(--tinta);
+  paint-order: stroke fill;
+  text-shadow: 14px 16px 0 var(--tinta);
+}
+.vertical .virada .palavra { top: 990px; }
+.horizontal .virada .palavra { top: 300px; font-size: 300px; }
+.virada .sub {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  white-space: nowrap;
+  font: 800 52px/1 var(--texto);
+  background: var(--tinta); padding: 18px 34px; border-radius: 20px;
+}
+.vertical .virada .sub { top: 1290px; }
+.horizontal .virada .sub { top: 590px; }
+
+/* ───────── vitória ───────── */
+
+.vitoria { position: absolute; inset: 0; display: none; overflow: hidden; background: var(--cor-lado-escura); }
+.vitoria.on { display: block; }
+.vitoria .fundo { position: absolute; inset: 0; background: radial-gradient(120% 70% at 50% 35%, var(--cor-lado) 0%, var(--cor-lado-escura) 75%); }
+.vitoria .raios {
+  position: absolute; left: 50%; top: 40%; width: 2600px; height: 2600px; margin: -1300px 0 0 -1300px;
+  background: repeating-conic-gradient(rgba(255, 255, 255, .09) 0 7deg, transparent 7deg 18deg);
+  animation: gira 30s linear infinite;
+}
+.vitoria .foto-vit { position: absolute; left: 50%; transform: translateX(-50%); aspect-ratio: 3 / 4; filter: drop-shadow(0 40px 60px rgba(0, 0, 0, .5)); }
+.vertical .vitoria .foto-vit { top: 940px; height: 1060px; }
+.vertical .vitoria .foto-vit.dupla { height: 900px; top: 1060px; }
+.vertical .vitoria .foto-vit.dupla-0 { left: 27%; }
+.vertical .vitoria .foto-vit.dupla-1 { left: 73%; }
+.horizontal .vitoria .foto-vit.dupla { height: 620px; top: 460px; }
+.horizontal .vitoria .foto-vit.dupla-0 { left: 13%; }
+.horizontal .vitoria .foto-vit.dupla-1 { left: 34%; }
+.horizontal .vitoria .foto-vit { top: 170px; height: 910px; left: 30%; }
+.vitoria .titulo { position: absolute; left: 0; right: 0; text-align: center; }
+.vertical .vitoria .titulo { top: 150px; }
+.horizontal .vitoria .titulo { top: 120px; left: 46%; right: 40px; text-align: left; }
+.vitoria .rodada-vit { font: 700 40px/1 var(--texto); opacity: .85; }
+.vitoria .vence { font: 900 230px/0.82 var(--display); text-transform: uppercase; margin-top: 46px; text-shadow: 0 10px 0 rgba(0, 0, 0, .25); }
+.vitoria .vence-nome { display: block; white-space: nowrap; }
+.vitoria .vence small { display: block; font-size: .5em; letter-spacing: .02em; }
+.horizontal .vitoria .vence { font-size: 200px; }
+.vitoria .placar-vit { font: 800 64px/1 var(--display); margin-top: 18px; font-variant-numeric: tabular-nums; }
+.vitoria .placar-vit span { opacity: .7; }
+.vitoria .serie-vit { display: inline-block; margin-top: 18px; font: 700 30px/1 var(--texto); background: rgba(10, 21, 48, .55); padding: 10px 20px; border-radius: 99px; }
+.vitoria .mvp {
+  position: absolute;
+  display: flex; align-items: center; gap: 26px;
+  background: var(--branco); color: var(--tinta);
+  border-radius: 34px; padding: 22px 40px 22px 22px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, .45);
+}
+/* MVP e "próxima rodada" no alto: o terço de baixo fica sob o chat do TikTok. */
+.vertical .vitoria .mvp { left: 70px; right: 70px; top: 690px; }
+.horizontal .vitoria .mvp { left: 46%; width: 820px; top: 700px; }
+.vitoria .mvp .avatar { width: 140px; height: 140px; font-size: 56px; border-color: var(--cor-lado); border-width: 6px; }
+.vitoria .mvp .rotulo { font: 700 30px/1 var(--texto); color: var(--cor-lado); }
+.vitoria .mvp .quem { font: 800 56px/1.05 var(--texto); max-width: 620px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vitoria .mvp .valor { font: 800 40px/1 var(--display); margin-top: 6px; }
+.vitoria .proxima { position: absolute; left: 0; right: 0; text-align: center; font: 600 32px/1.3 var(--texto); }
+.vertical .vitoria .proxima { top: 895px; left: 60px; right: 60px; font-size: 30px; text-shadow: 0 2px 8px rgba(0, 0, 0, .6); z-index: 1; }
+.horizontal .vitoria .proxima { top: 960px; left: 46%; text-align: left; }
+
+/* ───────── pausa e painel ───────── */
+
+.pausa, .painel { z-index: 2; }
+.pausa {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  background: var(--tinta); border: 4px solid #fff; border-radius: 24px;
+  padding: 24px 48px; font: 800 64px/1 var(--display); text-transform: uppercase;
+}
+.pausa[hidden] { display: none; }
+
+.painel {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 960px; max-height: 92%; overflow: auto;
+  background: var(--papel); color: var(--tinta);
+  border-radius: 28px; padding: 40px 44px;
+  box-shadow: 0 40px 120px rgba(0, 0, 0, .6);
+  font: 500 26px/1.35 var(--texto);
+}
+.painel[hidden] { display: none; }
+.painel h2 { font: 900 64px/1 var(--display); margin-bottom: 6px; }
+.painel .sub { color: #4A5677; margin-bottom: 26px; }
+.painel fieldset { border: 0; border-top: 3px solid #D5DBE8; padding: 22px 0 6px; margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 22px; }
+.painel legend { font: 800 30px/1 var(--texto); padding-right: 14px; }
+.painel label { display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: 22px; }
+.painel label.cheia { grid-column: 1 / -1; }
+.painel label.linha { flex-direction: row; align-items: center; gap: 14px; }
+.painel input[type=text], .painel input[type=number] {
+  font: 500 26px/1.2 var(--texto); padding: 12px 14px;
+  border: 2px solid #B9C2D6; border-radius: 12px; background: #fff; color: var(--tinta);
+}
+.painel input[type=color] { width: 100%; height: 56px; border: 2px solid #B9C2D6; border-radius: 12px; background: #fff; padding: 4px; }
+.painel input[type=checkbox] { width: 30px; height: 30px; accent-color: var(--tinta); }
+.painel input:focus-visible, .painel button:focus-visible { outline: 4px solid #3D6BFF; outline-offset: 2px; }
+.painel .dica { grid-column: 1 / -1; font-size: 21px; color: #4A5677; }
+.painel .botoes { display: flex; gap: 16px; margin-top: 28px; flex-wrap: wrap; }
+.painel button { font: 800 26px/1 var(--texto); padding: 18px 28px; border-radius: 14px; border: 0; cursor: pointer; background: #DCE2EE; color: var(--tinta); }
+.painel button.principal { background: var(--tinta); color: #fff; }
+.painel .atalhos { margin-top: 26px; font-size: 21px; color: #4A5677; columns: 2; }
+.painel kbd { font: 800 20px/1 var(--texto); background: #fff; border: 2px solid #B9C2D6; border-bottom-width: 4px; border-radius: 8px; padding: 3px 8px; color: var(--tinta); }
+
+/* ───────── movimento ───────── */
+
+@keyframes bate { 0%, 100% { transform: translateX(var(--tx, 0)) scale(1); } 30% { transform: translateX(var(--tx, 0)) scale(1.08); } }
+.falta, .empate, .linha-ajuda, .dobro { --tx: -50%; }
+@keyframes pisca-falta { 50% { box-shadow: 0 0 0 8px var(--cor-lado, #fff), 0 12px 30px rgba(0, 0, 0, .35); } }
+@keyframes treme {
+  0% { translate: 0 0; } 25% { translate: 3px -2px; } 50% { translate: -3px 2px; } 75% { translate: 2px 3px; } 100% { translate: 0 0; }
+}
+@keyframes respira { 50% { scale: 1.045; } }
+.palco.parado .chave { animation: respira 2.4s ease-in-out infinite; }
+.palco.parado .chave-b { animation-delay: 1.2s; }
+@keyframes vinheta { 0% { opacity: 1; } 100% { opacity: .55; } }
+@keyframes gira { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .palco.parado .chave, .palco.final .tempo, .vitoria .raios, .palco.com-dobro .dobro { animation: none !important; }
+}
+
+/* ───────── nome de quem empilhou ───────── */
+
+.bolha-pouso {
+  position: absolute; left: 0; top: 0;
+  display: flex; align-items: center; gap: 10px;
+  padding: 5px 16px 5px 5px;
+  background: var(--tinta);
+  border: 3px solid var(--cor-lado);
+  border-radius: 999px;
+  font: 700 24px/1 var(--texto);
+  white-space: nowrap;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, .35);
+  will-change: transform;
+  transition: transform .25s ease-out;
+}
+.bolha-pouso .avatar { width: 40px; height: 40px; font-size: 17px; border-width: 2px; }
+.bolha-pouso .quem { max-width: 190px; overflow: hidden; text-overflow: ellipsis; }
+.bolha-pouso b { font: 900 30px/1 var(--display); color: #FFD45A; }
+
+/* ───────── arte grande de cada lado ───────── */
+
+/* Cada lado fica na sua metade. A arte é 3:4 com a cabeça no terço de cima:
+   o rosto cai entre 28% e 50% da altura, acima das torres e das faixas. */
+.arte { position: absolute; top: 0; bottom: 270px; width: 540px; overflow: hidden; pointer-events: none; }
+.arte-a { left: 0; }
+.arte-b { right: 0; }
+.horizontal .arte { bottom: 150px; width: 960px; }
+.arte-img { position: absolute; top: 520px; width: 750px; height: 1000px; object-fit: contain; }
+.arte-a .arte-img { left: -140px; filter: url(#contorno-a); }
+.arte-b .arte-img { right: -140px; filter: url(#contorno-b); }
+/* No horizontal o alto das bordas é do placar e do top 3: o rosto vem logo abaixo. */
+.horizontal .arte-img { top: 585px; width: 520px; height: 693px; }
+.horizontal .arte-a .arte-img { left: 40px; }
+.horizontal .arte-b .arte-img { right: 40px; }
+
+/* Sem arte, a foto vira adesivo: arco com borda branca grossa e fio na cor do lado. */
+.adesivo {
+  position: absolute; bottom: -24px;
+  width: 480px; height: 760px;
+  border: 16px solid var(--branco);
+  border-radius: 240px 240px 34px 34px;
+  overflow: hidden;
+}
+.adesivo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; }
+.arte-a .adesivo { left: 56px; transform: rotate(-4deg); background: var(--a-escura); box-shadow: 0 0 0 8px var(--a), 0 30px 60px rgba(6, 16, 42, .45); }
+.arte-b .adesivo { right: 56px; transform: rotate(4deg); background: var(--b-escura); box-shadow: 0 0 0 8px var(--b), 0 30px 60px rgba(6, 16, 42, .45); }
+.arte-a .adesivo img { filter: url(#duo-a); }
+.arte-b .adesivo img { filter: url(#duo-b); }
+.horizontal .adesivo { width: 320px; height: 430px; border-width: 12px; }
+.horizontal .arte-a .adesivo { left: 36px; }
+.horizontal .arte-b .adesivo { right: 36px; }
+
+/* Haste escura atrás da régua: os traços brancos somem no céu claro. */
+.regua-fundo {
+  position: absolute; left: 506px; width: 68px; top: 720px; bottom: 270px;
+  border-radius: 34px 34px 0 0;
+  background: linear-gradient(180deg, transparent, rgba(6, 16, 42, .45) 22%, rgba(6, 16, 42, .5));
+}
+.horizontal .regua-fundo { left: 926px; top: 330px; bottom: 150px; }
+
+/* ───────── legenda dos presentes nas bordas ───────── */
+
+.legenda {
+  position: absolute; top: 530px; width: 118px;
+  display: flex; flex-direction: column;
+  background: rgba(10, 21, 48, .86);
+  border: 4px solid var(--branco);
+  box-shadow: 0 16px 34px rgba(6, 16, 42, .4);
+}
+.legenda-a { left: 0; border-left: 0; border-radius: 0 26px 26px 0; box-shadow: inset 8px 0 0 var(--a), 0 16px 34px rgba(6, 16, 42, .4); }
+.legenda-b { right: 0; border-right: 0; border-radius: 26px 0 0 26px; box-shadow: inset -8px 0 0 var(--b), 0 16px 34px rgba(6, 16, 42, .4); }
+.horizontal .legenda { display: none; }
+.leg { display: flex; flex-direction: column; align-items: center; padding: 10px 4px 9px; text-align: center; }
+.leg + .leg { border-top: 2px solid rgba(255, 255, 255, .14); }
+.leg-ico {
+  display: grid; place-items: center;
+  width: 54px; height: 54px; border-radius: 50%;
+  background: var(--branco); color: var(--tinta);
+  font: 900 30px/1 var(--display);
+}
+.leg-ico img { width: 44px; height: 44px; }
+.leg b { font: 900 32px/1 var(--display); margin-top: 5px; font-variant-numeric: tabular-nums; }
+.leg small { font: 700 15px/1.1 var(--texto); opacity: .82; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tijolo {
+  display: grid; place-items: center;
+  width: 40px; height: 28px; border-radius: 6px;
+  font: 900 22px/1 var(--display); font-style: normal; color: #fff;
+  box-shadow: inset 0 -5px 0 rgba(0, 0, 0, .22);
+}
+.legenda-a .tijolo { background: var(--a); }
+.legenda-b .tijolo { background: var(--b); }
+
+/* ───────── modo seguro TikTok ───────── */
+
+/* Sem chaves "Presente X = lado": a legenda das bordas faz esse papel
+   também no horizontal. */
+.seguro .chave { display: none; }
+/* A instrução com "curtidas também empilham" é mais longa: menor, pra não
+   cobrir a torcida no vertical. */
+.seguro .so-presente { font-size: 27px; letter-spacing: .05em; padding: 7px 20px 6px; }
+.seguro.horizontal .legenda { display: flex; top: 250px; width: 108px; }
+.seguro.horizontal .leg { padding: 5px 4px 4px; }
+.seguro.horizontal .leg-ico { width: 36px; height: 36px; font-size: 20px; }
+.seguro.horizontal .leg-ico img { width: 30px; height: 30px; }
+.seguro.horizontal .tijolo { width: 32px; height: 22px; font-size: 18px; }
+.seguro.horizontal .leg b { font-size: 24px; margin-top: 2px; }
+.seguro.horizontal .leg small { font-size: 13px; }
+/* O top 3 sai de baixo da legenda. */
+.seguro.horizontal .top { width: 420px; }
+.seguro.horizontal .top-a { left: 130px; }
+.seguro.horizontal .top-b { right: 130px; }

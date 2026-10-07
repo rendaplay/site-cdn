@@ -1,0 +1,593 @@
+@font-face {
+  font-family: "Big Shoulders Display";
+  src: url("fontes/BigShouldersDisplay.ttf") format("truetype");
+  font-weight: 100 900;
+}
+@font-face {
+  font-family: "Lexend";
+  src: url("fontes/Lexend-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+}
+
+:root {
+  --ajuda: #17F864;
+  --derruba: #FF5A36;
+  --ouro: #FFC81E;
+  --placa: rgba(9, 11, 34, 0.78);
+  --placa-borda: rgba(255, 255, 255, 0.09);
+  --texto: #F7F4EE;
+  --apagado: #B8BCD6;
+  --numero: "Big Shoulders Display", "Arial Narrow", sans-serif;
+  --fonte: "Lexend", "Segoe UI", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; background: #05060F; overflow: hidden; }
+body { font-family: var(--fonte); color: var(--texto); }
+
+.palco {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  overflow: hidden;
+  background: #2C2D78;
+}
+.palco.vertical { width: 1080px; height: 1920px; }
+.palco.horizontal { width: 1920px; height: 1080px; }
+
+#cena { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.85);
+}
+
+/* ───────── placar de moedas ───────── */
+
+.placar {
+  position: absolute;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 18px;
+  padding: 14px 22px;
+  background: var(--placa);
+  border: 1px solid var(--placa-borda);
+  border-radius: 22px;
+}
+.placar .lado { display: flex; flex-direction: column; line-height: 1; }
+.placar .l1 { align-items: flex-end; }
+.placar .nome {
+  font: 800 26px var(--numero);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.placar .l0 .nome { color: var(--ajuda); }
+.placar .l1 .nome { color: var(--derruba); }
+.placar .moedas {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font: 800 44px var(--numero);
+  color: var(--ouro);
+}
+.placar .moedas::before {
+  content: "";
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #FFE38A, #E0A100 70%);
+  box-shadow: inset 0 0 0 3px #C78E00;
+}
+.placar .l1 .moedas { flex-direction: row-reverse; }
+.placar .barra {
+  position: relative;
+  display: flex;
+  height: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #222;
+}
+.placar .barra i { display: block; height: 100%; transition: width 0.4s ease; }
+.placar .b0 { background: var(--ajuda); }
+.placar .b1 { background: var(--derruba); }
+.placar .divisa {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 6px;
+  margin-left: -3px;
+  background: #fff;
+  border-radius: 3px;
+  transition: left 0.4s ease;
+}
+
+/* ───────── altura ───────── */
+
+.altura {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--numero);
+  font-weight: 900;
+  line-height: 0.9;
+  color: #fff;
+  text-shadow: 0 5px 0 rgba(20, 10, 40, 0.35), 0 0 40px rgba(10, 5, 30, 0.45);
+}
+.altura .un { font-size: 0.42em; margin-left: 10px; opacity: 0.9; }
+.sub {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  font-size: 26px;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(10, 5, 30, 0.7);
+}
+.sub b { font-weight: 700; }
+.sub .atolado { padding: 2px 12px; border-radius: 999px; background: var(--derruba); color: #fff; font-weight: 700; text-shadow: none; }
+
+/* ───────── evento-surpresa ───────── */
+
+.surpresa {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 16px;
+  padding: 10px 22px 16px;
+  min-width: 520px;
+  border-radius: 18px;
+  background: #13163A;
+  border: 2px solid var(--ouro);
+  overflow: hidden;
+}
+.surpresa[data-tipo="ventania"] { border-color: #9FD3FF; }
+.surpresa[data-tipo="chuva"] { border-color: var(--ajuda); }
+.surpresa .titulo { font: 900 36px var(--numero); text-transform: uppercase; letter-spacing: 0.03em; }
+.surpresa .linha { grid-column: 1; font-size: 20px; color: var(--apagado); }
+.surpresa .linha b { color: #fff; }
+.surpresa .resta { grid-row: 1 / span 2; grid-column: 2; align-self: center; font: 900 54px var(--numero); }
+.surpresa i {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 6px;
+  background: var(--ouro);
+}
+.surpresa[data-tipo="ventania"] i { background: #9FD3FF; }
+.surpresa[data-tipo="chuva"] i { background: var(--ajuda); }
+
+/* ───────── colunas dos times ───────── */
+
+.coluna {
+  position: absolute;
+  padding: 18px 18px 14px;
+  background: var(--placa);
+  border: 1px solid var(--placa-borda);
+  border-top: 6px solid var(--time);
+  border-radius: 22px;
+}
+.coluna .cab h2 {
+  margin: 0;
+  font: 900 60px/0.95 var(--numero);
+  text-transform: uppercase;
+  color: var(--time);
+}
+.coluna .comando {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin: 10px 0 0;
+  font-size: 20px;
+}
+.coluna .comando b {
+  display: inline-grid;
+  place-items: center;
+  min-width: 52px;
+  height: 52px;
+  padding: 0 10px;
+  border-radius: 12px;
+  font: 900 44px var(--numero);
+  color: #0A0C1E;
+  background: var(--time);
+}
+.coluna .comando span { flex-basis: 100%; color: var(--apagado); font-size: 18px; }
+.coluna .torcida { margin: 6px 0 0; font-size: 16px; color: var(--apagado); }
+
+.coluna .cardapio {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--placa-borda);
+}
+.coluna .cardapio li {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  border-bottom: 1px solid var(--placa-borda);
+}
+.coluna .cardapio canvas { width: 46px; height: 46px; }
+.coluna .cardapio .efeito { font-size: 21px; font-weight: 600; white-space: nowrap; }
+.coluna .cardapio .preco { font: 800 26px var(--numero); color: var(--ouro); }
+
+.coluna h3 {
+  margin: 14px 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--apagado);
+}
+.coluna .top { list-style: none; margin: 0; padding: 0; }
+.coluna .top li {
+  display: grid;
+  grid-template-columns: 22px 40px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+}
+.coluna .top .pos { font: 900 26px var(--numero); color: var(--time); }
+.coluna .top .avatar { width: 40px; height: 40px; font-size: 18px; box-shadow: 0 0 0 2px var(--time); }
+.coluna .top .nome { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 19px; font-weight: 600; }
+.coluna .top .moedas { font: 800 26px var(--numero); color: var(--ouro); }
+.coluna .top .vazio { display: block; height: auto; padding: 10px 0; font-size: 17px; color: var(--apagado); }
+
+/* ───────── anúncios ───────── */
+
+.anuncios { position: absolute; left: 50%; width: 0; height: 0; }
+.anuncio {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: max-content;
+  max-width: 640px;
+  padding: 18px 30px 18px 18px;
+  border-radius: 24px;
+  background: #0E1030;
+  border: 3px solid var(--time);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  transform-origin: 50% 50%;
+  opacity: 0;
+}
+.anuncio .avatar { width: 96px; height: 96px; font-size: 44px; box-shadow: 0 0 0 4px var(--time); }
+.anuncio .txt { display: flex; flex-direction: column; min-width: 0; }
+.anuncio .quem { font-size: 24px; font-weight: 600; color: var(--apagado); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.anuncio .titulo { font: 900 60px/1 var(--numero); text-transform: uppercase; color: var(--time); white-space: nowrap; }
+.anuncio .linha { margin-top: 4px; font-size: 24px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.anuncio.salvou .linha, .anuncio.queda .linha { font: 900 46px/1.05 var(--numero); color: #fff; }
+.anuncio.gigante, .anuncio.areia, .anuncio.recorde, .anuncio.surpresa {
+  max-width: 900px;
+  padding: 26px 40px 26px 26px;
+  background: var(--time);
+  border-color: #fff;
+}
+.anuncio.gigante .titulo, .anuncio.areia .titulo, .anuncio.recorde .titulo, .anuncio.surpresa .titulo { font-size: 84px; color: #0A0C1E; }
+.anuncio.gigante .quem, .anuncio.gigante .linha,
+.anuncio.areia .linha, .anuncio.recorde .linha, .anuncio.surpresa .linha { color: #0A0C1E; }
+.anuncio.areia.t1 .titulo, .anuncio.areia.t1 .linha, .anuncio.gigante.t1 .titulo, .anuncio.gigante.t1 .quem,
+.anuncio.gigante.t1 .linha, .anuncio.surpresa.t1 .titulo, .anuncio.surpresa.t1 .linha { color: #fff; }
+.anuncio.gigante .avatar, .anuncio.areia .avatar { width: 130px; height: 130px; box-shadow: 0 0 0 5px #fff; }
+.anuncio.surpresa { flex-direction: column; align-items: center; text-align: center; border-color: var(--ouro); }
+.anuncio.surpresa.t0 { background: var(--ouro); }
+.anuncio.surpresa .txt { align-items: center; }
+.anuncio.surpresa .linha { white-space: normal; max-width: 560px; }
+.anuncio.recorde { background: #fff; border-color: var(--ajuda); }
+.anuncio.gloria {
+  max-width: 900px;
+  padding: 24px 40px 24px 24px;
+  background: #1A0A0A;
+  border: 4px solid var(--derruba);
+  box-shadow: 0 0 0 6px rgba(255, 90, 54, 0.25), 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+.anuncio.gloria .titulo { font-size: 76px; color: var(--derruba); }
+.anuncio.gloria .linha { font: 900 40px/1.05 var(--numero); color: #fff; }
+.anuncio.gloria .avatar { width: 120px; height: 120px; box-shadow: 0 0 0 5px var(--derruba); }
+.anuncio.lendario { border-width: 5px; border-color: var(--ouro); box-shadow: 0 0 0 8px rgba(255, 200, 30, 0.35), 0 0 80px rgba(255, 200, 30, 0.55); }
+.anuncio.lendario .titulo { font-size: 92px; }
+
+/* ───────── voos e avisos ───────── */
+
+.voos { position: absolute; inset: 0; pointer-events: none; }
+.voo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 16px 5px 5px;
+  border-radius: 999px;
+  background: rgba(9, 11, 34, 0.88);
+  border: 2px solid var(--time);
+  opacity: 0;
+  white-space: nowrap;
+}
+.voo .avatar { width: 46px; height: 46px; font-size: 20px; box-shadow: none; }
+.voo .valor { font: 900 34px var(--numero); color: var(--time); }
+.voo.pequeno { padding: 3px 12px 3px 3px; }
+.voo.pequeno .avatar { width: 32px; height: 32px; font-size: 15px; }
+.voo.pequeno .valor { font-size: 24px; }
+
+.avisos {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 620px;
+}
+.aviso {
+  max-width: 100%;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(9, 11, 34, 0.85);
+  border-left: 6px solid var(--time);
+  font-size: 21px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Recado pro streamer, não pra plateia: pequeno, no canto onde o TikTok
+   põe os botões, e só depois de uns segundos sem conector. */
+.sem-sinal {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+}
+.sem-sinal::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #FF5A36;
+}
+
+/* ───────── presente esperando time ───────── */
+
+/* Uma linha só, no lugar da linha do recorde: não briga com o evento-surpresa
+   nem com as colunas. */
+.pendentes {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.pendente {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 54px;
+  padding: 0 16px 0 6px;
+  border-radius: 999px;
+  background: #13163A;
+  border: 2px solid var(--ouro);
+  overflow: hidden;
+  white-space: nowrap;
+}
+.pendente.grande { box-shadow: 0 0 0 5px rgba(255, 200, 30, 0.3), 0 0 30px rgba(255, 200, 30, 0.45); }
+.pendente .avatar { width: 42px; height: 42px; font-size: 19px; box-shadow: 0 0 0 2px var(--ouro); }
+.pendente .nome { max-width: 230px; font-size: 22px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; }
+.pendente .moedas { display: flex; align-items: center; gap: 6px; font: 800 30px var(--numero); color: var(--ouro); }
+.pendente .moedas::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #FFE38A, #E0A100 70%);
+}
+.pendente .linha { font-size: 22px; font-weight: 600; }
+.pendente .linha i {
+  display: inline-grid;
+  place-items: center;
+  min-width: 36px;
+  height: 36px;
+  margin: 0 2px;
+  padding: 0 6px;
+  border-radius: 9px;
+  font: 900 30px var(--numero);
+  font-style: normal;
+  color: #0A0C1E;
+  vertical-align: middle;
+}
+.pendente .linha .c0 { background: var(--ajuda); }
+.pendente .linha .c1 { background: var(--derruba); }
+.pendente .resta { min-width: 40px; text-align: right; font: 900 32px var(--numero); color: var(--ouro); }
+.pendente .barra { position: absolute; left: 0; bottom: 0; height: 5px; background: var(--ouro); }
+
+.coluna .maior-queda {
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--placa-borda);
+  font-size: 17px;
+  color: var(--apagado);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.coluna .maior-queda b { font: 800 24px var(--numero); color: var(--derruba); }
+
+/* ───────── painéis laterais (só horizontal) ───────── */
+
+.painel-lado {
+  position: absolute;
+  display: none;
+  padding: 16px 20px;
+  background: var(--placa);
+  border: 1px solid var(--placa-borda);
+  border-radius: 22px;
+}
+.painel-lado h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--apagado);
+}
+.recordes .rec {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  padding: 7px 0;
+  border-top: 1px solid var(--placa-borda);
+}
+.recordes .rotulo { font-size: 18px; }
+.recordes b { font: 800 36px var(--numero); }
+.recordes .r-live b { color: var(--ajuda); }
+.recordes .r-queda b { color: var(--derruba); }
+.recordes .quem { grid-column: 1 / -1; font-size: 16px; color: var(--apagado); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ultimos ol { list-style: none; margin: 0; padding: 0; }
+.ultimos li {
+  display: grid;
+  grid-template-columns: 36px 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+  border-top: 1px solid var(--placa-borda);
+}
+.ultimos .avatar { width: 34px; height: 34px; font-size: 15px; box-shadow: 0 0 0 2px var(--time); }
+.ultimos .nome { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 17px; font-weight: 600; }
+.ultimos .efeito { font-size: 16px; color: var(--time); white-space: nowrap; }
+.ultimos .moedas { font: 800 24px var(--numero); color: var(--ouro); min-width: 54px; text-align: right; }
+.pausa {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(5, 6, 15, 0.55);
+  font: 900 120px var(--numero);
+  text-transform: uppercase;
+}
+
+/* ───────── vertical (1080×1920) ─────────
+   O TikTok cobre o topo (~110 px), os comentários embaixo à esquerda
+   (~1250 em diante) e os botões embaixo à direita: tudo que importa
+   fica entre 118 e ~1180. */
+
+.vertical .placar { top: 118px; left: 60px; right: 60px; }
+.vertical .altura { top: 232px; font-size: 168px; }
+.vertical .sub { top: 392px; }
+.vertical .surpresa { top: 438px; }
+.vertical .coluna { top: 540px; width: 300px; }
+.vertical .c0 { left: 22px; }
+.vertical .c1 { right: 22px; }
+.vertical .anuncios { top: 528px; }
+.vertical .avisos { top: 1122px; width: 420px; }
+.vertical .pendentes { top: 384px; }
+.vertical .pendente + .pendente { display: none; }
+.com-pendente .sub { visibility: hidden; }
+.vertical.com-pendente .surpresa { top: 450px; }
+.vertical .aviso { font-size: 19px; }
+
+/* ───────── horizontal (1920×1080) ───────── */
+
+.horizontal .placar { top: 24px; left: 540px; right: 540px; }
+.horizontal .altura { top: 128px; font-size: 130px; }
+.horizontal .sub { top: 252px; font-size: 22px; }
+.horizontal .surpresa { top: 292px; }
+.horizontal .coluna { top: 30px; width: 400px; }
+.horizontal .c0 { left: 30px; }
+.horizontal .c1 { right: 30px; }
+.horizontal .anuncios { top: 846px; }
+.horizontal .avisos { top: 990px; }
+.horizontal .pendentes { top: 244px; }
+.horizontal .pendente + .pendente { display: none; }
+.horizontal.com-pendente .surpresa { top: 306px; }
+.horizontal .painel-lado { display: block; width: 400px; bottom: 30px; }
+.horizontal .recordes { left: 30px; }
+.horizontal .ultimos { right: 30px; }
+.horizontal .coluna .maior-queda { display: none; }
+.horizontal .sem-sinal { right: auto; left: 50%; bottom: 8px; transform: translateX(-50%); }
+
+/* ───────── painel (tecla P) ───────── */
+
+.painel {
+  position: absolute;
+  inset: 40px;
+  overflow: auto;
+  padding: 32px 36px;
+  border-radius: 24px;
+  background: #0C0E26;
+  border: 1px solid var(--placa-borda);
+  font-size: 20px;
+  z-index: 10;
+}
+.painel h2 { margin: 0 0 4px; font: 900 54px var(--numero); text-transform: uppercase; }
+.painel .sub-painel { margin: 0 0 18px; color: var(--apagado); }
+.painel fieldset {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px 18px;
+  margin: 0 0 18px;
+  padding: 16px 18px 18px;
+  border: 1px solid var(--placa-borda);
+  border-radius: 16px;
+}
+.painel legend { padding: 0 8px; font-weight: 700; color: var(--ajuda); }
+.painel label { display: flex; flex-direction: column; gap: 6px; font-size: 16px; color: var(--apagado); }
+.painel label.cheia { grid-column: 1 / -1; }
+.painel label.linha { flex-direction: row; align-items: center; gap: 10px; color: var(--texto); }
+.painel input[type="text"], .painel input[type="number"] {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #2A2E5A;
+  background: #14173A;
+  color: var(--texto);
+  font: inherit;
+  font-size: 18px;
+}
+.painel input[type="color"] { width: 100%; height: 44px; border: 0; background: none; }
+.painel .botoes { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0 18px; }
+.painel button {
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: 1px solid #2A2E5A;
+  background: #14173A;
+  color: var(--texto);
+  font: 600 18px var(--fonte);
+  cursor: pointer;
+}
+.painel button.principal { background: var(--ajuda); color: #031610; border: 0; box-shadow: 0 5px 0 #01AC50; }
+.painel .atalhos { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; color: var(--apagado); font-size: 17px; }
+.painel kbd { padding: 2px 8px; border-radius: 6px; background: #22264F; color: #fff; font-family: var(--fonte); }
+
+/* ───────── modo seguro TikTok ───────── */
+.seguro .placar .moedas,
+.seguro .pendente .moedas::before { display: none; }

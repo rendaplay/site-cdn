@@ -1,0 +1,59 @@
+/* Configuração = preset (preset.js) + o que o painel salvou neste PC +
+   o que veio na URL, nessa ordem. ?ws= e ?demo= quem lê é o comum/live.js. */
+"use strict";
+
+const Config = {
+  PREFIXO: "rendaplay.racha.",
+
+  carregar() {
+    const url = new URLSearchParams(location.search);
+    const presets = window.RACHA_PRESETS;
+    const chave = presets[url.get("preset")] ? url.get("preset") : window.RACHA_PRESET_PADRAO;
+    const salvo = this.lerSalvo(chave);
+    /* Ajuste salvo antes do volume existir: o som vinha desligado de
+       fábrica, não foi escolha do streamer. */
+    if (!("volume" in salvo)) delete salvo.som;
+    const config = mesclar(clonar(presets[chave]), salvo);
+    if (url.has("som")) config.som = url.get("som") !== "0";
+
+    const formato = url.get("formato");
+    return {
+      chave,
+      config,
+      opcoes: {
+        formato: formato === "horizontal" || formato === "vertical" ? formato : null,
+        semente: url.has("semente") ? Number(url.get("semente")) : null,
+      },
+    };
+  },
+
+  lerSalvo(chave) {
+    try { return JSON.parse(localStorage.getItem(this.PREFIXO + chave) || "null") || {}; }
+    catch (e) { return {}; }
+  },
+
+  salvar(chave, config) {
+    try { localStorage.setItem(this.PREFIXO + chave, JSON.stringify(config)); return true; }
+    catch (e) { return false; }
+  },
+
+  restaurar(chave) {
+    try { localStorage.removeItem(this.PREFIXO + chave); } catch (e) { /* sem storage: nada salvo */ }
+  },
+};
+
+function clonar(x) { return JSON.parse(JSON.stringify(x)); }
+
+/* Objetos mesclam por chave; listas de objeto por posição (as faixas);
+   valor simples ou lista de texto troca inteiro. */
+function mesclar(base, extra) {
+  if (Array.isArray(base) && Array.isArray(extra) && base.every(x => x && typeof x === "object")) {
+    return base.map((b, i) => (i in extra ? mesclar(b, extra[i]) : b));
+  }
+  if (base && extra && typeof base === "object" && typeof extra === "object" && !Array.isArray(base)) {
+    const saida = { ...base };
+    for (const k of Object.keys(extra)) saida[k] = k in base ? mesclar(base[k], extra[k]) : extra[k];
+    return saida;
+  }
+  return extra === undefined ? base : extra;
+}

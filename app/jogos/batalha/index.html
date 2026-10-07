@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Batalha de Torres · Renda Play</title>
+<link rel="stylesheet" href="batalha.css">
+</head>
+<body>
+<div id="palco" class="palco vertical" aria-live="polite">
+
+  <div class="cenario" aria-hidden="true"></div>
+  <svg class="filtros" aria-hidden="true" width="0" height="0"></svg>
+  <div class="campo campo-a" aria-hidden="true"><div class="retina"></div></div>
+  <div class="campo campo-b" aria-hidden="true"><div class="retina"></div></div>
+  <div class="arte arte-a" aria-hidden="true"></div>
+  <div class="arte arte-b" aria-hidden="true"></div>
+  <div class="regua-fundo" aria-hidden="true"></div>
+  <canvas id="torres" aria-hidden="true"></canvas>
+
+  <header class="placar-topo">
+    <div class="serie serie-a"></div>
+    <div class="relogio"><span class="tempo">3:00</span><span class="rodada"></span></div>
+    <div class="serie serie-b"></div>
+  </header>
+
+  <section class="lado lado-a" data-lado="0">
+    <h2 class="nome"></h2>
+    <div class="altura"><span class="altura-num">0</span><span class="altura-m">m</span></div>
+    <div class="info"><span class="torcida"></span><span class="seq"></span></div>
+  </section>
+  <section class="lado lado-b" data-lado="1">
+    <h2 class="nome"></h2>
+    <div class="altura"><span class="altura-num">0</span><span class="altura-m">m</span></div>
+    <div class="info"><span class="torcida"></span><span class="seq"></span></div>
+  </section>
+
+  <div class="meta"><div class="meta-barra"><i></i></div><span class="meta-txt"></span></div>
+
+  <div class="instrucao">
+    <div class="so-presente">Comente 1 ou 2 pra empilhar</div>
+    <div class="chave chave-a"><span class="presente-icone"></span><span class="chave-txt"></span></div>
+    <div class="chave chave-b"><span class="presente-icone"></span><span class="chave-txt"></span></div>
+    <p class="linha-ajuda"></p>
+  </div>
+
+  <aside class="legenda legenda-a" aria-label="O que cada presente faz"></aside>
+  <aside class="legenda legenda-b" aria-label="O que cada presente faz"></aside>
+
+  <div class="falta"></div>
+  <div class="dobro"></div>
+  <div class="empate">Empate técnico</div>
+
+  <div class="maior"></div>
+  <ol class="top top-a"></ol>
+  <ol class="top top-b"></ol>
+  <div class="creditos"></div>
+  <div class="sem-sinal" hidden></div>
+
+  <div class="bolhas"></div>
+  <div class="destaque"></div>
+  <div class="ataque"></div>
+  <div class="contagem"></div>
+  <div class="virada"></div>
+  <div class="vitoria"></div>
+  <div class="pausa" hidden>Pausado</div>
+  <form class="painel" hidden></form>
+</div>
+
+<script src="preset.js"></script>
+<script src="presets/meninos.js"></script>
+<script src="presets/flamengo-corinthians.js"></script>
+<script src="presets/cachorro-gato.js"></script>
+<script src="presets/ninja-guerreiro.js"></script>
+<script src="config.js"></script>
+<script src="regras.js"></script>
+<script src="../comum/live.js"></script>
+<script src="fonte.js"></script>
+<script src="som.js"></script>
+<script src="torres.js"></script>
+<script src="cenario.js"></script>
+<script src="tela.js"></script>
+<script src="painel.js"></script>
+<script src="jogo.js"></script>
+</body>
+</html>

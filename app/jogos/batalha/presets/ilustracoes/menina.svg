@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600">
+  <defs>
+    <linearGradient id="camisa" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F6DCE8"/>
+    </linearGradient>
+    <radialGradient id="rosto" cx=".42" cy=".38" r=".7">
+      <stop offset="0" stop-color="#A86A45"/>
+      <stop offset="1" stop-color="#8A5334"/>
+    </radialGradient>
+    <radialGradient id="cabelo" cx=".4" cy=".35" r=".7">
+      <stop offset="0" stop-color="#4A2C1C"/>
+      <stop offset="1" stop-color="#22130B"/>
+    </radialGradient>
+  </defs>
+  <g fill="url(#cabelo)">
+    <circle cx="300" cy="420" r="150"/><circle cx="240" cy="360" r="70"/><circle cx="380" cy="300" r="74"/><circle cx="210" cy="470" r="64"/><circle cx="340" cy="540" r="62"/>
+    <circle cx="900" cy="420" r="150"/><circle cx="960" cy="360" r="70"/><circle cx="820" cy="300" r="74"/><circle cx="990" cy="470" r="64"/><circle cx="860" cy="540" r="62"/>
+  </g>
+  <path d="M40 1600C60 1350 230 1215 470 1185h260c240 30 410 165 430 415z" fill="url(#camisa)"/>
+  <path d="M80 1600c30-160 120-260 230-320l40 320zM1120 1600c-30-160-120-260-230-320l-40 320z" fill="#F7B3D2"/>
+  <path d="M440 1190c60 90 260 90 320 0l40 26c-70 120-330 120-400 0z" fill="#F0559A"/>
+  <path d="M600 1330c-30-40-100-20-90 36 8 42 90 92 90 92s82-50 90-92c10-56-60-76-90-36z" fill="#F0559A"/>
+  <path d="M528 1000h144v175c-28 40-116 40-144 0z" fill="#7A4629"/>
+  <ellipse cx="342" cy="760" rx="50" ry="70" fill="#8A5334"/>
+  <ellipse cx="858" cy="760" rx="50" ry="70" fill="#8A5334"/>
+  <circle cx="338" cy="852" r="26" fill="none" stroke="#FFC83D" stroke-width="10"/>
+  <circle cx="862" cy="852" r="26" fill="none" stroke="#FFC83D" stroke-width="10"/>
+  <path d="M600 420c165 0 268 118 268 322 0 196-118 324-268 324S332 938 332 742c0-204 103-322 268-322z" fill="url(#rosto)"/>
+  <path d="M790 480c60 62 78 160 78 262 0 196-118 324-268 324-58 0-106-18-144-50 196 18 320-118 320-322 0-88-6-150 14-214z" fill="#000" opacity=".08"/>
+  <path d="M332 700c-10-200 100-300 268-300s278 100 268 300c-40-110-130-180-268-190-138 10-228 80-268 190z" fill="url(#cabelo)"/>
+  <path d="M600 410c-10 60-6 90 0 104" stroke="#140A05" stroke-width="10" stroke-linecap="round"/>
+  <g fill="#FF5FA2">
+    <path d="M410 470l-110-70v140z"/><path d="M410 470l110-70v140z"/>
+    <path d="M790 470l-110-70v140z"/><path d="M790 470l110-70v140z"/>
+  </g>
+  <circle cx="410" cy="470" r="30" fill="#E23E86"/>
+  <circle cx="790" cy="470" r="30" fill="#E23E86"/>
+  <path d="M446 678q56-30 112-6" stroke="#22130B" stroke-width="16" stroke-linecap="round" fill="none"/>
+  <path d="M642 672q56-24 112 6" stroke="#22130B" stroke-width="16" stroke-linecap="round" fill="none"/>
+  <ellipse cx="502" cy="760" rx="50" ry="60" fill="#FFFFFF"/>
+  <ellipse cx="698" cy="760" rx="50" ry="60" fill="#FFFFFF"/>
+  <circle cx="510" cy="770" r="34" fill="#4A2A16"/>
+  <circle cx="690" cy="770" r="34" fill="#4A2A16"/>
+  <circle cx="512" cy="772" r="17" fill="#120A06"/>
+  <circle cx="692" cy="772" r="17" fill="#120A06"/>
+  <circle cx="525" cy="755" r="12" fill="#FFFFFF"/>
+  <circle cx="705" cy="755" r="12" fill="#FFFFFF"/>
+  <g stroke="#22130B" stroke-width="10" stroke-linecap="round">
+    <path d="M456 718l-22-20M478 706l-12-26M502 702v-26"/>
+    <path d="M744 718l22-20M722 706l12-26M698 702v-26"/>
+  </g>
+  <path d="M588 820q20 32-2 50" stroke="#6E3E22" stroke-width="13" stroke-linecap="round" fill="none"/>
+  <ellipse cx="432" cy="882" rx="54" ry="30" fill="#FF7FB0" opacity=".35"/>
+  <ellipse cx="768" cy="882" rx="54" ry="30" fill="#FF7FB0" opacity=".35"/>
+  <path d="M500 900q100 116 200 0q-100 32-200 0z" fill="#6A1520"/>
+  <path d="M516 905q84 21 168 0v17q-84 21-168 0z" fill="#FFFFFF"/>
+  <path d="M562 978q38-28 76 0q-38 16-76 0z" fill="#E8585E"/>
+</svg>

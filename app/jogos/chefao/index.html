@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chefão Coletivo · Renda Play</title>
+<link rel="stylesheet" href="chefao.css">
+</head>
+<body>
+<div id="palco" class="palco" aria-live="polite">
+  <canvas id="arena" aria-hidden="true"></canvas>
+
+  <header class="topo">
+    <div class="caixa moedas">
+      <div class="rotulo"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4"/></svg>Moedas na live</div>
+      <div class="num">0</div>
+      <div class="sub"></div>
+    </div>
+    <div class="marca"><span class="titulo-jogo"></span><span class="rodada"></span></div>
+    <div class="caixa derrotados">
+      <div class="rotulo">Chefões derrotados</div>
+      <div class="num">0</div>
+      <div class="sub"></div>
+    </div>
+  </header>
+
+  <section class="vida">
+    <div class="linha-nome"><h1 class="nome-chefe"></h1><div class="chips"></div></div>
+    <div class="barra"><i class="rastro"></i><i class="cheio"></i><i class="escudo"></i><span class="marca m50"></span><span class="marca m25"></span></div>
+    <div class="numeros"><span class="vida-num"></span><span class="pct"></span></div>
+  </section>
+
+  <div class="estado"></div>
+  <div class="fala"></div>
+  <div class="anuncio"></div>
+  <div class="faltam"></div>
+  <div class="aviso"></div>
+
+  <section class="cardapio"><div class="chamada"></div><ol></ol></section>
+  <section class="ranking"><h3>Dano no chefão</h3><ol></ol></section>
+
+  <div class="final"></div>
+  <div class="sem-sinal" hidden></div>
+  <div class="pausa" hidden>Pausado</div>
+  <form class="painel" hidden></form>
+</div>
+
+<script src="../comum/live.js"></script>
+<script src="preset.js"></script>
+<script src="config.js"></script>
+<script src="regras.js"></script>
+<script src="arte.js"></script>
+<script src="cena.js"></script>
+<script src="hud.js"></script>
+<script src="som.js"></script>
+<script src="painel.js"></script>
+<script src="jogo.js"></script>
+</body>
+</html>
