@@ -57,6 +57,13 @@ const reduzir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 // O navegador só toca sozinho o vídeo mudo; o som liga no toque, um vídeo por vez.
 const somIcone = (ligado) => `<svg class="ico" aria-hidden="true"><use href="#i-som-${ligado ? 'on' : 'off'}"/></svg>`;
 
+function alternarSom(video) {
+  const ligar = video.muted;
+  for (const outro of $$('video')) if (outro !== video && !outro.muted) outro.muted = true;
+  video.muted = !ligar;
+  if (ligar) video.play().catch(() => {});
+}
+
 function botaoDeSom(video) {
   const botao = document.createElement('button');
   botao.type = 'button';
@@ -65,15 +72,17 @@ function botaoDeSom(video) {
     botao.innerHTML = somIcone(!video.muted) + `<span>${video.muted ? 'Ativar som' : 'Som ligado'}</span>`;
     botao.setAttribute('aria-pressed', String(!video.muted));
   };
-  botao.addEventListener('click', () => {
-    const ligar = video.muted;
-    for (const outro of $$('video')) if (outro !== video && !outro.muted) { outro.muted = true; outro.dispatchEvent(new Event('volumechange')); }
-    video.muted = !ligar;
-    if (ligar) video.play().catch(() => {});
-  });
+  botao.addEventListener('click', () => alternarSom(video));
+  video.addEventListener('click', () => alternarSom(video));
   video.addEventListener('volumechange', mostrar);
   mostrar();
   video.after(botao);
+}
+
+// No Clarity tinha gente tocando no preço: o cartão inteiro vale como o botão dele.
+for (const plano of $$('.plano')) {
+  const botao = plano.querySelector('[data-checkout]');
+  plano.addEventListener('click', (e) => { if (!e.target.closest('a, button')) botao.click(); });
 }
 
 for (const video of $$('video')) {

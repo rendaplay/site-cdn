@@ -403,6 +403,7 @@ strong, b { font-weight: 750; }
 .video-som:hover { background: rgba(3, 22, 16, 0.95); }
 .video-som:focus-visible { outline: 2px solid var(--verde); outline-offset: 2px; }
 .video-som[aria-pressed="true"] span { color: var(--verde); }
+.video-real video { cursor: pointer; }
 .video-real figcaption { margin-top: 18px; font-size: 0.9rem; color: var(--texto-apagado); text-align: center; }
 .selo-aovivo {
   position: absolute;
@@ -576,6 +577,7 @@ strong, b { font-weight: 750; }
   box-shadow: inset 0 0 0 1.5px var(--claro-3);
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 }
 .plano h3 { font-size: 1.8rem; }
 .plano-desc { color: var(--claro-texto); margin-top: 2px; font-weight: 600; }
