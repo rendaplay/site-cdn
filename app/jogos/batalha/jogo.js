@@ -18,6 +18,7 @@ const Jogo = {
   iniciar() {
     Som.ligado = config.som !== false;
     Som.volume = Math.max(0, Math.min(1, (config.volume ?? 50) / 100));
+    Som.destravarNoToque();
     Tela.montar(config, opcoes.formato);
     Painel.montar(chave, config);
     this.novoRelogio(config.rodada.segundos);

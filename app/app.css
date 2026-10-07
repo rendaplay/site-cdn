@@ -63,6 +63,19 @@ button:disabled { cursor: default; opacity: 0.45; }
   font-weight: 700;
 }
 
+.link-suporte { align-self: center; text-align: center; font-size: 14px; }
+
+.botao-suporte {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--texto);
+  text-decoration: none;
+}
+
+.icone-zap { width: 20px; height: 20px; fill: #25D366; flex: none; }
+
 .tela {
   max-width: 560px;
   margin: 0 auto;
@@ -105,6 +118,23 @@ input:focus { border-color: var(--rp-verde); outline: none; }
 .topo { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
 .logo-pequena { height: 30px; }
 
+.topo-acoes { display: flex; align-items: center; gap: 8px; }
+
+.botao-topo-suporte {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 40px;
+  padding: 0 14px 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--linha);
+  background: var(--cartao);
+  color: var(--texto);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
 .botao-conta {
   width: 40px;
   height: 40px;
@@ -116,6 +146,10 @@ input:focus { border-color: var(--rp-verde); outline: none; }
 
 .aviso { margin-bottom: 16px; display: flex; flex-direction: column; gap: 14px; }
 .aviso .rp-botao { text-align: center; text-decoration: none; }
+
+.instalar { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
+.instalar-acoes { display: flex; align-items: center; gap: 4px; margin-top: 6px; }
+.instalar-acoes .rp-botao { padding: 0.6em 1.4em; }
 
 .tiktok label { color: var(--texto); font-weight: 700; font-size: 15px; margin-bottom: 8px; }
 

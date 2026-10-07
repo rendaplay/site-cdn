@@ -13,10 +13,21 @@ const Som = {
   _mestre: null,
   _ruido: null,
 
+  /* No celular nada destrava sozinho: o áudio só liga no fim de um toque
+     (pointerup/touchend), e o iPhone suspende de novo quando o streamer vai
+     pro TikTok e volta. */
+  destravarNoToque() {
+    const destravar = () => { if (this.ligado && this.volume) this.ctx(); };
+    for (const evento of ["pointerdown", "pointerup", "touchend", "keydown"]) addEventListener(evento, destravar, true);
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) destravar(); });
+  },
+
   ctx() {
     if (!this._ctx) {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return null;
+      // Sem isto o iPhone com a chave do silencioso ligada deixa o jogo mudo.
+      if (navigator.audioSession) navigator.audioSession.type = "playback";
       this._ctx = new AC();
       this._mestre = this._ctx.createGain();
       this._mestre.connect(this._ctx.destination);

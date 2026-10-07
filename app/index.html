@@ -29,16 +29,29 @@
     <button id="botao-entrar" class="rp-botao largo" type="submit">Entrar</button>
     <button id="trocar-modo" class="link" type="button">Primeira vez? Ativar com o código da compra</button>
   </form>
+  <a class="link link-suporte" data-suporte target="_blank" rel="noopener">Não consegue entrar? Fale com o suporte no WhatsApp</a>
 </main>
 
 <!-- Início -->
 <main id="tela-inicio" class="tela tela-inicio" hidden>
   <header class="topo">
     <img class="logo-pequena" src="marca/logo-horizontal.svg" alt="Renda Play">
-    <button id="botao-conta" class="botao-conta" type="button" aria-label="Conta"><span id="conta-inicial">R</span></button>
+    <div class="topo-acoes">
+      <a class="botao-topo-suporte" data-suporte target="_blank" rel="noopener"><svg class="icone-zap" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.2A12.7 12.7 0 0 0 5.1 22.4L3.3 28.8l6.6-1.7A12.7 12.7 0 1 0 16 3.2Zm0 23.2a10.5 10.5 0 0 1-5.4-1.5l-.4-.2-3.9 1 1-3.8-.2-.4A10.5 10.5 0 1 1 16 26.4Zm5.8-7.9c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1a8.6 8.6 0 0 1-2.5-1.6 9.6 9.6 0 0 1-1.8-2.2c-.2-.3 0-.5.1-.7l.5-.6.3-.5a.6.6 0 0 0 0-.5l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.7 3.7 0 0 0-1.1 2.7 6.5 6.5 0 0 0 1.3 3.4 14.6 14.6 0 0 0 5.7 5c2.1.9 2.9 1 4 .8a3.4 3.4 0 0 0 2.2-1.6 2.8 2.8 0 0 0 .2-1.6c-.1-.1-.3-.2-.6-.4Z"/></svg>Suporte</a>
+      <button id="botao-conta" class="botao-conta" type="button" aria-label="Conta"><span id="conta-inicial">R</span></button>
+    </div>
   </header>
 
   <section id="aviso-conta" class="cartao aviso" hidden></section>
+
+  <section id="instalar" class="cartao instalar" hidden>
+    <p><b>Use como app</b></p>
+    <p id="instalar-texto" class="apagado pequeno"></p>
+    <div class="instalar-acoes">
+      <button id="botao-instalar" class="rp-botao" type="button" hidden>Instalar</button>
+      <button id="botao-instalar-fechar" class="link" type="button">Agora não</button>
+    </div>
+  </section>
 
   <section class="cartao tiktok">
     <label for="campo-tiktok">Seu @ do TikTok</label>
@@ -63,8 +76,10 @@
       <li>Vá no app do <b>TikTok</b>, toque em <b>+</b> e depois em <b>LIVE</b>.</li>
       <li>Escolha <b>Jogos para celular</b> (transmitir a tela) e entre ao vivo.</li>
       <li>Volte pra Renda Play. Quando o jogo mostrar <b>conectado</b>, o chat já mexe nele.</li>
+      <li>Toque uma vez no jogo pra ligar o som.</li>
     </ol>
-    <p class="apagado pequeno">Deixe o som do celular ligado: o som do jogo vai junto pra live.</p>
+    <p class="apagado pequeno">Deixe o volume do celular ligado: o som do jogo vai junto pra live.</p>
+    <p id="dica-iphone" class="apagado pequeno" hidden>No iPhone, trave a rotação na Central de Controle antes de entrar ao vivo, senão o jogo gira junto com o celular.</p>
     <button id="botao-abrir-jogo" class="rp-botao largo" type="button">Abrir o jogo</button>
     <button id="botao-cancelar" class="link" type="button">Agora não</button>
   </section>
@@ -75,6 +90,10 @@
   <section class="folha" role="dialog" aria-labelledby="conta-email">
     <h2 id="conta-email"></h2>
     <p id="conta-plano" class="apagado"></p>
+    <a class="botao-secundario largo botao-suporte" data-suporte target="_blank" rel="noopener">
+      <svg class="icone-zap" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.2A12.7 12.7 0 0 0 5.1 22.4L3.3 28.8l6.6-1.7A12.7 12.7 0 1 0 16 3.2Zm0 23.2a10.5 10.5 0 0 1-5.4-1.5l-.4-.2-3.9 1 1-3.8-.2-.4A10.5 10.5 0 1 1 16 26.4Zm5.8-7.9c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1a8.6 8.6 0 0 1-2.5-1.6 9.6 9.6 0 0 1-1.8-2.2c-.2-.3 0-.5.1-.7l.5-.6.3-.5a.6.6 0 0 0 0-.5l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.7 3.7 0 0 0-1.1 2.7 6.5 6.5 0 0 0 1.3 3.4 14.6 14.6 0 0 0 5.7 5c2.1.9 2.9 1 4 .8a3.4 3.4 0 0 0 2.2-1.6 2.8 2.8 0 0 0 .2-1.6c-.1-.1-.3-.2-.6-.4Z"/></svg>
+      Falar com o suporte
+    </a>
     <button id="botao-sair" class="botao-secundario largo" type="button">Sair da conta</button>
     <button id="botao-fechar-conta" class="link" type="button">Fechar</button>
   </section>
@@ -87,6 +106,7 @@
   <div id="menu-jogo" class="menu-jogo" hidden>
     <button id="botao-sair-jogo" class="botao-secundario" type="button">Parar e sair</button>
     <button id="botao-voltar-jogo" class="link" type="button">Continuar</button>
+    <a class="link" data-suporte target="_blank" rel="noopener">Suporte no WhatsApp</a>
   </div>
 </div>
 

@@ -26,8 +26,10 @@ const Som = {
       const c = this.ctx();
       if (c && c.state !== "running") c.resume().then(() => this.avisar(), () => {});
     };
-    addEventListener("pointerdown", destravar, true);
-    addEventListener("keydown", destravar, true);
+    // No toque, o navegador só libera o áudio no fim dele (pointerup/touchend).
+    for (const evento of ["pointerdown", "pointerup", "touchend", "keydown"]) addEventListener(evento, destravar, true);
+    // O iPhone suspende o áudio quando o streamer vai pro TikTok e volta.
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) destravar(); });
     if (this.ligado) {
       this.ctx();
       setTimeout(() => this.avisar(), 1500);
@@ -45,6 +47,8 @@ const Som = {
     if (!this._ctx) {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return null;
+      // Sem isto o iPhone com a chave do silencioso ligada deixa o jogo mudo.
+      if (navigator.audioSession) navigator.audioSession.type = "playback";
       const c = this._ctx = new AC();
       c.onstatechange = () => this.avisar();
       /* Soma dos sons → passa-baixa (nada estridente) → compressor fazendo
@@ -72,7 +76,7 @@ const Som = {
     const travado = this.ligado && this.volume > 0 && this._ctx && this._ctx.state !== "running";
     if (travado && !this._aviso) {
       const a = this._aviso = document.createElement("div");
-      a.textContent = "Clique na tela para ativar o som";
+      a.textContent = matchMedia("(pointer: coarse)").matches ? "Toque na tela para ativar o som" : "Clique na tela para ativar o som";
       a.style.cssText = "position:fixed;left:12px;bottom:12px;z-index:9999;padding:6px 12px;border-radius:999px;"
         + "background:rgba(0,0,0,.6);color:#fff;font:600 13px system-ui,sans-serif;pointer-events:none";
       document.body.appendChild(a);

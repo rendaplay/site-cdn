@@ -8,6 +8,7 @@ const CONFIG = {
   relay: "https://relay.rendaplay.com.br",
   // Capas, marca e arquivos dos jogos: o montar.py --cdn aponta pro jsDelivr.
   assets: "",
+  suporte: "https://wa.me/5511941867789?text=" + encodeURIComponent("Oi! Preciso de ajuda com o app da Renda Play no celular."),
 };
 
 /* Só os jogos web: os de Roblox ainda precisam do PC. */

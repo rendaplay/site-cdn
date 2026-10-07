@@ -61,6 +61,42 @@ const app = {
   trava: null,
 };
 
+const IPHONE = /iPhone|iPad|iPod/.test(navigator.userAgent)
+  || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const INSTALADO = matchMedia("(display-mode: standalone), (display-mode: fullscreen)").matches
+  || navigator.standalone === true;
+
+/* O Chrome do Android avisa quando dá pra instalar; o iPhone nunca avisa. */
+let pedidoInstalar = null;
+addEventListener("beforeinstallprompt", evento => {
+  evento.preventDefault();
+  pedidoInstalar = evento;
+  mostrarInstalar();
+});
+addEventListener("appinstalled", () => { pedidoInstalar = null; $("instalar").hidden = true; });
+
+function mostrarInstalar() {
+  if (INSTALADO || guardado.ler("instalar-dispensado")) return;
+  const texto = $("instalar-texto");
+  if (IPHONE) {
+    texto.textContent = "No Safari, toque em Compartilhar e depois em Adicionar à Tela de Início. Pelo ícone, o jogo abre sem a barra do navegador.";
+  } else if (pedidoInstalar) {
+    texto.textContent = "Instale pra abrir direto da tela inicial, já em tela cheia.";
+  } else {
+    texto.textContent = "No menu do Chrome (⋮), toque em Instalar app ou Adicionar à tela inicial.";
+  }
+  $("botao-instalar").hidden = !pedidoInstalar;
+  $("instalar").hidden = false;
+}
+
+async function instalar() {
+  if (!pedidoInstalar) return;
+  pedidoInstalar.prompt();
+  const { outcome } = await pedidoInstalar.userChoice;
+  if (outcome === "accepted") $("instalar").hidden = true;
+  pedidoInstalar = null;
+}
+
 function mostrar(tela) {
   for (const id of ["tela-entrar", "tela-inicio"]) $(id).hidden = id !== tela;
 }
@@ -130,6 +166,7 @@ async function carregarConta() {
     }
   }
   montarInicio();
+  mostrarInstalar();
   mostrar("tela-inicio");
 }
 
@@ -301,6 +338,8 @@ async function pararLive() {
 
 /* ───────────── ligações ───────────── */
 
+for (const link of document.querySelectorAll("[data-suporte]")) link.href = CONFIG.suporte;
+
 $("form-entrar").addEventListener("submit", entrar);
 $("trocar-modo").addEventListener("click", () => modoEntrar(!ativando));
 $("campo-tiktok").addEventListener("input", atualizarAcoes);
@@ -309,6 +348,12 @@ $("botao-iniciar").addEventListener("click", () => comecar(false));
 $("botao-abrir-jogo").addEventListener("click", abrirJogo);
 $("botao-cancelar").addEventListener("click", () => { $("folha-como").hidden = true; pararLive(); });
 $("botao-conta").addEventListener("click", () => { $("folha-conta").hidden = false; });
+$("botao-instalar").addEventListener("click", instalar);
+$("botao-instalar-fechar").addEventListener("click", () => {
+  guardado.gravar("instalar-dispensado", "1");
+  $("instalar").hidden = true;
+});
+$("dica-iphone").hidden = !IPHONE;
 $("botao-fechar-conta").addEventListener("click", () => { $("folha-conta").hidden = true; });
 $("botao-sair").addEventListener("click", sair);
 $("selo-jogo").addEventListener("click", () => { $("menu-jogo").hidden = !$("menu-jogo").hidden; });
