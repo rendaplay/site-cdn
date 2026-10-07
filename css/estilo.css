@@ -308,6 +308,66 @@ strong, b { font-weight: 750; }
 .hero-alt a:hover { color: var(--verde); }
 .hero .selos-mini { margin-top: 18px; }
 
+/* ───────── saque ───────── */
+
+.saque { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: saque; }
+.saque li {
+  counter-increment: saque;
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 0 0 22px 52px;
+  color: var(--prata);
+  font-size: 0.98rem;
+}
+.saque li::before {
+  content: counter(saque);
+  position: absolute;
+  left: 0; top: -2px;
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--noite);
+  border: 2px solid var(--verde);
+  color: var(--verde);
+  font-family: var(--display);
+}
+.saque li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 16px; top: 36px; bottom: 2px;
+  width: 2px;
+  background: linear-gradient(var(--verde), rgba(23, 248, 100, 0.15));
+}
+.saque li:last-child::before { background: var(--ouro); border-color: var(--ouro); color: var(--noite); }
+.saque b { color: var(--branco); font-size: 1.12rem; }
+.saque-conta {
+  margin-top: 18px;
+  padding: 22px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 200, 30, 0.35);
+  background: rgba(255, 200, 30, 0.06);
+}
+.saque-conta-titulo { font-family: var(--display); color: var(--branco); font-size: 1.1rem; }
+.saque-conta ul { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 10px; }
+.saque-conta li { display: grid; grid-template-columns: 1fr auto auto; align-items: baseline; gap: 12px; }
+.saque-conta span { color: var(--branco); font-weight: 600; }
+.saque-conta small { color: var(--texto-apagado); font-size: 0.9rem; }
+.saque-conta li b { font-family: var(--display); font-weight: 400; color: var(--ouro); font-size: 1.2rem; min-width: 5.5em; text-align: right; }
+.saque-nota { margin-top: 14px; font-size: 0.85rem; color: var(--texto-apagado); }
+
+@media (min-width: 900px) {
+  .saque { grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .saque li { padding: 52px 0 0; }
+  .saque li:not(:last-child)::after { left: 40px; right: -18px; top: 16px; bottom: auto; width: auto; height: 2px; background: linear-gradient(90deg, var(--verde), rgba(23, 248, 100, 0.15)); }
+  .saque-conta { margin-top: 36px; display: grid; grid-template-columns: auto 1fr; column-gap: 40px; align-items: center; }
+  .saque-conta ul { margin: 0; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .saque-conta li { grid-template-columns: 1fr; gap: 2px; }
+  .saque-conta li b { text-align: left; }
+  .saque-nota { grid-column: 1 / -1; }
+}
+
 /* iPhone SE e afins: sem isso o preço e o botão caem abaixo da dobra */
 @media (max-width: 360px), (max-height: 600px) and (max-width: 560px) {
   .hero { padding-top: 22px; }
