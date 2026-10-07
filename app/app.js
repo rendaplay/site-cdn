@@ -79,13 +79,14 @@ function mostrarInstalar() {
   if (INSTALADO || guardado.ler("instalar-dispensado")) return;
   const texto = $("instalar-texto");
   if (IPHONE) {
-    texto.textContent = "No Safari, toque em Compartilhar e depois em Adicionar à Tela de Início. Pelo ícone, o jogo abre sem a barra do navegador.";
+    texto.textContent = "Adicione à tela de início pelo Safari. Pelo ícone, o jogo abre em tela cheia, sem a barra do navegador.";
   } else if (pedidoInstalar) {
     texto.textContent = "Instale pra abrir direto da tela inicial, já em tela cheia.";
   } else {
     texto.textContent = "No menu do Chrome (⋮), toque em Instalar app ou Adicionar à tela inicial.";
   }
   $("botao-instalar").hidden = !pedidoInstalar;
+  $("botao-passo-a-passo").hidden = !IPHONE;
   $("instalar").hidden = false;
 }
 
@@ -353,6 +354,8 @@ $("botao-instalar-fechar").addEventListener("click", () => {
   guardado.gravar("instalar-dispensado", "1");
   $("instalar").hidden = true;
 });
+$("botao-passo-a-passo").addEventListener("click", () => { $("folha-iphone").hidden = false; });
+$("botao-fechar-iphone").addEventListener("click", () => { $("folha-iphone").hidden = true; });
 $("dica-iphone").hidden = !IPHONE;
 $("botao-fechar-conta").addEventListener("click", () => { $("folha-conta").hidden = true; });
 $("botao-sair").addEventListener("click", sair);

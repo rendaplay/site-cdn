@@ -242,6 +242,18 @@ input:focus { border-color: var(--rp-verde); outline: none; }
 .passos { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 10px; }
 .passos b { color: var(--rp-verde-luz); }
 
+.folha-rolagem { max-height: 92dvh; overflow-y: auto; overscroll-behavior: contain; }
+.passos-com-foto { gap: 22px; }
+.passos-com-foto img {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  margin-top: 10px;
+  border-radius: 14px;
+  border: 1px solid var(--linha);
+}
+
 /* ───────── jogo ───────── */
 
 .tela-jogo { position: fixed; inset: 0; z-index: 20; background: #000; }
