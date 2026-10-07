@@ -54,8 +54,31 @@ if (barraCta) {
 
 const reduzir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// O navegador só toca sozinho o vídeo mudo; o som liga no toque, um vídeo por vez.
+const somIcone = (ligado) => `<svg class="ico" aria-hidden="true"><use href="#i-som-${ligado ? 'on' : 'off'}"/></svg>`;
+
+function botaoDeSom(video) {
+  const botao = document.createElement('button');
+  botao.type = 'button';
+  botao.className = 'video-som';
+  const mostrar = () => {
+    botao.innerHTML = somIcone(!video.muted) + `<span>${video.muted ? 'Ativar som' : 'Som ligado'}</span>`;
+    botao.setAttribute('aria-pressed', String(!video.muted));
+  };
+  botao.addEventListener('click', () => {
+    const ligar = video.muted;
+    for (const outro of $$('video')) if (outro !== video && !outro.muted) { outro.muted = true; outro.dispatchEvent(new Event('volumechange')); }
+    video.muted = !ligar;
+    if (ligar) video.play().catch(() => {});
+  });
+  video.addEventListener('volumechange', mostrar);
+  mostrar();
+  video.after(botao);
+}
+
 for (const video of $$('video')) {
   video.muted = true;
+  botaoDeSom(video);
   if (reduzir) { video.pause(); video.controls = true; continue; }
   if (!('quandoVisivel' in video.dataset)) continue;
   quandoVisivel(video, (visivel) => {
