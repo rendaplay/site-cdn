@@ -550,56 +550,15 @@ strong, b { font-weight: 750; }
 .secao-precos { background: var(--claro); color: var(--noite); }
 .secao-precos .cabeca p { color: var(--claro-texto); }
 
-.periodo {
-  position: relative;
-  display: flex;
-  width: max-content;
-  margin: 0 auto 40px;
-  padding: 5px;
-  border-radius: 999px;
-  background: #DFEAE2;
-}
-.periodo button {
-  position: relative;
-  z-index: 1;
-  font: inherit;
-  font-weight: 750;
-  font-size: 1rem;
-  color: var(--claro-texto);
-  background: none;
-  border: 0;
-  border-radius: 999px;
-  padding: 10px 22px;
-  cursor: pointer;
-  display: flex; align-items: center; gap: 8px;
-  transition: color 250ms ease;
-}
-.periodo button[aria-pressed="true"] { color: var(--branco); }
-.periodo-pilula {
-  position: absolute;
-  top: 5px; bottom: 5px; left: 0;
-  width: 0;
-  border-radius: 999px;
-  background: var(--noite);
-  transition: transform 380ms var(--mola), width 380ms var(--mola);
-}
-.periodo-desc {
-  font-size: 0.75rem;
-  font-weight: 800;
-  color: var(--noite);
-  background: var(--verde);
-  padding: 2px 8px;
-  border-radius: 999px;
-}
-.periodo button:focus-visible { outline-color: var(--noite); }
-
-.planos { display: grid; gap: 26px; align-items: start; }
+.planos { display: grid; gap: 26px; align-items: start; margin-top: 40px; }
 .plano {
   position: relative;
   padding: 28px 24px 26px;
   border-radius: var(--raio-card);
   background: var(--claro-2);
   box-shadow: inset 0 0 0 1.5px var(--claro-3);
+  display: flex;
+  flex-direction: column;
 }
 .plano h3 { font-size: 1.8rem; }
 .plano-desc { color: var(--claro-texto); margin-top: 2px; font-weight: 600; }
@@ -611,7 +570,9 @@ strong, b { font-weight: 750; }
 .preco-valor { font-family: var(--display); font-size: 2.7rem; line-height: 1; font-variant-numeric: tabular-nums; }
 .preco-per { color: var(--claro-texto); font-weight: 650; }
 .preco-obs { margin-top: 6px; font-size: 0.92rem; color: var(--claro-texto); min-height: 1.4em; }
-.preco-obs [hidden] { display: none; }
+.preco-depois { margin-top: 4px; font-size: 0.92rem; color: var(--claro-texto); }
+.preco-depois b { color: var(--noite); }
+.plano-fidelidade { margin-top: auto; padding-top: 14px; font-size: 0.88rem; font-weight: 700; text-align: center; color: var(--claro-texto); }
 .plano .botao { width: 100%; margin-top: 20px; }
 .plano .botao:focus-visible { outline-color: var(--noite); }
 .botao-micro { text-align: center; font-size: 0.85rem; color: var(--claro-texto); margin-top: 4px; }
@@ -632,10 +593,11 @@ strong, b { font-weight: 750; }
   background: var(--noite);
   color: var(--branco);
   box-shadow: 0 8px 0 var(--verde-sombra), inset 0 0 0 3px var(--verde);
-  order: -1;
   margin-top: 8px;
 }
-.plano-destaque .plano-desc, .plano-destaque .preco-per, .plano-destaque .preco-obs, .plano-destaque .preco-risco, .plano-destaque .botao-micro { color: var(--prata); }
+.plano-destaque .plano-desc, .plano-destaque .preco-per, .plano-destaque .preco-obs, .plano-destaque .preco-risco, .plano-destaque .botao-micro,
+.plano-destaque .preco-depois, .plano-destaque .plano-fidelidade { color: var(--prata); }
+.plano-destaque .preco-depois b { color: var(--branco); }
 .plano-destaque .preco-valor { color: var(--ouro); }
 .plano-destaque .plano-itens { border-top-color: var(--noite-3); }
 .plano-destaque .botao:focus-visible { outline-color: var(--branco); }
@@ -651,8 +613,8 @@ strong, b { font-weight: 750; }
 .plano-vitalicio .preco { margin-top: 16px; }
 
 @media (min-width: 900px) {
-  .planos { grid-template-columns: 1.08fr 1fr 1fr; gap: 22px; align-items: stretch; }
-  .plano-destaque { order: 0; margin-top: -14px; margin-bottom: 14px; }
+  .planos { grid-template-columns: 1fr 1.08fr 1fr; gap: 22px; align-items: stretch; }
+  .plano-destaque { margin-top: -14px; margin-bottom: 14px; }
 }
 
 .garantia {
@@ -673,6 +635,7 @@ strong, b { font-weight: 750; }
 .carimbo-dias { font-family: var(--display); font-size: 18px; fill: var(--branco); }
 .garantia h3 { font-size: 1.6rem; }
 .garantia p { margin-top: 6px; color: var(--claro-texto); max-width: 34em; }
+.garantia .botao { margin-top: 16px; }
 @media (min-width: 720px) {
   .garantia { grid-template-columns: auto 1fr; text-align: left; justify-items: start; align-items: center; gap: 28px; padding: 24px 32px; }
 }

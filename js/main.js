@@ -27,39 +27,12 @@ function apontar(link, base) {
   if (base) link.href = comParametros(base, link.getAttribute('href'));
 }
 
-function aplicarLinks(periodo) {
-  const sufixo = periodo === 'anual' ? 'Anual' : 'Mensal';
-  for (const botao of $$('[data-plano]')) apontar(botao, CONFIG.checkout[botao.dataset.plano + sufixo]);
+function aplicarLinks() {
   for (const botao of $$('[data-checkout]')) apontar(botao, CONFIG.checkout[botao.dataset.checkout]);
   for (const link of $$('[data-link]')) link.href = CONFIG.links[link.dataset.link];
 }
 
-// ───────── mensal / anual ─────────
-
-const botoesPeriodo = $$('[data-periodo]');
-const pilula = $('.periodo-pilula');
-
-function moverPilula() {
-  const ativo = botoesPeriodo.find((b) => b.getAttribute('aria-pressed') === 'true');
-  if (!ativo || !pilula) return;
-  pilula.style.width = ativo.offsetWidth + 'px';
-  pilula.style.transform = `translateX(${ativo.offsetLeft}px)`;
-}
-
-function escolherPeriodo(periodo) {
-  const anual = periodo === 'anual';
-  for (const botao of botoesPeriodo) botao.setAttribute('aria-pressed', String(botao.dataset.periodo === periodo));
-  for (const el of $$('[data-mensal-only]')) el.hidden = anual;
-  for (const el of $$('[data-anual-only]')) el.hidden = !anual;
-  for (const valor of $$('[data-mensal][data-anual]')) valor.textContent = valor.dataset[periodo];
-  moverPilula();
-  aplicarLinks(periodo);
-}
-
-for (const botao of botoesPeriodo) botao.addEventListener('click', () => escolherPeriodo(botao.dataset.periodo));
-escolherPeriodo('mensal');
-window.addEventListener('resize', moverPilula);
-document.fonts && document.fonts.ready.then(moverPilula);
+aplicarLinks();
 
 // ───────── topo e barra de CTA ─────────
 

@@ -1,6 +1,9 @@
 // Único lugar com links externos do site (index.html e comecar.html). Para trocar um link, troque só aqui.
 window.CONFIG = {
   checkout: {
+    // 1º mês, pagamento único. A renovação (liveMensal/completoMensal) é vendida no app.
+    startPasse: 'https://pay.kiwify.com.br/CpQ7dKg',
+    proPasse: 'https://pay.kiwify.com.br/da9jhx6',
     liveMensal: 'https://pay.kiwify.com.br/Glz0Dsz',
     completoMensal: 'https://pay.kiwify.com.br/vURQfhq',
     liveAnual: 'https://pay.kiwify.com.br/3KsnBH8',
@@ -9,6 +12,8 @@ window.CONFIG = {
   },
   links: {
     // A Kiwify dá um link de afiliação por produto; a aprovação é automática.
+    afiliadosStart: 'https://dashboard.kiwify.com/join/affiliate/wZeRJXmA',
+    afiliadosPro: 'https://dashboard.kiwify.com/join/affiliate/ZXNwuGKq',
     afiliadosAssinatura: 'https://dashboard.kiwify.com/join/affiliate/e3NrMflk',
     afiliadosVitalicio: 'https://dashboard.kiwify.com/join/affiliate/IoZbZwcH',
     contato: 'mailto:contato.rendaplay@gmail.com',
