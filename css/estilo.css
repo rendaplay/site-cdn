@@ -1026,3 +1026,13 @@ strong, b { font-weight: 750; }
   .guia-nav ol { flex-direction: column; padding: 0; overflow: visible; }
   .passo-guia { scroll-margin-top: 90px; }
 }
+
+/* ───────── jogos que rodam no celular ───────── */
+
+.card-selo .ico { width: 1.05em; height: 1.05em; margin: -2px 3px 0 -1px; vertical-align: middle; stroke-width: 2.4; }
+.mais-legenda { display: flex; align-items: center; gap: 8px; margin: 0; padding: 0 20px 20px; font-size: 0.85rem; color: var(--prata); }
+.mais-legenda .ico { color: var(--verde); }
+.plano-itens li.item-celular { padding-left: 0; display: flex; gap: 9px; align-items: flex-start; }
+.plano-itens li.item-celular::before { content: none; }
+.item-celular .ico { width: 1.25em; height: 1.25em; margin-top: 0.05em; color: var(--verde-sombra); }
+.plano-destaque .item-celular .ico { color: var(--verde); }
