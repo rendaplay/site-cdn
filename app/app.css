@@ -118,14 +118,14 @@ input:focus { border-color: var(--rp-verde); outline: none; }
 .topo { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
 .logo-pequena { height: 30px; }
 
-.topo-acoes { display: flex; align-items: center; gap: 8px; }
+.topo-acoes { display: flex; align-items: center; gap: 6px; }
 
 .botao-topo-suporte {
   display: flex;
   align-items: center;
   gap: 7px;
   height: 40px;
-  padding: 0 14px 0 12px;
+  padding: 0 12px 0 10px;
   border-radius: 999px;
   border: 1px solid var(--linha);
   background: var(--cartao);

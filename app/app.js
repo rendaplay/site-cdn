@@ -83,11 +83,20 @@ function mostrarInstalar() {
   } else if (pedidoInstalar) {
     texto.textContent = "Instale pra abrir direto da tela inicial, já em tela cheia.";
   } else {
-    texto.textContent = "No menu do Chrome (⋮), toque em Instalar app ou Adicionar à tela inicial.";
+    texto.textContent = "Adicione à tela inicial pelo Chrome. Pelo ícone, o jogo abre em tela cheia, sem a barra do navegador.";
   }
   $("botao-instalar").hidden = !pedidoInstalar;
-  $("botao-passo-a-passo").hidden = !IPHONE;
+  $("botao-passo-a-passo").hidden = Boolean(pedidoInstalar);
   $("instalar").hidden = false;
+}
+
+function abrirPassoAPasso() {
+  if (IPHONE) {
+    $("folha-iphone").hidden = false;
+    return;
+  }
+  $("botao-android-instalar").hidden = !pedidoInstalar;
+  $("folha-android").hidden = false;
 }
 
 async function instalar() {
@@ -354,7 +363,19 @@ $("botao-instalar-fechar").addEventListener("click", () => {
   guardado.gravar("instalar-dispensado", "1");
   $("instalar").hidden = true;
 });
-$("botao-passo-a-passo").addEventListener("click", () => { $("folha-iphone").hidden = false; });
+$("botao-passo-a-passo").addEventListener("click", abrirPassoAPasso);
+$("botao-ajuda").addEventListener("click", () => { $("folha-ajuda").hidden = false; });
+$("botao-fechar-ajuda").addEventListener("click", () => { $("folha-ajuda").hidden = true; });
+$("botao-ajuda-instalar").hidden = INSTALADO;
+$("botao-ajuda-instalar").addEventListener("click", () => {
+  $("folha-ajuda").hidden = true;
+  abrirPassoAPasso();
+});
+$("botao-android-instalar").addEventListener("click", () => {
+  $("folha-android").hidden = true;
+  instalar();
+});
+$("botao-fechar-android").addEventListener("click", () => { $("folha-android").hidden = true; });
 $("botao-fechar-iphone").addEventListener("click", () => { $("folha-iphone").hidden = true; });
 $("dica-iphone").hidden = !IPHONE;
 $("botao-fechar-conta").addEventListener("click", () => { $("folha-conta").hidden = true; });

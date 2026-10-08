@@ -38,6 +38,7 @@
     <img class="logo-pequena" src="marca/logo-horizontal.svg" alt="Renda Play">
     <div class="topo-acoes">
       <a class="botao-topo-suporte" data-suporte target="_blank" rel="noopener"><svg class="icone-zap" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.2A12.7 12.7 0 0 0 5.1 22.4L3.3 28.8l6.6-1.7A12.7 12.7 0 1 0 16 3.2Zm0 23.2a10.5 10.5 0 0 1-5.4-1.5l-.4-.2-3.9 1 1-3.8-.2-.4A10.5 10.5 0 1 1 16 26.4Zm5.8-7.9c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1a8.6 8.6 0 0 1-2.5-1.6 9.6 9.6 0 0 1-1.8-2.2c-.2-.3 0-.5.1-.7l.5-.6.3-.5a.6.6 0 0 0 0-.5l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.7 3.7 0 0 0-1.1 2.7 6.5 6.5 0 0 0 1.3 3.4 14.6 14.6 0 0 0 5.7 5c2.1.9 2.9 1 4 .8a3.4 3.4 0 0 0 2.2-1.6 2.8 2.8 0 0 0 .2-1.6c-.1-.1-.3-.2-.6-.4Z"/></svg>Suporte</a>
+      <button id="botao-ajuda" class="botao-conta" type="button" aria-label="Como usar o app">?</button>
       <button id="botao-conta" class="botao-conta" type="button" aria-label="Conta"><span id="conta-inicial">R</span></button>
     </div>
   </header>
@@ -86,6 +87,27 @@
   </section>
 </div>
 
+<!-- Como usar -->
+<div id="folha-ajuda" class="folha-fundo" hidden>
+  <section class="folha folha-rolagem" role="dialog" aria-labelledby="ajuda-titulo">
+    <h2 id="ajuda-titulo">Como usar a Renda Play</h2>
+    <ol class="passos">
+      <li>Escreva seu <b>@ do TikTok</b> e escolha o jogo.</li>
+      <li>Toque em <b>Testar sem live</b> pra ver o jogo funcionando com um chat de mentira.</li>
+      <li>Pra valer, toque em <b>Iniciar live</b> e depois em <b>Abrir o jogo</b>.</li>
+      <li>No app do <b>TikTok</b>, toque em <b>+</b>, depois em <b>LIVE</b> e escolha <b>Jogos para celular</b> (transmitir a tela).</li>
+      <li>Volte pra Renda Play. Quando o jogo mostrar <b>conectado</b>, o chat já mexe nele.</li>
+      <li>Toque uma vez no jogo pra ligar o som. Pra sair, toque no selo do canto de cima.</li>
+    </ol>
+    <button id="botao-ajuda-instalar" class="botao-secundario largo" type="button">Instalar na tela de início</button>
+    <a class="botao-secundario largo botao-suporte" data-suporte target="_blank" rel="noopener">
+      <svg class="icone-zap" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.2A12.7 12.7 0 0 0 5.1 22.4L3.3 28.8l6.6-1.7A12.7 12.7 0 1 0 16 3.2Zm0 23.2a10.5 10.5 0 0 1-5.4-1.5l-.4-.2-3.9 1 1-3.8-.2-.4A10.5 10.5 0 1 1 16 26.4Zm5.8-7.9c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1a8.6 8.6 0 0 1-2.5-1.6 9.6 9.6 0 0 1-1.8-2.2c-.2-.3 0-.5.1-.7l.5-.6.3-.5a.6.6 0 0 0 0-.5l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.7 3.7 0 0 0-1.1 2.7 6.5 6.5 0 0 0 1.3 3.4 14.6 14.6 0 0 0 5.7 5c2.1.9 2.9 1 4 .8a3.4 3.4 0 0 0 2.2-1.6 2.8 2.8 0 0 0 .2-1.6c-.1-.1-.3-.2-.6-.4Z"/></svg>
+      Falar com o suporte
+    </a>
+    <button id="botao-fechar-ajuda" class="rp-botao largo" type="button">Entendi</button>
+  </section>
+</div>
+
 <!-- Instalar no iPhone -->
 <div id="folha-iphone" class="folha-fundo" hidden>
   <section class="folha folha-rolagem" role="dialog" aria-labelledby="iphone-titulo">
@@ -102,6 +124,28 @@
         <img src="tutorial/4.webp" alt="Ícone da Renda Play na tela de início" width="640" height="486" loading="lazy"></li>
     </ol>
     <button id="botao-fechar-iphone" class="rp-botao largo" type="button">Entendi</button>
+  </section>
+</div>
+
+<!-- Instalar no Android -->
+<div id="folha-android" class="folha-fundo" hidden>
+  <section class="folha folha-rolagem" role="dialog" aria-labelledby="android-titulo">
+    <h2 id="android-titulo">Renda Play na tela inicial</h2>
+    <p class="apagado pequeno">Faça no Chrome. Leva meio minuto e só precisa fazer uma vez.</p>
+    <button id="botao-android-instalar" class="rp-botao largo" type="button" hidden>Instalar agora</button>
+    <ol class="passos passos-com-foto">
+      <li>Toque em <b>⋮</b> no canto de cima, à direita.
+        <img src="tutorial/android-1.webp" alt="Barra do Chrome com o menu marcado" width="640" height="136" loading="lazy"></li>
+      <li>Toque em <b>Adicionar à tela inicial</b>. Em alguns celulares aparece <b>Instalar app</b>.
+        <img src="tutorial/android-2.webp" alt="Menu do Chrome com Adicionar à tela inicial marcado" width="640" height="548" loading="lazy"></li>
+      <li>Toque em <b>Instalar</b>.
+        <img src="tutorial/android-3.webp" alt="Opção Instalar marcada" width="640" height="366" loading="lazy"></li>
+      <li>Confirme em <b>Instalar</b>. Se o celular perguntar, toque em <b>Adicionar</b>.
+        <img src="tutorial/android-4.webp" alt="Janela Instalar aplicativo com Instalar marcado" width="640" height="344" loading="lazy"></li>
+      <li>Pronto. Abra a Renda Play pelo ícone na tela inicial: o jogo fica em tela cheia, sem a barra do Chrome.
+        <img src="tutorial/android-5.webp" alt="Ícone da Renda Play na tela inicial" width="640" height="314" loading="lazy"></li>
+    </ol>
+    <button id="botao-fechar-android" class="rp-botao largo" type="button">Entendi</button>
   </section>
 </div>
 
