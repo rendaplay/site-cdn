@@ -404,6 +404,7 @@ strong, b { font-weight: 750; }
 .video-som:focus-visible { outline: 2px solid var(--verde); outline-offset: 2px; }
 .video-som[aria-pressed="true"] span { color: var(--verde); }
 .video-real video { cursor: pointer; }
+.hero .video-real { width: min(100%, 360px); }
 .video-real figcaption { margin-top: 18px; font-size: 0.9rem; color: var(--texto-apagado); text-align: center; }
 .selo-aovivo {
   position: absolute;
@@ -517,6 +518,7 @@ strong, b { font-weight: 750; }
 }
 .provas::-webkit-scrollbar { display: none; }
 .provas .video-real { width: 100%; scroll-snap-align: start; }
+.provas video { aspect-ratio: 9 / 16; object-fit: cover; }
 .provas figcaption { margin-top: 14px; font-size: 0.85rem; text-align: left; }
 @media (min-width: 760px) {
   .provas { grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; overflow: visible; margin-inline: 0; padding: 4px 0 0; }
