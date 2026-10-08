@@ -50,32 +50,25 @@ if (barraCta) {
   for (const id of Object.keys(visiveis)) quandoVisivel($('#' + id), (v) => { visiveis[id] = v; atualizarBarra(); }, 0);
 }
 
-// ───────── vídeos: só baixam quando chegam na tela ─────────
+// ───────── vídeos: só baixam no play ─────────
 
-const reduzir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-// O navegador só toca sozinho o vídeo mudo; o som liga no toque, um vídeo por vez.
-const somIcone = (ligado) => `<svg class="ico" aria-hidden="true"><use href="#i-som-${ligado ? 'on' : 'off'}"/></svg>`;
-
-function alternarSom(video) {
-  const ligar = video.muted;
-  for (const outro of $$('video')) if (outro !== video && !outro.muted) outro.muted = true;
-  video.muted = !ligar;
-  if (ligar) video.play().catch(() => {});
+// Vídeo parado com play: tocar já liga o som, um vídeo por vez.
+function tocar(video) {
+  for (const outro of $$('video')) if (outro !== video) outro.pause();
+  video.muted = false;
+  video.play().catch(() => { video.controls = true; });
 }
 
-function botaoDeSom(video) {
+function botaoDePlay(video) {
   const botao = document.createElement('button');
   botao.type = 'button';
-  botao.className = 'video-som';
-  const mostrar = () => {
-    botao.innerHTML = somIcone(!video.muted) + `<span>${video.muted ? 'Ativar som' : 'Som ligado'}</span>`;
-    botao.setAttribute('aria-pressed', String(!video.muted));
-  };
-  botao.addEventListener('click', () => alternarSom(video));
-  video.addEventListener('click', () => alternarSom(video));
-  video.addEventListener('volumechange', mostrar);
-  mostrar();
+  botao.className = 'video-play';
+  botao.innerHTML = '<svg class="ico ico-cheio" aria-hidden="true"><use href="#i-play"/></svg><span>Assistir com som</span>';
+  botao.addEventListener('click', () => tocar(video));
+  video.addEventListener('click', () => (video.paused ? tocar(video) : video.pause()));
+  const mostrar = () => { botao.hidden = !video.paused; };
+  video.addEventListener('play', mostrar);
+  video.addEventListener('pause', mostrar);
   video.after(botao);
 }
 
@@ -86,12 +79,6 @@ for (const plano of $$('.plano')) {
 }
 
 for (const video of $$('video')) {
-  video.muted = true;
-  botaoDeSom(video);
-  if (reduzir) { video.pause(); video.controls = true; continue; }
-  if (!('quandoVisivel' in video.dataset)) continue;
-  quandoVisivel(video, (visivel) => {
-    if (visivel) video.play().catch(() => { video.controls = true; });
-    else video.pause();
-  }, 0.25);
+  botaoDePlay(video);
+  quandoVisivel(video, (visivel) => { if (!visivel) video.pause(); }, 0.25);
 }
