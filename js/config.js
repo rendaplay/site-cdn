@@ -1,11 +1,13 @@
 // Único lugar com links externos do site (index.html e comecar.html). Para trocar um link, troque só aqui.
 window.CONFIG = {
   checkout: {
-    // 1º mês, pagamento único. A renovação (liveMensal/completoMensal) é vendida no app.
+    // 1º mês, pagamento único. A renovação (liveMensal/completoMensal/celularMensal) é vendida no app.
+    celularPasse: 'https://pay.kiwify.com.br/6X628e7',
     startPasse: 'https://pay.kiwify.com.br/CpQ7dKg',
     proPasse: 'https://pay.kiwify.com.br/da9jhx6',
     liveMensal: 'https://pay.kiwify.com.br/Glz0Dsz',
     completoMensal: 'https://pay.kiwify.com.br/vURQfhq',
+    celularMensal: 'https://pay.kiwify.com.br/Kmp9813',
     liveAnual: 'https://pay.kiwify.com.br/3KsnBH8',
     completoAnual: 'https://pay.kiwify.com.br/QCuO3UL',
     vitalicio: 'https://pay.kiwify.com.br/bIhXLuY',

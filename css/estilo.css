@@ -463,6 +463,153 @@ strong, b { font-weight: 750; }
   .passo h3 { align-self: start; }
 }
 
+/* ───────── tutorial: um vídeo por jeito de fazer a live ───────── */
+
+.secao-tutorial { background: radial-gradient(60% 50% at 50% 60%, rgba(23, 248, 100, 0.10), transparent 70%), var(--noite-fundo); }
+.tutorial { display: grid; justify-items: center; gap: 30px; }
+.tutorial-abas {
+  display: inline-flex;
+  gap: 4px;
+  padding: 5px;
+  border-radius: 999px;
+  background: var(--noite-2);
+  box-shadow: inset 0 0 0 1px var(--noite-3);
+}
+.tutorial-aba {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--prata);
+  font: inherit; font-weight: 750;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.tutorial-aba .ico { width: 20px; height: 20px; }
+.tutorial-aba[aria-selected="true"] { background: var(--verde); color: var(--noite); box-shadow: 0 3px 0 var(--verde-sombra); }
+.tutorial-aba:focus-visible { outline: 3px solid var(--branco); outline-offset: 2px; }
+
+.tutorial-tela { margin: 0; width: 100%; display: grid; justify-items: center; }
+.tutorial-tela[hidden] { display: none; }
+.tutorial-tela figcaption { margin-top: 22px; max-width: 30em; text-align: center; color: var(--prata); }
+
+.moldura {
+  position: relative;
+  padding: 10px;
+  background: linear-gradient(160deg, var(--noite-3), var(--noite) 60%);
+  box-shadow: 0 0 0 3px var(--verde), 0 10px 0 var(--verde-sombra), 0 30px 90px -20px rgba(23, 248, 100, 0.45);
+}
+.moldura video { display: block; width: 100%; height: auto; background: var(--noite-2); cursor: pointer; }
+.moldura-celular { width: min(100%, 340px); border-radius: 38px; }
+.moldura-celular video { border-radius: 28px; }
+/* entalhe do celular */
+.moldura-celular::before {
+  content: "";
+  position: absolute; z-index: 1;
+  top: 18px; left: 50%; translate: -50% 0;
+  width: 84px; height: 22px;
+  border-radius: 999px;
+  background: var(--noite);
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.moldura-pc { width: min(100%, 880px); border-radius: 18px; margin-bottom: 34px; }
+.moldura-pc video { border-radius: 10px; }
+/* pé do monitor */
+.moldura-pc::after {
+  content: "";
+  position: absolute;
+  top: calc(100% + 13px); left: 50%; translate: -50% 0;
+  width: 26%; height: 14px;
+  border-radius: 0 0 14px 14px;
+  background: linear-gradient(var(--noite-3), var(--noite-2));
+  box-shadow: 0 3px 0 var(--verde-sombra);
+}
+.selo-tutorial {
+  position: absolute; z-index: 1;
+  top: 24px; right: 22px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(3, 22, 16, 0.82);
+  font-size: 0.8rem; font-weight: 750; color: var(--verde);
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.moldura-celular .selo-tutorial { top: 50px; }
+.moldura.tocando .selo-tutorial, .moldura.tocando::before { opacity: 0; }
+
+.player {
+  position: absolute; z-index: 2;
+  left: 20px; right: 20px; bottom: 20px;
+  display: flex; align-items: center; gap: 4px;
+  padding: 6px 10px 6px 6px;
+  border-radius: 999px;
+  background: rgba(3, 22, 16, 0.78);
+  backdrop-filter: blur(10px);
+  box-shadow: inset 0 0 0 1px rgba(23, 248, 100, 0.25), 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+  opacity: 0; translate: 0 8px; pointer-events: none;
+  transition: opacity 0.25s, translate 0.25s;
+}
+.moldura.comecou:is(:not(.tocando), .mexendo, .arrastando) .player { opacity: 1; translate: 0 0; pointer-events: auto; }
+.moldura.comecou.tocando:not(.mexendo, .arrastando), .moldura.comecou.tocando:not(.mexendo, .arrastando) video { cursor: none; }
+.player-botao {
+  flex: none;
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border: 0; border-radius: 50%;
+  background: transparent;
+  color: var(--branco);
+  cursor: pointer;
+}
+.player-botao .ico { width: 22px; height: 22px; }
+.player-botao[data-acao="play"] { background: var(--verde); color: var(--noite); box-shadow: 0 3px 0 var(--verde-sombra); }
+.player-botao[data-acao="play"] .ico { width: 18px; height: 18px; }
+.player-botao:hover:not([data-acao="play"]) { color: var(--verde); }
+.player-botao:focus-visible, .player-trilha:focus-visible { outline: 2px solid var(--verde); outline-offset: 2px; }
+.player-trilha {
+  --andou: 0; --carregado: 0;
+  position: relative;
+  flex: 1;
+  height: 32px;
+  margin: 0 10px;
+  cursor: pointer;
+  touch-action: none;
+}
+.player-trilha::before, .player-carregado, .player-andou {
+  content: "";
+  position: absolute; left: 0; top: 50%;
+  height: 6px; translate: 0 -50%;
+  border-radius: 999px;
+  transition: height 0.15s;
+}
+.player-trilha::before { right: 0; background: rgba(244, 248, 243, 0.16); }
+.player-carregado { width: calc(var(--carregado) * 100%); background: rgba(244, 248, 243, 0.28); }
+.player-andou { width: calc(var(--andou) * 100%); background: linear-gradient(90deg, var(--verde-sombra), var(--verde)); box-shadow: 0 0 12px rgba(23, 248, 100, 0.6); }
+/* bolinha na ponta do que já tocou */
+.player-andou::after {
+  content: "";
+  position: absolute; right: -8px; top: 50%;
+  width: 16px; height: 16px; translate: 0 -50%;
+  border-radius: 50%;
+  background: var(--branco);
+  box-shadow: 0 0 0 3px var(--verde);
+  scale: 0.75;
+  transition: scale 0.15s;
+}
+.player-trilha:hover :is(.player-carregado, .player-andou), .arrastando .player-trilha :is(.player-carregado, .player-andou),
+.player-trilha:hover::before, .arrastando .player-trilha::before { height: 8px; }
+.player-trilha:hover .player-andou::after, .arrastando .player-andou::after { scale: 1; }
+.player-tempo { flex: none; font-size: 0.82rem; font-weight: 700; color: var(--prata); font-variant-numeric: tabular-nums; margin-right: 2px; }
+.moldura-celular .player { left: 16px; right: 16px; bottom: 16px; }
+/* no celular estreito o tempo come espaço da trilha */
+@media (max-width: 420px) { .moldura-celular .player-tempo { display: none; } }
+
+.moldura:fullscreen { padding: 0; border-radius: 0; display: grid; place-items: center; background: #000; box-shadow: none; }
+.moldura:fullscreen video { width: auto; max-width: 100%; max-height: 100vh; border-radius: 0; }
+.moldura:fullscreen::before, .moldura:fullscreen::after, .moldura:fullscreen .selo-tutorial { display: none; }
+
 /* ───────── jogos: 3 em destaque + o resto sob demanda ───────── */
 
 .secao-jogos { background: var(--noite-fundo); }
