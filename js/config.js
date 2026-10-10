@@ -14,6 +14,7 @@ window.CONFIG = {
   },
   links: {
     // A Kiwify dá um link de afiliação por produto; a aprovação é automática.
+    afiliadosCelular: 'https://dashboard.kiwify.com/join/affiliate/uaoJiwq6',
     afiliadosStart: 'https://dashboard.kiwify.com/join/affiliate/wZeRJXmA',
     afiliadosPro: 'https://dashboard.kiwify.com/join/affiliate/ZXNwuGKq',
     afiliadosAssinatura: 'https://dashboard.kiwify.com/join/affiliate/e3NrMflk',
