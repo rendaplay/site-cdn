@@ -6,7 +6,7 @@ for (const link of document.querySelectorAll('[data-link]')) link.href = CONFIG.
 
 const CHAVE = 'rendaplay-requisitos';
 const caixas = [...document.querySelectorAll('[data-req]')];
-const pronto = document.getElementById('req-pronto');
+const listas = [...document.querySelectorAll('.requisitos')];
 
 function lerMarcados() {
   try { return JSON.parse(localStorage.getItem(CHAVE)) || {}; } catch { return {}; }
@@ -25,8 +25,46 @@ for (const caixa of caixas) {
     atualizarPronto();
   });
 }
-function atualizarPronto() { pronto.hidden = !caixas.every((c) => c.checked); }
+// Celular e PC têm cada um a sua lista; "tiktok" vale pras duas.
+function atualizarPronto() {
+  for (const lista of listas) {
+    const pronto = lista.nextElementSibling;
+    pronto.hidden = ![...lista.querySelectorAll('[data-req]')].every((c) => c.checked);
+  }
+}
 atualizarPronto();
+
+// ───────── caminho: pelo celular ou pelo PC ─────────
+
+const abas = [...document.querySelectorAll('[role="tab"]')];
+
+function abrirCaminho(aba) {
+  for (const outra of abas) {
+    const ativa = outra === aba;
+    outra.setAttribute('aria-selected', ativa);
+    outra.tabIndex = ativa ? 0 : -1;
+    const via = outra.getAttribute('aria-controls');
+    document.getElementById(via).hidden = !ativa;
+    document.querySelector(`.guia-nav[data-via="${via.replace('via-', '')}"]`).hidden = !ativa;
+  }
+}
+
+for (const aba of abas) {
+  aba.addEventListener('click', () => abrirCaminho(aba));
+  aba.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    const vizinha = abas[(abas.indexOf(aba) + 1) % abas.length];
+    abrirCaminho(vizinha);
+    vizinha.focus();
+  });
+}
+
+// O HTML abre no celular (a maioria compra por ele). Link com ?via=pc, #pc ou âncora de um passo do PC abre no PC.
+const alvo = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+if (new URLSearchParams(location.search).get('via') === 'pc' || location.hash === '#pc' || alvo?.closest('#via-pc')) {
+  abrirCaminho(document.getElementById('aba-pc'));
+  alvo?.scrollIntoView();
+}
 
 // ───────── copiar frases ─────────
 

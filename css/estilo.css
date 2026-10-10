@@ -997,6 +997,11 @@ strong, b { font-weight: 750; }
 .guia-confirmada .ico { stroke-width: 3.2; }
 .guia-topo h1 { margin-top: 18px; font-size: clamp(2.5rem, 5vw + 1rem, 4.2rem); }
 .guia-lead { margin-top: 14px; font-size: 1.15rem; color: var(--prata); max-width: 36em; }
+.guia-pergunta { margin: 28px 0 10px; font-weight: 800; }
+.guia-nav[hidden], [role="tabpanel"][hidden] { display: none; }
+.guia-espaco { margin-top: 28px; }
+.lista-foto { padding-bottom: 22px; }
+.lista-foto img { display: block; margin-top: 10px; width: 100%; max-width: 320px; height: auto; border-radius: 14px; border: 1px solid var(--noite-3); }
 
 .guia-grade { display: grid; gap: 0; padding-bottom: 96px; }
 .guia-grade > * { min-width: 0; }
