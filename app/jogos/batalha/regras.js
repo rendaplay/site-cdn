@@ -84,6 +84,9 @@ class Batalha {
 
   regraAtaque() { return { ...ATAQUE_PADRAO, ...this.config.ataque }; }
 
+  /* Da mais barata à mais cara: é a ordem das opções no ⚙. */
+  faixasAtaque() { return [...this.regraAtaque().faixas].sort((x, y) => x.de - y.de); }
+
   ladoDoPresente(nome) {
     const n = normalizar(nome);
     if (!n) return -1;
@@ -143,7 +146,9 @@ class Batalha {
       .slice(0, n);
   }
 
-  presente({ id, nick, avatar, presente, quantidade = 1, moedas = 0, agora = Date.now() }) {
+  /* `faixa` vem do ⚙ (índice em faixasAtaque(), escolhido pelo streamer pra
+     esse presente); sem ela o ataque vale pelo valor. */
+  presente({ id, nick, avatar, presente, quantidade = 1, moedas = 0, faixa = null, agora = Date.now() }) {
     const pontos = Math.max(0, Math.round(moedas));
     if (!pontos) return [];
     const quem = { id: String(id || nick), nick: nick || "anônimo", avatar: avatar || null };
@@ -160,10 +165,11 @@ class Batalha {
       p.quem = quem;
       p.pontos += pontos;
       p.presentes.push({ presente, quantidade });
+      if (faixa !== null) p.faixa = Math.max(p.faixa ?? -1, faixa);
       this.pendentes.set(quem.id, p);
       return [{ tipo: "pendente", quem, pontos: p.pontos, presente, quantidade }];
     }
-    return [...guardado, ...this.pontuar(lado, quem, pontos, presente, quantidade, agora)];
+    return [...guardado, ...this.pontuar(lado, quem, pontos, presente, quantidade, agora, false, faixa)];
   }
 
   liberar(lado, quem, agora) {
@@ -172,7 +178,7 @@ class Batalha {
     this.pendentes.delete(quem.id);
     const nomes = [...new Set(p.presentes.map(x => x.presente))].join(", ");
     const qtd = p.presentes.reduce((s, x) => s + x.quantidade, 0);
-    return this.pontuar(lado, quem, p.pontos, nomes, qtd, agora, true);
+    return this.pontuar(lado, quem, p.pontos, nomes, qtd, agora, true, p.faixa ?? null);
   }
 
   /* O comando (1/2, nome do lado) ou o nome do presente ("gg") escolhe o
@@ -252,9 +258,10 @@ class Batalha {
   }
 
   /* Quantos metros o presente derruba da torre rival (null: não ataca). */
-  ataque(lado, quem, moedas) {
+  ataque(lado, quem, moedas, escolhida = null) {
     const r = this.regraAtaque();
-    const faixa = [...r.faixas].sort((x, y) => y.de - x.de).find(f => moedas >= f.de);
+    const faixas = this.faixasAtaque();
+    const faixa = escolhida !== null ? faixas[escolhida] : faixas.filter(f => moedas >= f.de).pop();
     const alvo = 1 - lado;
     const altura = this.lados[alvo].pontos;
     if (!faixa || !(r.maxPct > 0) || altura <= 0) return null;
@@ -271,7 +278,7 @@ class Batalha {
     return n;
   }
 
-  pontuar(lado, quem, pontos, presente, quantidade, agora, liberado = false) {
+  pontuar(lado, quem, pontos, presente, quantidade, agora, liberado = false, faixa = null) {
     /* O 2× só sobe a torre: ranking e MVP contam o que a pessoa mandou. */
     const moedas = pontos;
     const dobrado = !!this.dobro && this.dobro.lado === lado && agora < this.dobro.ate;
@@ -301,7 +308,7 @@ class Batalha {
       tipo: "pontos", lado, quem, pontos, presente, quantidade, liberado, dobrado,
       sequencia: s.n, maior, destaque: pontos >= (this.config.destaqueMoedas || Infinity),
     }];
-    const ataque = this.ataque(lado, quem, moedas);
+    const ataque = this.ataque(lado, quem, moedas, faixa);
     if (ataque) saida.push(ataque);
     return [...saida, ...this.depoisDeMudar(quem, agora)];
   }

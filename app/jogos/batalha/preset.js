@@ -27,7 +27,9 @@ window.BATALHA_PRESETS = {
         foto: "fotos/lula.webp",
         arte: "presets/arte/lula.png",
         presente: { nome: "Rosa", icone: "🌹", aceitos: ["Rose", "Rosa"], palavras: ["rosas", "rosinha"] },
-        comandos: ["1", "lula", "vermelho"],
+        /* 13 e 22: o número do partido de cada um, que o público já conhece. */
+        comandos: ["13", "lula", "vermelho"],
+        falas: [],
       },
       {
         nome: "Verde",
@@ -43,7 +45,8 @@ window.BATALHA_PRESETS = {
           aceitos: ["White Rose", "Rosa branca", "Rosa Branca", "GG"],
           palavras: ["branca", "rosa branca", "gg"],
         },
-        comandos: ["2", "flavio", "verde"],
+        comandos: ["22", "flavio", "verde"],
+        falas: [],
       },
     ],
     rodada: {
@@ -59,7 +62,7 @@ window.BATALHA_PRESETS = {
     /* Lado com até `atras`% da altura do outro (rodada com 150 m ou mais):
        o próximo presente dele vale 2× por 10 s. segundos: 0 desliga. */
     dobro: { atras: 50, minimo: 150, segundos: 10, intervalo: 45 },
-    /* Comentar 1/2 (ou o nome do presente) empilha um tijolinho de
+    /* Comentar o comando do lado (ou o nome do presente) empilha um tijolinho de
        `metros` (rosa = 1 m), um a cada `intervalo` s por pessoa, até
        `teto` m por pessoa na rodada. */
     comentario: { metros: 0.2, intervalo: 5, teto: 6 },

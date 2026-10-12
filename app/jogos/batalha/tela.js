@@ -127,6 +127,9 @@ const Tela = {
     /* Modo seguro: sem chaves "Presente Rosa = Vermelho" e sem nada que peça
        presente; o vínculo fica pelo ícone na legenda do próprio lado. */
     this.seguro = cfg.modoSeguro !== false;
+    /* Ultra seguro: nem o ícone do presente nem os golpes por moeda na legenda;
+       o presente continua contando, só não aparece o que ele faz. */
+    this.ultra = !!cfg.ultraSeguro;
     p.classList.toggle("seguro", this.seguro);
     const [a, b] = cfg.lados;
     const curte = this.curtidaLigada(cfg);
@@ -180,6 +183,10 @@ const Tela = {
         presente = el("img");
         presente.src = l.presente.imagem;
         presente.alt = "";
+      }
+      if (this.ultra) {
+        this.palco.querySelector(`.legenda-${s}`).replaceChildren(...itens);
+        return;
       }
       itens.push(item(presente, "+1 m", l.presente.nome));
       if (cfg.ataque && cfg.ataque.maxPct > 0) {
@@ -354,7 +361,16 @@ const Tela = {
     this.ultimoPresente = performance.now();
     if (a.dobrado) this.fimDobro();
     Torres.empilhar(a);
-    if (a.destaque) this.destacar(a);
+    if (a.destaque) {
+      this.destacar(a);
+      this.falar(a.lado);
+    }
+  },
+
+  /* Fala gravada do lado (preset `falas`); intervalo 0 desliga. */
+  falar(lado, prioridade = false) {
+    const intervalo = this.cfg.fala ? this.cfg.fala.intervalo : 15;
+    if (intervalo > 0) Som.fala(this.cfg.lados[lado].falas, { intervalo, prioridade });
   },
 
   /* Nome de quem mandou, no topo da torre, quando a peça assenta: com a
@@ -437,7 +453,9 @@ const Tela = {
     const oque = el("div", "oque");
     /* A live manda "Rose"; na tela vale o nome do preset ("Rosa"). */
     const simbolo = lado.presente.aceitos.some(x => normalizar(x) === normalizar(a.presente));
-    oque.textContent = a.liberado
+    oque.textContent = this.ultra
+      ? `reforçou a torre do ${lado.nome}`
+      : a.liberado
       ? `escolheu o ${lado.nome} e o presente entrou na torre`
       : `mandou ${a.quantidade > 1 ? a.quantidade + "× " : ""}${simbolo ? lado.presente.nome : a.presente} pra torre do ${lado.nome}`;
     txt.append(oque, el("div", "valor", `+${metros(a.pontos)}${a.dobrado ? " (2×)" : ""}`));
@@ -512,6 +530,7 @@ const Tela = {
   ataque(a) {
     if (this.emVitoria) return;
     Torres.atacar(a);
+    this.falar(a.lado);
     const golpe = GOLPES[a.ataque] || GOLPES.vento;
     const espera = ((ATAQUES[a.ataque] || ATAQUES.vento).antes) * 1000;
     setTimeout(() => this.anunciar("ataque", (pronto) => {
@@ -588,6 +607,7 @@ const Tela = {
     v.append(flash, faixas, palavra, sub);
     v.classList.add("on");
     Som.virada();
+    this.falar(a.lado);
 
     const dur = 1700;
     flash.animate([{ opacity: 0.7 }, { opacity: 0 }], { duration: 380, fill: "forwards" });
@@ -711,6 +731,7 @@ const Tela = {
     fotos.forEach(foto => foto.animate([{ translate: "0 200px", opacity: 0 }, { translate: "0 0", opacity: 1 }],
       { duration: 700, easing: "cubic-bezier(.2,1,.3,1)" }));
     Som.vitoria();
+    if (r.vencedor >= 0) this.falar(r.vencedor, true);
     const cores = empate ? [this.cfg.lados[0].cor, this.cfg.lados[1].cor, "#fff"] : [lado.cor, lado.acento, "#fff"];
     Torres.chuva(cores, 260);
     this.festa = setInterval(() => Torres.chuva(cores, 40), 900);

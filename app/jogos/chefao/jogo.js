@@ -28,6 +28,12 @@ const Jogo = {
     this.palco.classList.toggle("seguro", !!config.modoSeguro);
     Hud.montar(this.palco, config);
     Painel.montar(chave, config);
+    this.configurar = montarConfigurar({
+      jogo: "chefao",
+      opcoes: () => config.faixas.map(f => f.nome),
+      testar: presente => this.teste("presente", { presente }),
+      avancado: () => Painel.alternar(true),
+    });
     addEventListener("resize", () => this.aplicarFormato());
     addEventListener("keydown", e => this.tecla(e));
     this.entrarChefe(raid.chefe);
@@ -74,7 +80,8 @@ const Jogo = {
     if (ev.tipo === "comentario") lista = raid.comentario(quem, ev.texto, t);
     else if (ev.tipo === "presente") {
       const p = ev.presente;
-      lista = raid.presente(quem, { nome: p.nome, moedas: p.total, quantidade: p.quantidade }, t);
+      const faixa = this.configurar.faixa(p.nome, p.moedas);
+      lista = raid.presente(quem, { nome: p.nome, moedas: p.total, quantidade: p.quantidade, faixa }, t);
     } else if (ev.tipo === "curtida") lista = raid.curtida(quem, ev.curtidas, t);
     else if (ev.tipo === "seguiu") lista = raid.seguiu(quem, t);
     else if (ev.tipo === "compartilhou") lista = raid.compartilhou(quem, t);

@@ -13,6 +13,9 @@ const Config = {
     dobro: { atras: 50, minimo: 150, segundos: 10, intervalo: 45 },
     comentario: { metros: 0.2, intervalo: 5, teto: 6 },
     modoSeguro: true,
+    ultraSeguro: false,
+    /* Fala gravada de cada lado (`falas` do lado): uma a cada `intervalo` s no máximo. */
+    fala: { intervalo: 15 },
     curtida: { cada: 25, metros: 0.5, intervalo: 5, teto: 6 },
     seguiu: { metros: 1 },
     ataque: { maxPct: 40 },
@@ -28,6 +31,7 @@ const Config = {
     if (num("rodada")) config.rodada.segundos = num("rodada");
     if (num("meta") !== null) config.meta.moedas = num("meta");
     if (url.has("som")) config.som = url.get("som") !== "0";
+    if (config.ultraSeguro) config.modoSeguro = true;
 
     const formato = url.get("formato");
     return {
@@ -50,6 +54,16 @@ const Config = {
        do que foi salvo (tempo, cores, som) continua. */
     if (!salvo.comentario && Array.isArray(salvo.lados)) {
       for (const l of salvo.lados) if (l) { delete l.presente; delete l.comandos; }
+    }
+    if (Array.isArray(salvo.lados)) {
+      salvo.lados.forEach((l, i) => {
+        if (!l) return;
+        /* As falas são arquivos do preset: o painel não edita, e a lista salva
+           esconderia a fala nova. */
+        delete l.falas;
+        /* Lula x Flávio trocou 1/2 por 13/22: quem salvou sem mexer no comando segue o preset. */
+        if (chave === "lula-flavio" && Array.isArray(l.comandos) && l.comandos[0] === String(i + 1)) delete l.comandos;
+      });
     }
     return salvo;
   },

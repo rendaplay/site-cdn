@@ -276,12 +276,15 @@ class Racha {
     return i;
   }
 
-  efeitoDe(total) {
-    const faixa = this.faixaDe(total);
+  /* `escolhida` vem do ⚙ (o streamer escolheu a faixa desse presente): ela
+     vale no lugar do total, também pra virar míssil na temporada. */
+  efeitoDe(total, escolhida = null) {
+    const faixa = escolhida === null ? this.faixaDe(total) : escolhida;
     if (faixa < 0) return { faixa, efeito: null };
     let efeito = this.config.faixas[faixa].efeito;
+    const valor = escolhida === null ? total : this.config.faixas[faixa].moedas;
     const s = this.config.surpresa;
-    if (this.evento && this.evento.tipo === "missil" && efeito === "oleo" && total >= s.missil.moedas) efeito = "missil";
+    if (this.evento && this.evento.tipo === "missil" && efeito === "oleo" && valor >= s.missil.moedas) efeito = "missil";
     return { faixa, efeito };
   }
 
@@ -309,7 +312,7 @@ class Racha {
 
     const apoiado = doador.apoio && this.pilotos.get(doador.apoio);
     const alvo = apoiado && apoiado.correndo ? apoiado : doador;
-    const { faixa, efeito } = this.efeitoDe(total);
+    const { faixa, efeito } = this.efeitoDe(total, ev.faixa ?? null);
     const mult = this.multiplicador;
     const anuncio = {
       tipo: "presente", quem: this.ref(doador), alvo: this.ref(alvo), para: alvo !== doador,

@@ -16,6 +16,14 @@
 </head>
 <body>
 
+<!-- Carregando: visível de saída, pra nunca sobrar tela vazia (o iOS recarrega a página ao voltar do TikTok) -->
+<main id="tela-carregando" class="tela tela-entrar tela-carregando">
+  <img class="logo" src="marca/logo-horizontal.svg" alt="Renda Play">
+  <p id="carregando-texto" class="apagado">Carregando…</p>
+  <p id="carregando-erro" class="erro" role="alert" hidden></p>
+  <button id="botao-tentar" class="rp-botao largo" type="button" hidden>Tentar de novo</button>
+</main>
+
 <!-- Entrar / ativar -->
 <main id="tela-entrar" class="tela tela-entrar" hidden>
   <img class="logo" src="marca/logo-horizontal.svg" alt="Renda Play">

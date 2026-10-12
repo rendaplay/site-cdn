@@ -109,4 +109,40 @@ const Som = {
   },
   tique(ultimo) { this.nota(ultimo ? 1320 : 880, 0.09, { tipo: "square", vol: 0.07 }); },
   vitoria() { [392, 523, 659, 784, 1047].forEach((f, i) => this.nota(f, 0.4, { tipo: "triangle", vol: 0.14, atraso: i * 0.12 })); },
+
+  /* Fala gravada (arquivo do preset), uma por vez: `prioridade` corta a que
+     estiver tocando, senão espera o `intervalo` desde a última. */
+  _audios: new Map(),
+  _fala: null,
+  _falaEm: -Infinity,
+  _ultimaFala: null,
+
+  async fala(lista, { intervalo = 15, prioridade = false } = {}) {
+    if (!this.ligado || !this.volume || !lista || !lista.length) return;
+    const agora = performance.now();
+    if (!prioridade && (this._fala || agora - this._falaEm < intervalo * 1000)) return;
+    const c = this.ctx();
+    if (!c) return;
+    this._falaEm = agora;
+    const opcoes = lista.length > 1 ? lista.filter(x => x !== this._ultimaFala) : lista;
+    const url = opcoes[Math.floor(Math.random() * opcoes.length)];
+    this._ultimaFala = url;
+    let buffer = this._audios.get(url);
+    if (!buffer) {
+      try {
+        buffer = await c.decodeAudioData(await (await fetch(url)).arrayBuffer());
+      } catch (e) {
+        console.warn("fala:", url, e);
+        return;
+      }
+      this._audios.set(url, buffer);
+    }
+    if (this._fala) this._fala.stop();
+    const s = c.createBufferSource();
+    s.buffer = buffer;
+    s.connect(this._mestre);
+    s.onended = () => { if (this._fala === s) this._fala = null; };
+    this._fala = s;
+    s.start();
+  },
 };

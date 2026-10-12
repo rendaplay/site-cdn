@@ -190,10 +190,12 @@ class Raid {
     return [{ tipo: "compartilhou", id: j.id }, ...this.bater(j, this.cfg.compartilhou, { origem: "compartilhou" }, agora)];
   }
 
-  presente(quem, { nome, moedas, quantidade = 1 }, agora) {
+  /* `faixa` vem do ⚙ (o streamer escolheu a faixa desse presente); sem ela vale pelo valor.
+     O dano segue sempre pelas moedas. */
+  presente(quem, { nome, moedas, quantidade = 1, faixa = null }, agora) {
     const j = this.jogador(quem);
     const valor = Math.max(0, Math.round(Number(moedas) || 0));
-    const faixa = this.faixa(valor);
+    if (faixa === null) faixa = this.faixa(valor);
     j.moedas += valor;
     this.moedas += valor;
     if (valor > 0) this.ultimoPresente = agora;

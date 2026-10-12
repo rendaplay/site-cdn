@@ -43,6 +43,7 @@ const Painel = {
       <fieldset><legend>Modo seguro TikTok</legend>
         <p class="dica">A tela não pede presente, não mostra moedas e o 2× fica desligado. Recomendado: o TikTok restringe live por "solicitação artificial de presentes".</p>
         <label class="linha cheia"><input type="checkbox" name="modoSeguro" ${config.modoSeguro !== false ? "checked" : ""}>Modo seguro ligado</label>
+        <label class="linha cheia"><input type="checkbox" name="ultraSeguro" ${config.ultraSeguro ? "checked" : ""}>Ultra seguro: tira também os presentes e os golpes da legenda (o presente continua contando)</label>
       </fieldset>
       <fieldset><legend>Presente vale 2×</legend>
         <p class="dica">Quando um lado fica muito pra trás, o próximo presente dele vale o dobro por alguns segundos. Não funciona com o modo seguro ligado.</p>
@@ -52,7 +53,7 @@ const Painel = {
         ${campo("Espera até o próximo 2× (segundos)", "dobro.intervalo", config.dobro.intervalo, "number")}
       </fieldset>
       <fieldset><legend>Comentário empilha</legend>
-        <p class="dica">Comentar 1 / 2 (ou o nome do presente) empilha um tijolinho. Uma rosa vale 1 metro.</p>
+        <p class="dica">Comentar o comando do lado (ou o nome do presente) empilha um tijolinho. Uma rosa vale 1 metro.</p>
         ${campo("Metros por comentário (0 desliga)", "comentario.metros", config.comentario.metros, "number")}
         ${campo("Intervalo por pessoa (segundos)", "comentario.intervalo", config.comentario.intervalo, "number")}
         ${campo("Teto por pessoa na rodada (metros)", "comentario.teto", config.comentario.teto, "number")}
@@ -72,6 +73,7 @@ const Painel = {
       <fieldset><legend>Som</legend>
         <label class="linha"><input type="checkbox" name="som" ${config.som ? "checked" : ""}>Som do jogo ligado</label>
         ${campo("Volume (0 a 100)", "volume", config.volume, "number")}
+        ${campo(`Falas gravadas: no máximo uma a cada (segundos, 0 desliga) · ${config.lados.map(l => `${escapar(l.nome)}: ${(l.falas || []).length}`).join(" · ")}`, "fala.intervalo", config.fala.intervalo, "number", "cheia")}
       </fieldset>
       <div class="botoes">
         <button type="submit" class="principal">Salvar e recarregar</button>

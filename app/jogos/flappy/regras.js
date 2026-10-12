@@ -200,7 +200,8 @@ class Partida {
     }
   }
 
-  presente(quem, { nome = "", moedas = 0, quantidade = 1 } = {}) {
+  /* `faixa` vem do ⚙ (o streamer escolheu a faixa desse presente); sem ela vale pelo valor. */
+  presente(quem, { nome = "", moedas = 0, quantidade = 1, faixa = null } = {}) {
     const j = this.jogador(quem);
     const saida = [];
     moedas = Math.max(0, Math.round(Number(moedas) || 0));
@@ -216,7 +217,7 @@ class Partida {
     }
     const time = this.timeDe(j);
     j[time] += moedas;
-    const faixa = this.faixaDe(moedas);
+    if (faixa === null) faixa = this.faixaDe(moedas);
     const lendario = moedas >= this.cfg.lendario;
     const ev = { tipo: "presente", id: j.id, time, faixa, nome, moedas, quantidade, lendario,
       efeito: faixa >= 0 ? this.cfg.faixas[faixa][time].efeito : null };

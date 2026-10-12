@@ -20,6 +20,8 @@ const PLATEIA = {
   ],
 };
 
+const NOMES_EFEITO = { turbo: "Turbo", nitro: "Nitro", oleo: "Óleo", missil: "Míssil", escudo: "Escudo", bomba: "Bomba" };
+
 const Jogo = {
   agora: 0,
   pausado: false,
@@ -35,6 +37,12 @@ const Jogo = {
     this.palco = document.getElementById("palco");
     Hud.montar(this.palco, config);
     Painel.montar(chave, config);
+    this.configurar = montarConfigurar({
+      jogo: "racha",
+      opcoes: () => config.faixas.map(f => NOMES_EFEITO[f.efeito] || f.efeito),
+      testar: presente => this.presenteDe(presente),
+      avancado: () => Painel.alternar(true),
+    });
     Cena.montar(document.getElementById("cena"), "vertical", this.palco);
 
     this.mudarFormato(opcoes.formato || (innerHeight >= innerWidth ? "vertical" : "horizontal"));
@@ -51,6 +59,7 @@ const Jogo = {
   },
 
   receber(ev) {
+    if (ev.tipo === "presente" && ev.presente) ev = { ...ev, faixa: this.configurar.faixa(ev.presente.nome, ev.presente.moedas) };
     this.contar(racha.receber(ev, this.agora));
   },
 
@@ -115,13 +124,16 @@ const Jogo = {
 
   presenteTeste(faixa) {
     const f = config.faixas[faixa];
-    if (!f) return;
+    if (f) this.presenteDe({ nome: "Teste", moedas: f.moedas, quantidade: 1, total: f.moedas });
+  },
+
+  presenteDe(presente) {
     const pilotos = [...racha.pilotos.values()];
     const quem = pilotos.length ? pilotos[Math.floor(Math.random() * pilotos.length)] : { id: "teste1", nome: "teste1" };
     this.receber({
       tipo: "presente",
       usuario: { id: quem.id, nome: quem.nome, foto: quem.foto || null },
-      presente: { nome: "Teste", moedas: f.moedas, quantidade: 1, total: f.moedas },
+      presente,
     });
   },
 

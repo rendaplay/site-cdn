@@ -42,6 +42,12 @@ const Jogo = {
       return this.partida.mundo.passaro.y < (d.topo + d.chao) / 2;
     };
     Painel.montar(chave, config);
+    this.configurar = montarConfigurar({
+      jogo: "flappy",
+      opcoes: () => config.faixas.map(f => `${f.ajuda.nome} / ${f.caos.nome}`),
+      testar: presente => this.teste("presente", { presente }),
+      avancado: () => Painel.alternar(true),
+    });
     this.aplicarFormato(true);
 
     addEventListener("resize", () => this.aplicarFormato());
@@ -114,7 +120,8 @@ const Jogo = {
     if (ev.tipo === "comentario") lista = p.comentario(quem, ev.texto);
     else if (ev.tipo === "presente") {
       const pr = ev.presente;
-      lista = p.presente(quem, { nome: pr.nome, moedas: pr.total, quantidade: pr.quantidade });
+      const faixa = this.configurar.faixa(pr.nome, pr.moedas);
+      lista = p.presente(quem, { nome: pr.nome, moedas: pr.total, quantidade: pr.quantidade, faixa });
     } else if (ev.tipo === "curtida") lista = p.curtida(quem, ev.curtidas);
     else if (ev.tipo === "seguiu") lista = p.seguiu(quem);
     else if (ev.tipo === "compartilhou") lista = p.compartilhou(quem);

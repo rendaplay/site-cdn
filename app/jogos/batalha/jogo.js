@@ -21,6 +21,12 @@ const Jogo = {
     Som.destravarNoToque();
     Tela.montar(config, opcoes.formato);
     Painel.montar(chave, config);
+    this.configurar = montarConfigurar({
+      jogo: "batalha",
+      opcoes: () => batalha.faixasAtaque().map(f => (GOLPES[f.tipo] || { nome: f.tipo }).nome),
+      testar: p => this.enviarTeste({ name: p.nome, count: p.quantidade, coins: p.moedas, total_coins: p.total }),
+      avancado: () => Painel.alternar(true),
+    });
     this.novoRelogio(config.rodada.segundos);
     Tela.placar(batalha);
     Tela.sinal(false, true);
@@ -57,7 +63,8 @@ const Jogo = {
     if (p.type === "gift") {
       const qtd = Math.max(1, Number(d.count) || 1);
       const moedas = Number(d.total_coins) || (Number(d.coins) || 0) * qtd;
-      acontecimentos = batalha.presente({ ...quem, presente: d.name, quantidade: qtd, moedas });
+      const faixa = this.configurar.faixa(d.name, Number(d.coins) || moedas / qtd);
+      acontecimentos = batalha.presente({ ...quem, presente: d.name, quantidade: qtd, moedas, faixa });
     } else if (p.type === "chat") {
       acontecimentos = batalha.comentario({ ...quem, texto: d.text });
     } else if (p.type === "like") {
@@ -165,12 +172,12 @@ const Jogo = {
   presenteTeste(lado) {
     const valores = [1, 1, 5, 10, 30, 99, 199, 500, 1000];
     const moedas = valores[Math.floor(Math.random() * valores.length)];
+    this.enviarTeste({ name: config.lados[lado].presente.aceitos[0], count: 1, coins: moedas, total_coins: moedas });
+  },
+
+  enviarTeste(data) {
     const id = "teste" + Math.floor(Math.random() * 6);
-    this.receber({
-      type: "gift",
-      user: { id, nickname: id, avatar: null },
-      data: { name: config.lados[lado].presente.aceitos[0], count: 1, coins: moedas, total_coins: moedas },
-    });
+    this.receber({ type: "gift", user: { id, nickname: id, avatar: null }, data });
   },
 
   tecla(e) {

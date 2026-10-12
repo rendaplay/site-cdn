@@ -39,6 +39,12 @@ const Jogo = {
     this.palco = document.getElementById("palco");
     Hud.montar(this.palco, config);
     Painel.montar(chave, config);
+    this.configurar = montarConfigurar({
+      jogo: "escalada",
+      opcoes: () => config.faixas.map((_, i) => config.times.map(t => t.efeitos[i]).join(" / ")),
+      testar: presente => this.receber({ tipo: "presente", usuario: { id: "teste", nome: "teste", foto: null }, presente }),
+      avancado: () => Painel.alternar(true),
+    });
     Cena.montar(document.getElementById("cena"), "vertical", config.personagem);
     this.recordeDeSempre = Config.recordeDeSempre(chave, 0);
 
@@ -59,6 +65,7 @@ const Jogo = {
 
   receber(ev) {
     if (ev.simulado && this.live && this.live.modo === "mock") ev.mock = true;
+    if (ev.tipo === "presente" && ev.presente) ev.faixa = this.configurar.faixa(ev.presente.nome, ev.presente.moedas);
     this.contar(escalada.receber(ev, this.agora));
   },
 

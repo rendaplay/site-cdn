@@ -34,6 +34,9 @@ function frase(texto) {
   return /[.!?]$/.test(texto) ? texto : texto + ".";
 }
 
+/* Sem prazo, um pedido que o iOS congelou ao ir pro TikTok fica pendurado pra sempre. */
+const PRAZO_PEDIDO_MS = 15000;
+
 async function pedir(base, rota, { metodo = "GET", corpo, cabecalhos = {} } = {}) {
   let resposta;
   try {
@@ -42,6 +45,7 @@ async function pedir(base, rota, { metodo = "GET", corpo, cabecalhos = {} } = {}
       headers: { ...(corpo ? { "Content-Type": "application/json" } : {}), ...cabecalhos },
       body: corpo ? JSON.stringify(corpo) : undefined,
       cache: "no-store",
+      signal: AbortSignal.timeout ? AbortSignal.timeout(PRAZO_PEDIDO_MS) : undefined,
     });
   } catch (e) {
     throw Object.assign(new Error("Sem conexão com a Renda Play. Confira a internet e tente de novo."), { status: 0 });
@@ -108,7 +112,7 @@ async function instalar() {
 }
 
 function mostrar(tela) {
-  for (const id of ["tela-entrar", "tela-inicio"]) $(id).hidden = id !== tela;
+  for (const id of ["tela-carregando", "tela-entrar", "tela-inicio"]) $(id).hidden = id !== tela;
 }
 
 /* ───────────── entrar ───────────── */
@@ -152,6 +156,7 @@ async function entrar(evento) {
 
 function sair() {
   guardado.gravar("sessao", null);
+  guardado.gravar("ao-vivo", null);
   app.conta = null;
   $("campo-pedido").value = "";
   $("folha-conta").hidden = true;
@@ -164,20 +169,46 @@ function sair() {
 async function carregarConta() {
   const sessao = guardado.ler("sessao");
   if (!sessao) { mostrar("tela-entrar"); return; }
+  if (!app.conta) {
+    $("carregando-erro").hidden = true;
+    $("botao-tentar").hidden = true;
+    $("carregando-texto").hidden = false;
+    mostrar("tela-carregando");
+  }
   try {
     app.conta = await pedir(API, "/eu", { cabecalhos: { Authorization: "Bearer " + sessao } });
   } catch (e) {
     if (e.status === 401) { sair(); return; }
     if (!app.conta) {
-      mostrar("tela-entrar");
-      $("entrar-erro").textContent = e.message;
-      $("entrar-erro").hidden = false;
+      $("carregando-texto").hidden = true;
+      $("carregando-erro").textContent = e.message;
+      $("carregando-erro").hidden = false;
+      $("botao-tentar").hidden = false;
       return;
     }
   }
   montarInicio();
   mostrarInstalar();
   mostrar("tela-inicio");
+  retomarLive();
+}
+
+/* O iOS fecha a aba enquanto o TikTok transmite e recarrega a página na volta:
+   quem estava com o jogo aberto volta direto pra ele. Live parada há muito
+   tempo não volta, pra não religar o conector de surpresa no dia seguinte. */
+const RETOMAR_ATE_MS = 30 * 60 * 1000;
+
+function lembrarLive() {
+  guardado.gravar("ao-vivo", app.aoVivo ? JSON.stringify({ ...app.aoVivo, em: Date.now() }) : null);
+}
+
+function retomarLive() {
+  let salva = null;
+  try { salva = JSON.parse(guardado.ler("ao-vivo")); } catch (e) { /* lixo antigo */ }
+  if (!salva || Date.now() - salva.em > RETOMAR_ATE_MS) { guardado.gravar("ao-vivo", null); return; }
+  if (!app.conta.ativo || !app.conta.canal || !liberado(salva.jogo)) return;
+  app.aoVivo = { simular: salva.simular, jogo: salva.jogo };
+  abrirJogo();
 }
 
 function liberado(id) {
@@ -301,6 +332,7 @@ async function vigiarConector() {
     // Desligado sem a gente pedir (relay reiniciou, ficou sem leitor): liga de novo.
     if (estado === "parado" && app.aoVivo) await ligarConector(app.aoVivo.simular);
     mostrarSelo(estado);
+    lembrarLive();
   } catch (e) {
     mostrarSelo("sem internet");
   }
@@ -312,8 +344,11 @@ async function abrirJogo() {
   const parametros = new URLSearchParams({ canal: app.conta.canal, relay: RELAY });
   quadro.src = `jogos/${app.aoVivo.jogo}/index.html?${parametros}`;
   $("tela-jogo").hidden = false;
+  document.documentElement.classList.add("jogando");
   $("menu-jogo").hidden = true;
   mostrarSelo("conectando");
+  lembrarLive();
+  clearInterval(app.vigia);
   app.vigia = setInterval(vigiarConector, 4000);
   vigiarConector();
   try { await document.documentElement.requestFullscreen({ navigationUI: "hide" }); } catch (e) { /* iOS não tem */ }
@@ -337,8 +372,10 @@ async function pararLive() {
   clearInterval(app.vigia);
   app.vigia = null;
   app.aoVivo = null;
+  lembrarLive();
   $("quadro-jogo").src = "about:blank";
   $("tela-jogo").hidden = true;
+  document.documentElement.classList.remove("jogando");
   if (app.trava) { app.trava.release().catch(() => {}); app.trava = null; }
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   try {
@@ -383,9 +420,34 @@ $("botao-sair").addEventListener("click", sair);
 $("selo-jogo").addEventListener("click", () => { $("menu-jogo").hidden = !$("menu-jogo").hidden; });
 $("botao-voltar-jogo").addEventListener("click", () => { $("menu-jogo").hidden = true; });
 $("botao-sair-jogo").addEventListener("click", pararLive);
+$("botao-tentar").addEventListener("click", carregarConta);
+/* O app da tela de início do iOS volta do segundo plano com o tamanho da tela
+   errado por um instante (WebKit 170595): o jogo se ajusta a esse tamanho e
+   fica preto ou fora da tela. Na volta, desrola tudo e faz o jogo se medir
+   de novo algumas vezes, até o iOS assentar o tamanho certo. */
+function reajustarJogo() {
+  if ($("tela-jogo").hidden) return;
+  const quadro = $("quadro-jogo");
+  scrollTo(0, 0);
+  quadro.style.display = "none";
+  void quadro.offsetHeight;
+  quadro.style.display = "";
+  try {
+    quadro.contentWindow.scrollTo(0, 0);
+    quadro.contentWindow.dispatchEvent(new Event("resize"));
+  } catch (e) { /* jogo ainda carregando */ }
+}
+
+function aoVoltar() {
+  for (const espera of [0, 250, 800, 2000]) setTimeout(reajustarJogo, espera);
+  if (app.aoVivo && !app.trava) manterTelaAcesa();
+}
+
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible" && app.aoVivo && !app.trava) manterTelaAcesa();
+  if (document.visibilityState === "visible") aoVoltar();
 });
+addEventListener("pageshow", aoVoltar);
+addEventListener("resize", () => setTimeout(reajustarJogo, 250));
 
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 

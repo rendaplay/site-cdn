@@ -93,6 +93,7 @@ button:disabled { cursor: default; opacity: 0.45; }
 }
 
 .tela-entrar .logo { width: 210px; align-self: center; }
+.tela-carregando { text-align: center; gap: 16px; }
 
 .form { display: flex; flex-direction: column; gap: 14px; }
 .form h1 { font-size: 24px; }
@@ -257,6 +258,9 @@ input:focus { border-color: var(--rp-verde); outline: none; }
 /* ───────── jogo ───────── */
 
 .tela-jogo { position: fixed; inset: 0; z-index: 20; background: #000; }
+/* Com o jogo aberto a página de trás não rola: no iOS, voltar do segundo
+   plano rolava a página e o jogo saía da tela. */
+html.jogando, html.jogando body { overflow: hidden; height: 100%; }
 .tela-jogo iframe { width: 100%; height: 100%; border: 0; display: block; }
 
 /* Pequeno e discreto: aparece na transmissão junto com o jogo. */

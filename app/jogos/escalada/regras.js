@@ -124,13 +124,15 @@ class Escalada {
 
   /* ───────────── ações da live ───────────── */
 
+  /* `ev.faixa` vem do ⚙ (o streamer escolheu a faixa desse presente); sem ela
+     vale pelo valor. Só troca o efeito: metros, placar e ranking seguem as moedas. */
   presente(ev, agora) {
     const total = Math.max(0, Math.round(ev.presente && ev.presente.total || 0));
     if (!total) return [];
     const quem = this.quemDe(ev.usuario);
     const nome = ev.presente.nome;
     const quantidade = ev.presente.quantidade || 1;
-    const lote = [{ total, dobro: this.emDobro }];
+    const lote = [{ total, dobro: this.emDobro, faixa: ev.faixa ?? null }];
     this.ultimoPresenteEm = agora;
 
     let time = this.timeDoPresente(nome);
@@ -182,7 +184,9 @@ class Escalada {
     d.moedas += total;
     this.doadores[time].set(quem.id, d);
 
-    const faixa = this.faixa(total);
+    const faixa = lote.some(x => x.faixa !== null)
+      ? Math.max(...lote.map(x => x.faixa ?? this.faixa(x.total)))
+      : this.faixa(total);
     const saida = [{
       tipo: "presente", time, quem, total, metros, faixa, semTime: false, liberado: false,
       efeito: this.config.times[time].efeitos[faixa],

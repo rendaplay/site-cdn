@@ -169,13 +169,14 @@ class Combate {
     return lista;
   }
 
-  presente(quem, { nome, moedas, quantidade = 1 }, agora) {
+  /* `faixa` vem do ⚙ (o streamer escolheu a faixa desse presente); sem ela vale pelo valor. */
+  presente(quem, { nome, moedas, quantidade = 1, faixa = null }, agora) {
     const j = this.jogador(quem);
     moedas = Math.max(0, Number(moedas) || 0);
     j.moedas += moedas;
     this.moedas += moedas;
     this.ultimoPresente = agora;
-    let faixa = this.faixaDe(moedas);
+    if (faixa === null) faixa = this.faixaDe(moedas);
     if (faixa < 0) return [];
     const dourado = !!(this.evento && this.evento.tipo === "dourado");
     if (dourado) faixa = Math.min(this.cfg.faixas.length - 1, faixa + 1);

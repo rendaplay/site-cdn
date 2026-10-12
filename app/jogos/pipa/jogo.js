@@ -26,6 +26,12 @@ const Jogo = {
     Ceu.montar(document.getElementById("ceu"));
     Hud.montar(this.palco, config);
     Painel.montar(chave, config);
+    this.configurar = montarConfigurar({
+      jogo: "pipa",
+      opcoes: () => config.faixas.map(f => f.nome),
+      testar: presente => this.teste("presente", { presente }),
+      avancado: () => Painel.alternar(true),
+    });
     combate.distancia = (a, b) => Ceu.distancia(a, b);
 
     this.forcado = opcoes.formato;
@@ -72,7 +78,8 @@ const Jogo = {
     if (ev.tipo === "comentario") lista = combate.comentario(quem, ev.texto, t);
     else if (ev.tipo === "presente") {
       const p = ev.presente;
-      lista = combate.presente(quem, { nome: p.nome, moedas: p.total, quantidade: p.quantidade }, t);
+      const faixa = this.configurar.faixa(p.nome, p.moedas);
+      lista = combate.presente(quem, { nome: p.nome, moedas: p.total, quantidade: p.quantidade, faixa }, t);
     } else if (ev.tipo === "curtida") lista = combate.curtida(quem, ev.curtidas, t);
     else if (ev.tipo === "seguiu") lista = combate.seguiu(quem, t);
     else if (ev.tipo === "compartilhou") lista = combate.compartilhou(quem, t);
