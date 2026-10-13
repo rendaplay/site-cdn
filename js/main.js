@@ -45,8 +45,13 @@ if (topo) {
 
 const barraCta = $('#barra-cta');
 if (barraCta) {
-  const visiveis = { hero: true, precos: false, final: false };
-  const atualizarBarra = () => barraCta.classList.toggle('visivel', !visiveis.hero && !visiveis.precos && !visiveis.final);
+  // No celular o hero tem o vídeo e passa de uma tela: esperar ele sumir atrasava a barra demais.
+  const visiveis = { precos: false, final: false };
+  const atualizarBarra = () => {
+    const rolouUmaTela = window.scrollY > window.innerHeight * 0.9;
+    barraCta.classList.toggle('visivel', rolouUmaTela && !visiveis.precos && !visiveis.final);
+  };
+  window.addEventListener('scroll', atualizarBarra, { passive: true });
   for (const id of Object.keys(visiveis)) quandoVisivel($('#' + id), (v) => { visiveis[id] = v; atualizarBarra(); }, 0);
 }
 
