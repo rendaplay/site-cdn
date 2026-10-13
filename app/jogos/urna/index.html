@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Urna Eletrônica · Renda Play</title>
+<link rel="stylesheet" href="urna.css">
+</head>
+<body>
+<div id="palco" class="palco vertical" aria-live="polite">
+  <div class="fundo" aria-hidden="true"><i class="luz luz-a"></i><i class="luz luz-b"></i><i class="grade"></i></div>
+
+  <header class="topo">
+    <div class="marca"><b>ELEIÇÃO DA LIVE</b><span>2º TURNO</span></div>
+    <div class="relogio"><span class="tempo">5:00</span><small class="rodada"></small></div>
+    <div class="serie"></div>
+  </header>
+
+  <div class="faixa">
+    <div class="faixa-info"><span class="frente"></span><span class="diferenca"></span><span class="total"></span></div>
+    <div class="cabo"><i class="cabo-a"><b></b></i><i class="cabo-b"><b></b></i><span class="meio"></span></div>
+  </div>
+
+  <section class="cartao cartao-a" data-lado="0"></section>
+  <section class="cartao cartao-b" data-lado="1"></section>
+
+  <div class="mesa"><canvas id="urnas" aria-hidden="true"></canvas></div>
+  <ol class="ultimos"></ol>
+  <div class="chaves"></div>
+
+  <div class="bolhas" aria-hidden="true"></div>
+  <div class="massa" aria-hidden="true"></div>
+  <div class="virada" aria-hidden="true"></div>
+  <div class="apuracao" hidden></div>
+  <div class="eleito" hidden><canvas class="confete"></canvas><div class="eleito-conteudo"></div></div>
+  <div class="sem-sinal" hidden></div>
+  <div class="pausa" hidden>Pausado</div>
+  <form class="painel" hidden></form>
+</div>
+
+<script src="../comum/eleicao/candidatos.js"></script>
+<script src="../comum/eleicao/lados.js"></script>
+<script src="../comum/eleicao/vozes-catalogo.js"></script>
+<script src="../comum/eleicao/vozes.js"></script>
+<script src="preset.js"></script>
+<script src="config.js"></script>
+<script src="regras.js"></script>
+<script src="../comum/live.js"></script>
+<script src="../comum/presentes.js"></script>
+<script src="../comum/configurar.js"></script>
+<script src="urnas.js"></script>
+<script src="tela.js"></script>
+<script src="painel.js"></script>
+<script src="jogo.js"></script>
+</body>
+</html>

@@ -73,6 +73,7 @@ window.ESCALADA_PRESETS = {
     lendarioMoedas: 10000,
     som: true,
     volume: 60,
+    musica: 25,
   },
 };
 

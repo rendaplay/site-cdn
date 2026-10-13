@@ -49,6 +49,7 @@ const Painel = {
         ${campo("Anúncio grande a partir de (moedas)", "destaqueMoedas", config.destaqueMoedas, "number")}
         <label class="linha"><input type="checkbox" name="som" ${config.som ? "checked" : ""}>Som do jogo</label>
         ${campo("Volume do som (0 a 100)", "volume", config.volume, "number")}
+        ${campo("Volume da música (0 a 100)", "musica", config.musica, "number")}
       </fieldset>
       <fieldset><legend>Contra-ataque e cura</legend>
         ${campo("Primeiro aos (s de luta)", "contra.primeiro", ct.primeiro, "number")}

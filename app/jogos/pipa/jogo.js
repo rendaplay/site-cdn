@@ -96,6 +96,11 @@ const Jogo = {
         a.motivo === "vento" ? Ceu.levar(a.id) : Ceu.recolher(a.id);
       } else if (a.tipo === "gas" || a.tipo === "segurou") {
         Ceu.gas(a.id);
+        a.tipo === "gas" ? Som.gas() : Som.segurou();
+      } else if (a.tipo === "curtiu") {
+        Som.curtida();
+      } else if (a.tipo === "rei") {
+        if (a.id) Som.coroa();
       } else if (a.tipo === "presente") {
         this.presente(a, j);
       } else if (a.tipo === "relo") {
@@ -112,8 +117,10 @@ const Jogo = {
         const p = Ceu.pipas.get(a.id);
         if (p) Ceu.texto("ESCUDO", p.corpo.x, p.corpo.y - 80, 0.55, "#BFF3FF");
       } else if (a.tipo === "seguiu") {
+        Som.seguiu();
         Hud.aviso(`<b>${escapar(j.nome)}</b> seguiu e soltou a pipa`);
       } else if (a.tipo === "compartilhou") {
+        Som.seguiu();
         Hud.aviso(`<b>${escapar(j.nome)}</b> compartilhou: escudo ${config.escudoCompartilhar} s`);
       } else if (a.tipo === "evento") {
         this.evento(a);
@@ -185,6 +192,7 @@ const Jogo = {
   },
 
   fimEvento(a) {
+    Som.fanfarra();
     Vento.forca = 1;
     Ceu.tingir = { ...Ceu.tingir, alvo: 0 };
     if (a.evento === "ventania") {

@@ -37,6 +37,7 @@ const Painel = {
         <label class="linha"><input type="checkbox" name="modoSeguro" ${config.modoSeguro ? "checked" : ""}>Modo seguro TikTok (sem pedir presente)</label>
         <label class="linha"><input type="checkbox" name="som" ${config.som ? "checked" : ""}>Som do jogo</label>
         ${campo("Volume do som (0 a 100)", "volume", config.volume, "number")}
+        ${campo("Volume da música (0 a 100)", "musica", config.musica, "number")}
       </fieldset>
       ${config.faixas.map(faixa).join("")}
       <fieldset><legend>Evento-surpresa (chat esfriou)</legend>

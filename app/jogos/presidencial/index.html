@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Corrida Presidencial · Renda Play</title>
+<link rel="stylesheet" href="presidencial.css">
+</head>
+<body>
+<div id="palco" class="palco vertical">
+  <canvas id="cena" aria-hidden="true"></canvas>
+
+  <header class="topo">
+    <aside class="torcedores torcedores-a" data-lado="0"></aside>
+    <div class="placar">
+      <div class="time time-a"><span class="num">13</span><span class="nome">Lula</span><span class="vitorias">0</span></div>
+      <div class="meio"><small class="rotulo">Corrida 1</small><span class="relogio">0:00</span></div>
+      <div class="time time-b"><span class="vitorias">0</span><span class="nome">Flávio</span><span class="num">22</span></div>
+    </div>
+    <aside class="torcedores torcedores-b" data-lado="1"></aside>
+    <div class="progresso">
+      <div class="trilho">
+        <i class="marca" style="left:25%"></i><i class="marca" style="left:50%"></i><i class="marca" style="left:75%"></i>
+        <div class="raia raia-a"><i class="cheio"></i><canvas class="rosto" width="96" height="96"></canvas></div>
+        <div class="raia raia-b"><i class="cheio"></i><canvas class="rosto" width="96" height="96"></canvas></div>
+        <span class="bandeira" aria-hidden="true"></span>
+      </div>
+      <div class="falta"></div>
+    </div>
+  </header>
+
+  <div class="bolhas" aria-hidden="true"></div>
+  <div class="avisos" aria-live="polite"></div>
+  <div class="faixa" aria-live="polite"></div>
+  <div class="contagem"></div>
+  <div class="foto" hidden><div class="moldura"></div><div class="selo">Foto finish</div><div class="resultado"></div></div>
+
+  <section class="podio" hidden>
+    <canvas class="confete"></canvas>
+    <p class="rotulo"></p>
+    <h1 class="titulo"></h1>
+    <div class="degraus">
+      <div class="degrau d2"><img class="arte" alt=""><div class="bloco"><b>2º</b><span class="quem"></span></div></div>
+      <div class="degrau d1"><div class="brilho"></div><img class="arte" alt=""><div class="bloco"><b>1º</b><span class="quem"></span><span class="marca"></span></div></div>
+    </div>
+    <div class="dados"></div>
+    <div class="mvp"></div>
+    <div class="proxima"></div>
+  </section>
+
+  <footer class="base">
+    <div class="chaves"></div>
+    <div class="legenda"><span><i>⚡</i>impulso</span><span><i>🔥</i>nitro</span><span><i>🍌</i>casca no rival</span><span><i>🚀</i>jato</span></div>
+  </footer>
+
+  <div class="sem-sinal" hidden></div>
+  <div class="pausa" hidden>Pausado</div>
+  <form class="painel" hidden></form>
+</div>
+
+<script src="../comum/eleicao/candidatos.js"></script>
+<script src="../comum/eleicao/lados.js"></script>
+<script src="../comum/eleicao/vozes-catalogo.js"></script>
+<script src="../comum/eleicao/vozes.js"></script>
+<script src="preset.js"></script>
+<script src="config.js"></script>
+<script src="regras.js"></script>
+<script src="../comum/live.js"></script>
+<script src="../comum/presentes.js"></script>
+<script src="../comum/configurar.js"></script>
+<script src="corredor.js"></script>
+<script src="cena.js"></script>
+<script src="hud.js"></script>
+<script src="painel.js"></script>
+<script src="jogo.js"></script>
+</body>
+</html>

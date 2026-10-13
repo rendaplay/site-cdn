@@ -84,6 +84,7 @@ window.FLAPPY_PRESETS = {
     destaqueMoedas: 100,
     som: true,
     volume: 60,
+    musica: 25,
 
     /* Plateia de demonstração (?demo=1). Nome em inglês, como a TikTokLive manda. */
     demo: {

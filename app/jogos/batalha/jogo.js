@@ -6,6 +6,11 @@
 const { chave, config, opcoes } = Config.carregar();
 const batalha = new Batalha(config);
 
+/* Só Lula x Flávio tem bordão. O narrador das eleições também fala da
+   corrida, que não é este jogo: essas falas ficam de fora. */
+const PRESET_COM_VOZES = "lula-flavio";
+const VOZES_FORA = ["narr-entrada-1", "narr-vitoria-2"];
+
 const Jogo = {
   fase: "rodada",
   fimEm: 0,
@@ -19,6 +24,11 @@ const Jogo = {
     Som.ligado = config.som !== false;
     Som.volume = Math.max(0, Math.min(1, (config.volume ?? 50) / 100));
     Som.destravarNoToque();
+    if (chave === PRESET_COM_VOZES) {
+      Tela.vozes = true;
+      Vozes.iniciar({ volume: Som.volume, catalogo: (window.VOZES_CATALOGO || []).filter(v => !VOZES_FORA.includes(v.id)) });
+      Vozes.ligado = Som.ligado;
+    }
     Tela.montar(config, opcoes.formato);
     Painel.montar(chave, config);
     this.configurar = montarConfigurar({
@@ -43,6 +53,7 @@ const Jogo = {
     setInterval(() => this.relogio(), 100);
     /* O placar também tem coisa que expira sozinha (sequência de 25 s). */
     setInterval(() => Tela.placar(batalha), 1000);
+    Tela.abertura();
   },
 
   ligarDemo() {
@@ -147,6 +158,7 @@ const Jogo = {
     this.fase = "rodada";
     Tela.fecharVitoria();
     this.novoRelogio(config.rodada.segundos);
+    Tela.abertura();
   },
 
   zerar() {
@@ -191,7 +203,7 @@ const Jogo = {
     else if (k === "n") this.fase === "vitoria" ? this.proximaRodada() : this.encerrar();
     else if (k === "r") { if (this.fase === "vitoria") this.proximaRodada(); this.zerar(); }
     else if (k === "f") Tela.alternarFormato();
-    else if (k === "s") { Som.ligado = !Som.ligado; Som.tique(false); }
+    else if (k === "s") { Som.ligado = !Som.ligado; Som.tique(false); if (Vozes.ligado !== Som.ligado) Vozes.alternar(); }
     else if (k === "d" && !this.demo) this.ligarDemo();
     else if (k === "1" || k === "2") this.presenteTeste(Number(k) - 1);
   },

@@ -96,6 +96,9 @@ const Tela = {
   ultimoPresente: 0,
   bolhasAtivas: [[], []],
   bolhasFila: [[], []],
+  /* Bordões e narrador da eleição (comum/eleicao/vozes.js) no lugar das `falas`. */
+  vozes: false,
+  massaEm: -Infinity,
 
   montar(cfg, formatoForcado) {
     this.cfg = cfg;
@@ -343,8 +346,12 @@ const Tela = {
        cobririam a torre bem na hora do golpe. */
     const atacou = lista.some(a => a.tipo === "ataque");
     for (const a of ordem) {
-      if (a.tipo === "pontos") this.pontos(atacou ? { ...a, destaque: false } : a);
-      else if (a.tipo === "tijolinho") Torres.empilhar({ ...a, tijolinho: true });
+      if (a.tipo === "pontos") { Som.empilhar(); this.pontos(atacou ? { ...a, destaque: false } : a); }
+      else if (a.tipo === "tijolinho") {
+        if (a.fonte === "seguiu") Som.entrou();
+        else Som.toque();
+        Torres.empilhar({ ...a, tijolinho: true });
+      }
       else if (a.tipo === "ataque") this.ataque(a);
       else if (a.tipo === "pendente") this.pendente(a);
       else if (a.tipo === "escolha") this.escolha(a);
@@ -367,10 +374,25 @@ const Tela = {
     }
   },
 
-  /* Fala gravada do lado (preset `falas`); intervalo 0 desliga. */
-  falar(lado, prioridade = false) {
+  /* Fala gravada do lado (preset `falas`); intervalo 0 desliga.
+     `momento`: "presente" (presente grande ou ataque), "virada" ou "vitoria". */
+  falar(lado, momento = "presente") {
     const intervalo = this.cfg.fala ? this.cfg.fala.intervalo : 15;
-    if (intervalo > 0) Som.fala(this.cfg.lados[lado].falas, { intervalo, prioridade });
+    if (!(intervalo > 0)) return;
+    if (!this.vozes) return Som.fala(this.cfg.lados[lado].falas, { intervalo, prioridade: momento === "vitoria" });
+    if (momento !== "presente") {
+      Vozes.falar(momento, lado) || Vozes.falar(momento, "narrador");
+      return;
+    }
+    /* Presente grande chega toda hora: só o narrador, e um a cada `intervalo` s. */
+    const agora = performance.now();
+    if (agora - this.massaEm >= intervalo * 1000 && Vozes.falar("massa", "narrador")) this.massaEm = agora;
+  },
+
+  /* Começo de rodada: só o narrador da eleição tem fala pra isso. */
+  abertura() {
+    const intervalo = this.cfg.fala ? this.cfg.fala.intervalo : 15;
+    if (this.vozes && intervalo > 0) Vozes.falar("entrada", "narrador");
   },
 
   /* Nome de quem mandou, no topo da torre, quando a peça assenta: com a
@@ -607,7 +629,7 @@ const Tela = {
     v.append(flash, faixas, palavra, sub);
     v.classList.add("on");
     Som.virada();
-    this.falar(a.lado);
+    this.falar(a.lado, "virada");
 
     const dur = 1700;
     flash.animate([{ opacity: 0.7 }, { opacity: 0 }], { duration: 380, fill: "forwards" });
@@ -731,7 +753,7 @@ const Tela = {
     fotos.forEach(foto => foto.animate([{ translate: "0 200px", opacity: 0 }, { translate: "0 0", opacity: 1 }],
       { duration: 700, easing: "cubic-bezier(.2,1,.3,1)" }));
     Som.vitoria();
-    if (r.vencedor >= 0) this.falar(r.vencedor, true);
+    if (r.vencedor >= 0) this.falar(r.vencedor, "vitoria");
     const cores = empate ? [this.cfg.lados[0].cor, this.cfg.lados[1].cor, "#fff"] : [lado.cor, lado.acento, "#fff"];
     Torres.chuva(cores, 260);
     this.festa = setInterval(() => Torres.chuva(cores, 40), 900);

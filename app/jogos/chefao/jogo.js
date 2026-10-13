@@ -82,7 +82,10 @@ const Jogo = {
       const p = ev.presente;
       const faixa = this.configurar.faixa(p.nome, p.moedas);
       lista = raid.presente(quem, { nome: p.nome, moedas: p.total, quantidade: p.quantidade, faixa }, t);
-    } else if (ev.tipo === "curtida") lista = raid.curtida(quem, ev.curtidas, t);
+    } else if (ev.tipo === "curtida") {
+      Som.curtida();
+      lista = raid.curtida(quem, ev.curtidas, t);
+    }
     else if (ev.tipo === "seguiu") lista = raid.seguiu(quem, t);
     else if (ev.tipo === "compartilhou") lista = raid.compartilhou(quem, t);
     this.contar(lista);
@@ -176,9 +179,11 @@ const Jogo = {
           Hud.anunciar({ fita: "Mutirão!", nome: `${a.ids.length} pessoas juntas`, texto: `golpe coletivo de ${fmt.format(a.dano)}`, cor: "#5CFF9A", ms: 3000 });
           break;
         case "seguiu":
+          Som.seguiu();
           Hud.aviso(`<b>${escapar(j.nome)}</b> seguiu: ${fmt.format(config.seguiu)} de dano`);
           break;
         case "compartilhou":
+          Som.seguiu();
           Hud.aviso(`<b>${escapar(j.nome)}</b> compartilhou: ${fmt.format(config.compartilhou)} de dano`);
           break;
       }
@@ -196,6 +201,7 @@ const Jogo = {
     Hud.fecharFinal();
     Cena.trocarChefe(c);
     Hud.chefe(c);
+    Som.entrada();
     this.depois(700, () => Hud.anunciar({ fita: `Chefão ${c.numero}`, nome: c.nome, texto: `${fmt.format(c.vidaMax)} de vida`, cor: c.def.cor, ms: 2600 }));
     this.depois(1100, () => this.falar(c.def.entrada, 3000));
   },
@@ -210,6 +216,7 @@ const Jogo = {
       Cena.derrotar();
       this.falar(a.chefe.def.derrota, 1400);
       Som.golpeFinal();
+      Som.derrotado();
       this.depois(1700, () => { Hud.golpeFinal(final, danoFinal); Som.vitoria(); });
       this.depois(5000, () => Hud.vitoria(a, raid, this.nomeDoProximo()));
     });

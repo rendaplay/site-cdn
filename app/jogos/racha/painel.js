@@ -58,6 +58,7 @@ const Painel = {
       <fieldset><legend>Som</legend>
         ${campo("Som do jogo", "som", "checkbox")}
         ${campo("Volume do som (0 a 100)", "volume")}
+        ${campo("Volume da música (0 a 100)", "musica")}
       </fieldset>
       <div class="botoes">
         <button type="submit" class="principal">Salvar e recarregar</button>

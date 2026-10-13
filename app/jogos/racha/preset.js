@@ -61,6 +61,7 @@ window.RACHA_PRESETS = {
     },
     som: true,
     volume: 60,
+    musica: 25,
   },
 };
 

@@ -13,10 +13,12 @@ const CONFIG = {
 
 /* Só os jogos web: os de Roblox ainda precisam do PC. */
 const JOGOS = [
-  { id: "batalha", nome: "Batalha", descricao: "Tela dividida e uma corda que só anda com presente." },
+  { id: "batalha", nome: "Batalha de Torres", descricao: "Cada presente empilha na torre do 13 ou do 22." },
   { id: "pipa", nome: "Pipa Combate", descricao: "Comentou, soltou a pipa. Presente corta." },
   { id: "escalada", nome: "Escalada", descricao: "Metade do chat ajuda o Zé, metade derruba." },
   { id: "racha", nome: "Racha da Live", descricao: "Cada comentário vira um carro na pista." },
   { id: "chefao", nome: "Chefão Coletivo", descricao: "O chat inteiro contra o Boleto Gigante." },
   { id: "flappy", nome: "Voa, Tuca!", descricao: "O chat paga pra derrubar ou salvar o tucano." },
+  { id: "urna", nome: "Urna Eletrônica", descricao: "Cada presente vira voto no 13 ou no 22." },
+  { id: "presidencial", nome: "Corrida Presidencial", descricao: "Lula x Flávio na pista: presente vira nitro." },
 ];

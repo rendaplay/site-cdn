@@ -117,12 +117,18 @@ const Jogo = {
     const p = this.partida;
     const quem = { ...ev.usuario, simulado: ev.simulado };
     let lista = [];
-    if (ev.tipo === "comentario") lista = p.comentario(quem, ev.texto);
+    if (ev.tipo === "comentario") {
+      Som.comando();
+      lista = p.comentario(quem, ev.texto);
+    }
     else if (ev.tipo === "presente") {
       const pr = ev.presente;
       const faixa = this.configurar.faixa(pr.nome, pr.moedas);
       lista = p.presente(quem, { nome: pr.nome, moedas: pr.total, quantidade: pr.quantidade, faixa });
-    } else if (ev.tipo === "curtida") lista = p.curtida(quem, ev.curtidas);
+    } else if (ev.tipo === "curtida") {
+      Som.curtida();
+      lista = p.curtida(quem, ev.curtidas);
+    }
     else if (ev.tipo === "seguiu") lista = p.seguiu(quem);
     else if (ev.tipo === "compartilhou") lista = p.compartilhou(quem);
     this.contar(lista);
@@ -142,8 +148,10 @@ const Jogo = {
             ? { fita: "Chinelada do chat", cor: "#FF4D61", texto: `${config.chat.carga} comentários de quem sabota`, ms: 1800 }
             : { fita: "Bolha do chat", cor: "#3EE08F", texto: `${config.chat.carga} comentários de quem ajuda`, ms: 1800 });
           break;
-        case "seguiu": Hud.feed(j, "seguiu", "#FFD23F"); break;
-        case "compartilhou": Hud.feed(j, "compartilhou", "#FFD23F"); break;
+        case "seguiu": Som.seguiu(); Hud.feed(j, "seguiu", "#FFD23F"); break;
+        case "compartilhou": Som.seguiu(); Hud.feed(j, "compartilhou", "#FFD23F"); break;
+        case "time": Som.entrou(a.time); break;
+        case "chinelo": Som.chinelo(); break;
         case "ponto":
           Som.ponto();
           if (p.ativo("turbo") || (p.evento && p.evento.nome === "dobro")) Cena.texto("+2", tuca.x + 40, tuca.y - 70, { cor: "#FFD23F", tam: 58 });

@@ -65,6 +65,7 @@ const Painel = {
         ${campo("Cor da bermuda", "personagem.bermuda", "color")}
         ${campo("Som do jogo", "som", "checkbox")}
         ${campo("Volume do som (0 a 100)", "volume", "number")}
+        ${campo("Volume da música (0 a 100)", "musica", "number")}
       </fieldset>
       <div class="botoes">
         <button type="submit" class="principal">Salvar e recarregar</button>

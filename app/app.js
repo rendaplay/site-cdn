@@ -369,6 +369,8 @@ async function abrirJogo() {
   $("folha-como").hidden = true;
   const quadro = $("quadro-jogo");
   const parametros = new URLSearchParams({ canal: app.conta.canal, relay: RELAY });
+  // O iOS às vezes mostra o quadro ainda com 0×0 na primeira pintura e não avisa o jogo quando cresce.
+  quadro.onload = reajustarAosPoucos;
   quadro.src = `jogos/${app.aoVivo.jogo}/index.html?${parametros}`;
   $("tela-jogo").hidden = false;
   document.documentElement.classList.add("jogando");
@@ -538,8 +540,12 @@ async function voltarTelaCheia() {
   try { await screen.orientation.lock("portrait"); } catch (e) { /* nem todo aparelho deixa */ }
 }
 
-function aoVoltar() {
+function reajustarAosPoucos() {
   for (const espera of [0, 250, 800, 2000]) setTimeout(reajustarJogo, espera);
+}
+
+function aoVoltar() {
+  reajustarAosPoucos();
   if (app.aoVivo && !app.trava) manterTelaAcesa();
   setTimeout(pedirTelaCheia, 300);
 }

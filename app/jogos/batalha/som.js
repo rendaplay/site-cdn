@@ -110,6 +110,29 @@ const Som = {
   tique(ultimo) { this.nota(ultimo ? 1320 : 880, 0.09, { tipo: "square", vol: 0.07 }); },
   vitoria() { [392, 523, 659, 784, 1047].forEach((f, i) => this.nota(f, 0.4, { tipo: "triangle", vol: 0.14, atraso: i * 0.12 })); },
 
+  /* Presente chegou: o "plim" sai na hora, o encaixe só quando a peça assenta.
+     Chuva de presentes vira metralhadora: no máximo um a cada 120 ms. */
+  _empilharEm: -Infinity,
+  empilhar() {
+    const agora = performance.now();
+    if (agora - this._empilharEm < 120) return;
+    this._empilharEm = agora;
+    this.nota(1046, 0.12, { tipo: "sine", vol: 0.12 });
+    this.nota(1568, 0.16, { tipo: "sine", vol: 0.08, atraso: 0.05 });
+  },
+  /* Curtida e comentário chegam em rajada: no máximo um tique a cada 150 ms. */
+  _toqueEm: -Infinity,
+  toque() {
+    const agora = performance.now();
+    if (agora - this._toqueEm < 150) return;
+    this._toqueEm = agora;
+    this.nota(1900, 0.04, { tipo: "sine", vol: 0.035 });
+  },
+  entrou() {
+    this.nota(523, 0.1, { tipo: "triangle", vol: 0.1 });
+    this.nota(784, 0.16, { tipo: "triangle", vol: 0.1, atraso: 0.08 });
+  },
+
   /* Fala gravada (arquivo do preset), uma por vez: `prioridade` corta a que
      estiver tocando, senão espera o `intervalo` desde a última. */
   _audios: new Map(),
