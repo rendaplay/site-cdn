@@ -299,7 +299,20 @@ strong, b { font-weight: 750; }
 
 /* ───────── hero: oferta + vídeo real ───────── */
 
+.hero-selo {
+  display: inline-flex; align-items: center; gap: 7px;
+  margin-bottom: 16px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--verde);
+  background: rgba(23, 248, 100, 0.10);
+  box-shadow: inset 0 0 0 1.5px rgba(23, 248, 100, 0.35);
+}
+.hero-selo .ico { width: 1.2em; height: 1.2em; }
 .hero-oferta { margin-top: 26px; display: grid; justify-items: start; gap: 12px; }
+.hero-micro { font-size: 0.88rem; color: var(--prata); max-width: 30em; }
+@media (max-width: 480px) { .hero-oferta .botao { width: 100%; font-size: 1.15rem; padding-inline: 0.8em; } }
 .hero-preco { font-size: 1.1rem; color: var(--prata); }
 .hero-preco b { font-family: var(--display); font-weight: 400; font-size: 1.55rem; color: var(--ouro); white-space: nowrap; }
 .hero-oferta .botao { margin-bottom: var(--espessura); }
@@ -342,30 +355,13 @@ strong, b { font-weight: 750; }
 }
 .saque li:last-child::before { background: var(--ouro); border-color: var(--ouro); color: var(--noite); }
 .saque b { color: var(--branco); font-size: 1.12rem; }
-.saque-conta {
-  margin-top: 18px;
-  padding: 22px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 200, 30, 0.35);
-  background: rgba(255, 200, 30, 0.06);
-}
-.saque-conta-titulo { font-family: var(--display); color: var(--branco); font-size: 1.1rem; }
-.saque-conta ul { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 10px; }
-.saque-conta li { display: grid; grid-template-columns: 1fr auto auto; align-items: baseline; gap: 12px; }
-.saque-conta span { color: var(--branco); font-weight: 600; }
-.saque-conta small { color: var(--texto-apagado); font-size: 0.9rem; }
-.saque-conta li b { font-family: var(--display); font-weight: 400; color: var(--ouro); font-size: 1.2rem; min-width: 5.5em; text-align: right; }
-.saque-nota { margin-top: 14px; font-size: 0.85rem; color: var(--texto-apagado); }
+.saque-nota { margin-top: 28px; font-size: 0.92rem; color: var(--texto-apagado); }
+.saque-nota a { color: var(--prata); text-underline-offset: 3px; }
 
 @media (min-width: 900px) {
   .saque { grid-template-columns: repeat(4, 1fr); gap: 22px; }
   .saque li { padding: 52px 0 0; }
   .saque li:not(:last-child)::after { left: 40px; right: -18px; top: 16px; bottom: auto; width: auto; height: 2px; background: linear-gradient(90deg, var(--verde), rgba(23, 248, 100, 0.15)); }
-  .saque-conta { margin-top: 36px; display: grid; grid-template-columns: auto 1fr; column-gap: 40px; align-items: center; }
-  .saque-conta ul { margin: 0; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-  .saque-conta li { grid-template-columns: 1fr; gap: 2px; }
-  .saque-conta li b { text-align: left; }
-  .saque-nota { grid-column: 1 / -1; }
 }
 
 /* iPhone SE e afins: sem isso o preço e o botão caem abaixo da dobra */
@@ -747,6 +743,7 @@ strong, b { font-weight: 750; }
 .preco-depois b { color: var(--noite); }
 .plano-fidelidade { margin-top: auto; padding-top: 14px; font-size: 0.88rem; font-weight: 700; text-align: center; color: var(--claro-texto); }
 .plano .botao { width: 100%; margin-top: 20px; }
+@media (max-width: 480px) { .plano .botao { font-size: 1.05rem; padding-inline: 0.7em; } }
 .plano .botao:focus-visible { outline-color: var(--noite); }
 .botao-micro { text-align: center; font-size: 0.85rem; color: var(--claro-texto); margin-top: 4px; }
 .plano-itens { list-style: none; margin: 18px 0 0; padding: 18px 0 0; border-top: 1px solid var(--claro-3); display: grid; gap: 10px; font-size: 0.97rem; }
@@ -880,6 +877,12 @@ strong, b { font-weight: 750; }
 .faq summary:hover { color: var(--verde); }
 .faq details p { padding: 0 44px 22px 0; color: var(--prata); max-width: 40em; }
 .faq details[open] p { animation: abrir 260ms ease; }
+.faq-valores { list-style: none; margin: 0 44px 14px 0; padding: 0; display: grid; gap: 8px; max-width: 26em; }
+.faq-valores li { display: grid; grid-template-columns: 1fr auto auto; align-items: baseline; gap: 12px; }
+.faq-valores span { color: var(--branco); font-weight: 600; }
+.faq-valores small { color: var(--texto-apagado); font-size: 0.9rem; }
+.faq-valores b { font-weight: 650; color: var(--prata); min-width: 5.5em; text-align: right; }
+.faq details p.faq-nota { font-size: 0.85rem; color: var(--texto-apagado); }
 @keyframes abrir { from { opacity: 0; transform: translateY(-6px); } }
 @media (min-width: 980px) {
   .faq-grade { grid-template-columns: 0.75fr 1.25fr; gap: 64px; align-items: start; }
@@ -1187,6 +1190,77 @@ strong, b { font-weight: 750; }
 }
 
 /* ───────── jogos que rodam no celular ───────── */
+
+.jogos-grade { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.jogos-grade-pc { padding: 0 20px 20px; }
+@media (min-width: 760px) { .jogos-grade { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; } }
+.jogo-abrir {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit; font-size: 0.88rem; text-align: left;
+  color: var(--prata);
+  cursor: pointer;
+}
+.jogo-abrir img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 12px; background: var(--noite-3); transition: transform 200ms var(--mola); }
+.jogo-abrir:hover img { transform: translateY(-3px); }
+.jogo-abrir:focus-visible { outline: 3px solid var(--verde); outline-offset: 4px; border-radius: 12px; }
+.jogo-abrir b { display: block; color: var(--branco); font-size: 1rem; }
+.jogo-abrir .card-selo { top: auto; bottom: 8px; left: 8px; right: auto; }
+.card-selo-pc { background: var(--prata); }
+.jogo-capa { position: relative; display: block; margin-bottom: 8px; }
+.jogo-ver {
+  position: absolute;
+  right: 8px; bottom: 6px;
+  display: grid; place-items: center;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  color: var(--branco);
+  background: rgba(3, 22, 16, 0.82);
+}
+.jogo-ver .ico { width: 14px; height: 14px; margin-left: 2px; }
+
+.modal-jogo { width: min(92vw, 420px); max-height: 92vh; padding: 0; border: 0; overflow: visible; background: none; }
+.modal-jogo::backdrop { background: rgba(1, 13, 9, 0.88); }
+.modal-jogo .video-real { width: 100%; }
+.modal-jogo video { max-height: 86vh; object-fit: contain; }
+.modal-jogo img { display: block; width: 100%; height: auto; border-radius: var(--raio-card); }
+.modal-jogo img[hidden], .modal-jogo .video-real[hidden] { display: none; }
+.modal-fechar {
+  position: absolute; z-index: 1;
+  top: -14px; right: -10px;
+  width: 44px; height: 44px;
+  border: 0; border-radius: 50%;
+  font-size: 1.6rem; line-height: 1; font-weight: 700;
+  color: var(--noite); background: var(--branco);
+  cursor: pointer;
+}
+
+.oferta { padding: 8px 0 24px; }
+.oferta-card {
+  max-width: 560px;
+  margin-inline: auto;
+  padding: 26px 22px 22px;
+  border-radius: var(--raio-card);
+  background: var(--noite-2);
+  box-shadow: inset 0 0 0 2px var(--verde);
+}
+.oferta-card h2 { font-size: 0.85rem; font-family: var(--texto); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--verde); }
+.oferta-itens { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 10px; color: var(--prata); }
+.oferta-itens li { position: relative; padding-left: 28px; }
+.oferta-itens li::before { content: "✔"; position: absolute; left: 0; color: var(--verde); font-weight: 800; }
+.oferta-itens b { color: var(--branco); }
+.oferta-preco { margin-top: 18px; color: var(--prata); }
+.oferta-preco b { font-family: var(--display); font-weight: 400; font-size: 1.55rem; color: var(--ouro); }
+.oferta-card .botao { width: 100%; margin-top: 16px; }
+.oferta-garantia { display: flex; align-items: center; justify-content: center; gap: 7px; margin-top: 4px; font-size: 0.88rem; color: var(--prata); }
+.oferta-garantia .ico { width: 1.25em; height: 1.25em; color: var(--verde); }
+
+.plano-selo .ico { width: 1.1em; height: 1.1em; margin: -2px 4px 0 0; vertical-align: middle; }
+.video-play.carregando { cursor: progress; opacity: 0.85; }
 
 .card-selo .ico { width: 1.05em; height: 1.05em; margin: -2px 3px 0 -1px; vertical-align: middle; stroke-width: 2.4; }
 .mais-legenda { display: flex; align-items: center; gap: 8px; margin: 0; padding: 0 20px 20px; font-size: 0.85rem; color: var(--prata); }

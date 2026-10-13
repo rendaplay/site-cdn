@@ -64,13 +64,23 @@ function botaoDePlay(video) {
   botao.type = 'button';
   botao.className = 'video-play';
   botao.innerHTML = '<svg class="ico ico-cheio" aria-hidden="true"><use href="#i-play"/></svg><span>Assistir com som</span>';
-  botao.addEventListener('click', () => tocar(video));
-  video.addEventListener('click', () => (video.paused ? tocar(video) : video.pause()));
+  const rotulo = botao.querySelector('span');
+  let carregando = false;
+  botao.addEventListener('click', () => { if (!carregando) tocar(video); });
+  // No Clarity tinha gente tocando várias vezes enquanto o vídeo baixava: o 2º toque pausava.
+  video.addEventListener('click', () => {
+    if (carregando) return;
+    if (video.paused) tocar(video); else video.pause();
+  });
   const mostrar = () => {
-    botao.hidden = !video.paused;
+    carregando = !video.paused && video.readyState < HTMLMediaElement.HAVE_FUTURE_DATA;
+    botao.classList.toggle('carregando', carregando);
+    rotulo.textContent = carregando ? 'Carregando…' : 'Assistir com som';
+    botao.hidden = !video.paused && !carregando;
     video.closest('.moldura')?.classList.toggle('tocando', !video.paused);
   };
   video.addEventListener('play', mostrar);
+  video.addEventListener('playing', mostrar);
   video.addEventListener('pause', mostrar);
   video.after(botao);
 }
@@ -79,6 +89,35 @@ function botaoDePlay(video) {
 for (const plano of $$('.plano')) {
   const botao = plano.querySelector('[data-checkout]');
   plano.addEventListener('click', (e) => { if (!e.target.closest('a, button')) botao.click(); });
+}
+
+// ───────── jogos: tocar no card abre o vídeo (ou a capa grande) ─────────
+
+const modalJogo = $('#modal-jogo');
+if (modalJogo) {
+  const videoModal = $('video', modalJogo);
+  const figuraModal = videoModal.closest('figure');
+  const imagemModal = $('img', modalJogo);
+
+  for (const card of $$('.jogo-abrir')) {
+    card.addEventListener('click', () => {
+      const { video, poster, imagem } = card.dataset;
+      figuraModal.hidden = !video;
+      imagemModal.hidden = !imagem;
+      if (imagem) imagemModal.src = imagem;
+      modalJogo.showModal();
+      if (video) {
+        if (videoModal.getAttribute('src') !== video) {
+          videoModal.poster = poster;
+          videoModal.src = video;
+        }
+        tocar(videoModal);
+      }
+    });
+  }
+  $('.modal-fechar', modalJogo).addEventListener('click', () => modalJogo.close());
+  modalJogo.addEventListener('click', (e) => { if (e.target === modalJogo) modalJogo.close(); });
+  modalJogo.addEventListener('close', () => videoModal.pause());
 }
 
 // ───────── tutorial: barra de controle própria ─────────
