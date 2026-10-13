@@ -25,7 +25,7 @@ window.BATALHA_PRESETS = {
         corEscura: "#5C0710",
         acento: "#FFFFFF",
         foto: "fotos/lula.webp",
-        arte: "presets/arte/lula.png",
+        arte: "presets/arte/lula.webp",
         presente: { nome: "Rosa", icone: "🌹", aceitos: ["Rose", "Rosa"], palavras: ["rosas", "rosinha"] },
         /* 13 e 22: o número do partido de cada um, que o público já conhece. */
         comandos: ["13", "lula", "vermelho"],
@@ -37,7 +37,7 @@ window.BATALHA_PRESETS = {
         corEscura: "#00351A",
         acento: "#FFD400",
         foto: "fotos/flavio.webp",
-        arte: "presets/arte/flavio.png",
+        arte: "presets/arte/flavio.webp",
         /* A live manda "White Rose" (1 moeda). "GG" continua valendo pra
            quem já mandava GG pro verde. */
         presente: {
