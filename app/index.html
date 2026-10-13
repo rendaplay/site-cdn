@@ -175,7 +175,13 @@
 <div id="tela-jogo" class="tela-jogo" hidden>
   <iframe id="quadro-jogo" title="Jogo" allow="autoplay; fullscreen"></iframe>
   <button id="selo-jogo" class="selo" type="button"><span class="ponto"></span><span id="selo-texto">conectando</span></button>
+  <button id="botao-tela-cheia" class="tela-cheia" type="button" hidden>Toque pra voltar à tela cheia</button>
   <div id="menu-jogo" class="menu-jogo" hidden>
+    <p id="aviso-arroba" class="pequeno" hidden>O TikTok ainda não achou a sua live. Se você já está ao vivo, confira o @:</p>
+    <form id="form-arroba" class="arroba arroba-menu" hidden>
+      <span>@</span><input id="campo-arroba-jogo" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="24">
+      <button class="rp-botao" type="submit">Trocar</button>
+    </form>
     <button id="botao-sair-jogo" class="botao-secundario" type="button">Parar e sair</button>
     <button id="botao-voltar-jogo" class="link" type="button">Continuar</button>
     <a class="link" data-suporte target="_blank" rel="noopener">Suporte no WhatsApp</a>

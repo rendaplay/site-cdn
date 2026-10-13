@@ -114,9 +114,14 @@ const Jogo = {
     this.encaixar();
   },
 
-  /* O palco tem tamanho fixo (1080×1920 ou 1920×1080) e escala pra caber na
-     janela sem distorcer. O canvas desenha no tamanho real da tela. */
+  /* O palco tem 1080×1920 (ou 1920×1080) e escala pra caber na janela sem
+     distorcer; na vertical, em tela mais comprida, ele estica pra baixo e pra
+     cima até 9:21. O canvas desenha no tamanho real da tela. */
   encaixar() {
+    const vertical = this.formatoAtual !== "horizontal";
+    const altura = vertical ? Math.min(2520, Math.max(1920, Math.round(1080 * innerHeight / innerWidth))) : 0;
+    Cena.formato(this.formatoAtual, altura);
+    this.palco.style.height = vertical ? `${altura}px` : "";
     const { W, H } = Cena.L;
     const escala = Math.min(innerWidth / W, innerHeight / H);
     this.palco.style.transform = `translate(${(innerWidth - W * escala) / 2}px, ${(innerHeight - H * escala) / 2}px) scale(${escala})`;

@@ -286,6 +286,20 @@
       try { aoEvento(ev, live); } catch (e) { console.error("[live] erro no jogo ao tratar evento", e); }
     }
 
+    /* O app do celular abre o jogo num iframe e manda a telemetria da live:
+       recebe daqui o total desde que o jogo abriu. Só conta o que veio do
+       conector (o "Testar" do ⚙ e a plateia de demonstração ficam fora). */
+    const totais = { moedas: 0, comentarios: 0, curtidas: 0 };
+
+    function contar(ev) {
+      if (!ev) return;
+      if (ev.tipo === "presente") totais.moedas += ev.presente.total;
+      else if (ev.tipo === "comentario") totais.comentarios += 1;
+      else if (ev.tipo === "curtida") totais.curtidas += ev.curtidas;
+      else return;
+      if (raiz.parent && raiz.parent !== raiz) raiz.parent.postMessage({ rendaplay: "resumo", ...totais }, "*");
+    }
+
     function receber(pacote) {
       if (aoPacote && pacote && typeof pacote === "object") {
         try { aoPacote(pacote, live); } catch (e) { console.error("[live] erro no jogo ao tratar pacote", e); }
@@ -301,7 +315,9 @@
       if (modoConector !== "mock" && pacote && pacote.user && MOCK_ID.test(String(pacote.user.id))) {
         modoConector = live.modo = "mock";
       }
-      entregar(normalizarEvento(pacote));
+      const ev = normalizarEvento(pacote);
+      contar(ev);
+      entregar(ev);
     }
 
     function puxar() {

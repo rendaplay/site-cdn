@@ -63,6 +63,7 @@ const app = {
   aoVivo: null,
   vigia: null,
   trava: null,
+  resumo: null,
 };
 
 const IPHONE = /iPhone|iPad|iPod/.test(navigator.userAgent)
@@ -208,6 +209,10 @@ function retomarLive() {
   if (!salva || Date.now() - salva.em > RETOMAR_ATE_MS) { guardado.gravar("ao-vivo", null); return; }
   if (!app.conta.ativo || !app.conta.canal || !liberado(salva.jogo)) return;
   app.aoVivo = { simular: salva.simular, jogo: salva.jogo };
+  // O jogo recarregado conta do zero: o que já tinha somado vira a base.
+  if (salva.id_live) {
+    Object.assign(app.aoVivo, { id_live: salva.id_live, inicio: salva.inicio, base: salva.numeros, numeros: salva.numeros });
+  }
   abrirJogo();
 }
 
@@ -313,17 +318,39 @@ const ROTULOS = {
   conectado: "conectado",
   conectando: "conectando ao TikTok",
   live_offline: "esperando você entrar ao vivo",
-  usuario_nao_encontrado: "@ não encontrado no TikTok",
+  usuario_nao_encontrado: "procurando sua live, toque aqui",
   restrito: "live com restrição de idade",
   erro: "TikTok recusou, tentando de novo",
   parado: "desligado",
 };
 
+/* O TikTok responde "não encontrado" também pra conta que ainda não abriu a
+   live; o conector segue tentando, e o menu deixa conferir o @ sem sair. */
 function mostrarSelo(estado) {
   const selo = $("selo-jogo");
+  const simulado = app.aoVivo && app.aoVivo.simular;
   selo.dataset.estado = estado;
-  $("selo-texto").textContent = app.aoVivo && app.aoVivo.simular && estado === "conectado"
-    ? "teste: plateia simulada" : ROTULOS[estado] || estado;
+  const rotulo = simulado && estado === "conectado" ? "teste: plateia simulada" : ROTULOS[estado] || estado;
+  $("selo-texto").textContent = simulado ? rotulo : `@${arroba()} · ${rotulo}`;
+  const procurando = !simulado && estado === "usuario_nao_encontrado";
+  $("aviso-arroba").hidden = !procurando;
+  $("form-arroba").hidden = !procurando;
+  if (procurando && document.activeElement !== $("campo-arroba-jogo")) $("campo-arroba-jogo").value = arroba();
+}
+
+async function trocarArroba(evento) {
+  evento.preventDefault();
+  const novo = $("campo-arroba-jogo").value.trim().replace(/^@+/, "");
+  if (!/^[A-Za-z0-9._]{2,24}$/.test(novo)) return alert("Esse @ não parece certo. Use só letras, números, ponto e _.");
+  $("campo-tiktok").value = novo;
+  guardado.gravar("tiktok", novo);
+  try {
+    await ligarConector(false);
+    $("menu-jogo").hidden = true;
+    mostrarSelo("conectando");
+  } catch (e) {
+    alert(e.message);
+  }
 }
 
 async function vigiarConector() {
@@ -347,6 +374,9 @@ async function abrirJogo() {
   document.documentElement.classList.add("jogando");
   $("menu-jogo").hidden = true;
   mostrarSelo("conectando");
+  if (!app.aoVivo.id_live) abrirTelemetria();
+  clearInterval(app.resumo);
+  app.resumo = setInterval(() => mandarTelemetria([resumoDaLive(false)]), RESUMO_A_CADA_MS);
   lembrarLive();
   clearInterval(app.vigia);
   app.vigia = setInterval(vigiarConector, 4000);
@@ -371,6 +401,7 @@ async function manterTelaAcesa() {
 async function pararLive() {
   clearInterval(app.vigia);
   app.vigia = null;
+  fecharTelemetria();
   app.aoVivo = null;
   lembrarLive();
   $("quadro-jogo").src = "about:blank";
@@ -382,6 +413,59 @@ async function pararLive() {
     await pedir(RELAY, "/api/conector/parar", { metodo: "POST", corpo: {}, cabecalhos: cabecalhosDoCanal() });
   } catch (e) { /* desliga sozinho sem leitor */ }
 }
+
+/* ───────────── telemetria ───────────── */
+/* Mesma rota do launcher do PC (api/TELEMETRIA.md): é o que põe a live do
+   celular no painel do dono. Falhou, ignora: a live não pode depender disso. */
+
+const RESUMO_A_CADA_MS = 60000;
+const DURACAO_MAX_S = 48 * 3600;
+
+function mandarTelemetria(eventos) {
+  const sessao = guardado.ler("sessao");
+  if (!sessao || !app.aoVivo || !app.aoVivo.id_live) return;
+  pedir(API, "/telemetria", {
+    metodo: "POST", corpo: { versao: "celular", eventos }, cabecalhos: { Authorization: "Bearer " + sessao },
+  }).catch(() => {});
+}
+
+function eventoDaLive(tipo, dados) {
+  return { tipo, em: Date.now() / 1000, dados: { id_live: app.aoVivo.id_live, ...dados } };
+}
+
+function resumoDaLive(final) {
+  return eventoDaLive("resumo_live", { ...app.aoVivo.numeros, final });
+}
+
+function abrirTelemetria() {
+  if (!crypto.randomUUID) return;
+  const zerado = { moedas: 0, comentarios: 0, curtidas: 0 };
+  Object.assign(app.aoVivo, { id_live: crypto.randomUUID(), inicio: Date.now(), base: zerado, numeros: zerado });
+  const dados = { jogo: app.aoVivo.jogo, modo: app.aoVivo.simular ? "teste" : "real", origem: "celular" };
+  if (/^[A-Za-z0-9._]{2,24}$/.test(arroba())) dados.tiktok = arroba();
+  mandarTelemetria([eventoDaLive("live_iniciada", dados)]);
+}
+
+function fecharTelemetria() {
+  clearInterval(app.resumo);
+  app.resumo = null;
+  if (!app.aoVivo || !app.aoVivo.id_live) return;
+  const duracao = Math.round((Date.now() - app.aoVivo.inicio) / 1000);
+  mandarTelemetria([resumoDaLive(true),
+    eventoDaLive("live_encerrada", { duracao_s: Math.min(Math.max(duracao, 0), DURACAO_MAX_S) })]);
+}
+
+/* O jogo manda o total desde que abriu (jogos_web/comum/live.js). */
+addEventListener("message", evento => {
+  const dados = evento.data;
+  const vivo = app.aoVivo;
+  if (!vivo || !vivo.base || evento.source !== $("quadro-jogo").contentWindow) return;
+  if (!dados || dados.rendaplay !== "resumo") return;
+  vivo.numeros = {};
+  for (const campo of Object.keys(vivo.base)) {
+    vivo.numeros[campo] = vivo.base[campo] + Math.max(0, Math.round(Number(dados[campo]) || 0));
+  }
+});
 
 /* ───────────── ligações ───────────── */
 
@@ -420,6 +504,8 @@ $("botao-sair").addEventListener("click", sair);
 $("selo-jogo").addEventListener("click", () => { $("menu-jogo").hidden = !$("menu-jogo").hidden; });
 $("botao-voltar-jogo").addEventListener("click", () => { $("menu-jogo").hidden = true; });
 $("botao-sair-jogo").addEventListener("click", pararLive);
+$("form-arroba").addEventListener("submit", trocarArroba);
+$("botao-tela-cheia").addEventListener("click", voltarTelaCheia);
 $("botao-tentar").addEventListener("click", carregarConta);
 /* O app da tela de início do iOS volta do segundo plano com o tamanho da tela
    errado por um instante (WebKit 170595): o jogo se ajusta a esse tamanho e
@@ -438,9 +524,24 @@ function reajustarJogo() {
   } catch (e) { /* jogo ainda carregando */ }
 }
 
+/* O Android tira a tela cheia quando a pessoa vai pro TikTok, e só um toque
+   devolve (o navegador não deixa pedir sem gesto). */
+function pedirTelaCheia() {
+  const fora = !$("tela-jogo").hidden && document.fullscreenEnabled && !document.fullscreenElement
+    && !matchMedia("(display-mode: fullscreen)").matches;
+  $("botao-tela-cheia").hidden = !fora;
+}
+
+async function voltarTelaCheia() {
+  $("botao-tela-cheia").hidden = true;
+  try { await document.documentElement.requestFullscreen({ navigationUI: "hide" }); } catch (e) { /* segue sem */ }
+  try { await screen.orientation.lock("portrait"); } catch (e) { /* nem todo aparelho deixa */ }
+}
+
 function aoVoltar() {
   for (const espera of [0, 250, 800, 2000]) setTimeout(reajustarJogo, espera);
   if (app.aoVivo && !app.trava) manterTelaAcesa();
+  setTimeout(pedirTelaCheia, 300);
 }
 
 document.addEventListener("visibilitychange", () => {

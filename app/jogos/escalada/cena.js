@@ -360,8 +360,14 @@ const Cena = {
     this.proximoAviao = 0;
   },
 
-  formato(nome) {
-    this.L = LAYOUTS[nome] || LAYOUTS.vertical;
+  formato(nome, altura) {
+    const base = LAYOUTS[nome] || LAYOUTS.vertical;
+    /* Celular mais comprido que 9:16: o palco cresce em vez de sobrar faixa
+       preta, e a ação desce meia sobra pra ficar no meio. */
+    const sobra = altura > base.H ? (altura - base.H) / 2 : 0;
+    this.L = sobra
+      ? { ...base, H: altura, refY: base.refY + sobra, chaoMax: base.chaoMax + sobra, horizonte: base.horizonte + sobra }
+      : base;
   },
 
   dimensionar(escala) {
