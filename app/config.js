@@ -21,4 +21,5 @@ const JOGOS = [
   { id: "flappy", nome: "Voa, Tuca!", descricao: "O chat paga pra derrubar ou salvar o tucano." },
   { id: "urna", nome: "Urna Eletrônica", descricao: "Cada presente vira voto no 13 ou no 22." },
   { id: "presidencial", nome: "Corrida Presidencial", descricao: "Lula x Flávio na pista: presente vira nitro." },
+  { id: "bolinha", nome: "Chuva de Bolinha", descricao: "Cada comentário solta uma bolinha com a sua foto." },
 ];

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chuva de Bolinha · Renda Play</title>
+<link rel="stylesheet" href="bolinha.css">
+</head>
+<body>
+<div id="palco" class="palco" aria-live="polite">
+  <canvas id="mesa" aria-hidden="true"></canvas>
+
+  <header class="topo">
+    <div class="relogio vidro">
+      <div class="rotulo">Rodada <b>1</b></div>
+      <div class="tempo">2:00</div>
+      <div class="barra"><i></i></div>
+    </div>
+    <div class="rei vidro vazio">
+      <div class="foto"></div>
+      <div class="info">
+        <div class="rotulo">Rei da Bolinha</div>
+        <div class="nome">quem será?</div>
+      </div>
+    </div>
+    <ol class="top vidro"></ol>
+  </header>
+
+  <aside class="legenda vidro">
+    <h3>Como jogar</h3>
+    <ol></ol>
+  </aside>
+
+  <div class="fila"></div>
+  <div class="anuncio"></div>
+  <div class="destaque"></div>
+
+  <section class="podio" hidden>
+    <h2>Fim da rodada</h2>
+    <div class="degraus"></div>
+    <div class="novo-rei"></div>
+    <div class="geral"><h3>Ranking da live</h3><ol></ol></div>
+    <div class="proxima"></div>
+  </section>
+
+  <div class="sem-sinal" hidden></div>
+  <div class="pausa" hidden>Pausado</div>
+  <form class="painel" hidden></form>
+</div>
+
+<script src="../comum/live.js"></script>
+<script src="../comum/presentes.js"></script>
+<script src="../comum/configurar.js"></script>
+<script src="preset.js"></script>
+<script src="config.js"></script>
+<script src="fisica.js"></script>
+<script src="regras.js"></script>
+<script src="cena.js"></script>
+<script src="hud.js"></script>
+<script src="som.js"></script>
+<script src="painel.js"></script>
+<script src="jogo.js"></script>
+</body>
+</html>
