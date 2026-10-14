@@ -12,14 +12,31 @@ const Som = {
   _ctx: null,
   _mestre: null,
   _ruido: null,
+  _voltou: false,
 
   /* No celular nada destrava sozinho: o áudio só liga no fim de um toque
      (pointerup/touchend), e o iPhone suspende de novo quando o streamer vai
      pro TikTok e volta. */
   destravarNoToque() {
     const destravar = () => { if (this.ligado && this.volume) this.ctx(); };
-    for (const evento of ["pointerdown", "pointerup", "touchend", "keydown"]) addEventListener(evento, destravar, true);
-    document.addEventListener("visibilitychange", () => { if (!document.hidden) destravar(); });
+    /* Na volta do TikTok o áudio pode ficar mudo de vez, mesmo "running":
+       o primeiro toque depois disso troca o contexto por um novo. */
+    const tocou = () => {
+      if (this._voltou) this.recriar();
+      destravar();
+    };
+    for (const evento of ["pointerdown", "pointerup", "touchend", "keydown"]) addEventListener(evento, tocou, true);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) this._voltou = !!this._ctx;
+      else destravar();
+    });
+  },
+
+  recriar() {
+    this._voltou = false;
+    if (!this._ctx) return;
+    this._ctx.close().catch(() => {});
+    this._ctx = this._mestre = this._ruido = null;
   },
 
   ctx() {
@@ -32,7 +49,7 @@ const Som = {
       this._mestre = this._ctx.createGain();
       this._mestre.connect(this._ctx.destination);
     }
-    if (this._ctx.state === "suspended") this._ctx.resume();
+    if (this._ctx.state !== "running") this._ctx.resume().catch(() => {});
     this._mestre.gain.value = this.volume;
     return this._ctx;
   },

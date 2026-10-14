@@ -22,6 +22,7 @@ const Som = {
   _relogio: null,
   _proximo: 0,
   _passo: 0,
+  _voltou: false,
 
   /* Liga com a config do jogo (`som`; `volume` e `musica` de 0 a 100). */
   aplicar(config) {
@@ -35,14 +36,39 @@ const Som = {
       if (c && c.state !== "running") c.resume().then(() => this.avisar(), () => {});
     };
     // No toque, o navegador só libera o áudio no fim dele (pointerup/touchend).
-    for (const evento of ["pointerdown", "pointerup", "touchend", "keydown"]) addEventListener(evento, destravar, true);
-    // O iPhone suspende o áudio quando o streamer vai pro TikTok e volta.
-    document.addEventListener("visibilitychange", () => { if (!document.hidden) destravar(); });
+    const tocou = () => {
+      if (this._voltou) this.recriar();
+      destravar();
+    };
+    for (const evento of ["pointerdown", "pointerup", "touchend", "keydown"]) addEventListener(evento, tocou, true);
+    /* Quando o streamer vai pro TikTok abrir a live e volta, o celular pode
+       deixar o áudio mudo de vez, às vezes com o contexto dizendo "running":
+       resume() não traz de volta. O primeiro toque depois da volta troca o
+       contexto por um novo, e o novo só nasce liberado dentro de um gesto. */
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) this._voltou = !!this._ctx;
+      else destravar();
+    });
     if (this.ligado) {
       this.ctx();
       setTimeout(() => this.avisar(), 1500);
     }
     this.ligarMusica();
+  },
+
+  recriar() {
+    this._voltou = false;
+    const velho = this._ctx;
+    if (!velho) return;
+    velho.onstatechange = null;
+    velho.close().catch(() => {});
+    this._ctx = this._mestre = this._ruido = this._trilha = this._abafa = null;
+    this._motor = this._giro = this._torcida = null;
+    this._tocando = [];
+    this._ultimo = {};
+    if (this.ligado) this.ctx();
+    this.ligarMusica();
+    this.avisar();
   },
 
   alternar() {
