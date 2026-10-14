@@ -58,7 +58,7 @@ const Jogo = {
   },
 
   aplicarFormato() {
-    const f = this.forcado || (innerHeight >= innerWidth ? "vertical" : "horizontal");
+    const f = this.forcado || "vertical";
     const { W, H } = FORMATOS[f];
     if (f !== this.formato) {
       this.formato = f;

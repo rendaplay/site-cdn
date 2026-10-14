@@ -274,16 +274,40 @@
       simular(evento) { entregar(normalizarEvento(evento)); },
     };
 
+    /* No app do celular o jogo roda num iframe: o app junta estas linhas no
+       registro da live que vai pro suporte. */
+    function anotar(linha) {
+      if (raiz.parent && raiz.parent !== raiz) raiz.parent.postMessage({ rendaplay: "registro", linha }, "*");
+    }
+
+    function descrever(ev) {
+      const quem = `@${ev.usuario.nome}`;
+      if (ev.tipo === "comentario") return `comentario ${quem}: ${String(ev.texto || "").slice(0, 80)}`;
+      if (ev.tipo === "presente") return `presente ${quem}: ${ev.presente.nome} x${ev.presente.quantidade} (${ev.presente.total} moedas)`;
+      if (ev.tipo === "seguiu" || ev.tipo === "compartilhou") return `${ev.tipo} ${quem}`;
+      return null;
+    }
+
     function mudarEstado(estado) {
       if (live.estado === estado) return;
       live.estado = estado;
+      anotar(`estado: ${estado}`);
       aoEstado(estado, live);
     }
 
     function entregar(ev) {
       if (!ev) return;
       if (modoConector === "mock") ev.simulado = true;
-      try { aoEvento(ev, live); } catch (e) { console.error("[live] erro no jogo ao tratar evento", e); }
+      const linha = descrever(ev);
+      if (linha) anotar(linha);
+      try { aoEvento(ev, live); } catch (e) {
+        console.error("[live] erro no jogo ao tratar evento", e);
+        anotar(`ERRO no jogo ao tratar ${ev.tipo}: ${e && e.message}`);
+      }
+    }
+
+    if (raiz.addEventListener) {
+      raiz.addEventListener("error", e => anotar(`ERRO no jogo: ${e.message} (${e.filename}:${e.lineno})`));
     }
 
     /* O app do celular abre o jogo num iframe e manda a telemetria da live:
@@ -302,7 +326,10 @@
 
     function receber(pacote) {
       if (aoPacote && pacote && typeof pacote === "object") {
-        try { aoPacote(pacote, live); } catch (e) { console.error("[live] erro no jogo ao tratar pacote", e); }
+        try { aoPacote(pacote, live); } catch (e) {
+          console.error("[live] erro no jogo ao tratar pacote", e);
+          anotar(`ERRO no jogo ao tratar pacote ${pacote.type}: ${e && e.message}`);
+        }
       }
       if (pacote && pacote.type === "bridge_status") {
         const d = pacote.data || {};
@@ -332,13 +359,16 @@
           /* Relay reiniciado volta a contar do zero: recomeça dali. */
           if (cursor !== null && seq >= cursor) (d.eventos || []).forEach(receber);
           cursor = seq;
-          live.conector = (d.conector && d.conector.estado) || "parado";
+          const conector = (d.conector && d.conector.estado) || "parado";
+          if (conector !== live.conector) anotar(`conector da nuvem: ${conector}`);
+          live.conector = conector;
           espera = 1000;
           mudarEstado(live.conector === "conectado" ? "conectado" : "conectando");
           timer = setTimeout(puxar, INTERVALO_NUVEM);
         })
-        .catch(() => {
+        .catch(e => {
           if (!vivo || plateia) return;
+          if (live.estado !== "desconectado") anotar(`relay não respondeu: ${e && e.message}`);
           mudarEstado("desconectado");
           espera = Math.min(5000, espera * 1.5);
           timer = setTimeout(puxar, espera);

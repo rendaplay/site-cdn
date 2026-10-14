@@ -200,7 +200,7 @@ const Tela = {
   },
 
   aplicarFormato() {
-    const f = this.forcado || (innerHeight >= innerWidth ? "vertical" : "horizontal");
+    const f = this.forcado || "vertical";
     const { W, H } = CENAS[f];
     if (f !== this.formato || Torres.canvas.width !== W) {
       this.formato = f;
@@ -526,7 +526,7 @@ const Tela = {
       return;
     }
     this.alerta(
-      `<b>${escapar(a.quem.nick)}</b>, mande o <b>PRESENTE ${escapar(lado.presente.icone)} ${escapar(lado.presente.nome.toUpperCase())}</b> pra empilhar <b>MUITO</b> mais`, 6000);
+      `<b>${escapar(a.quem.nick)}</b>, mande o <b>PRESENTE ${lado.presente.imagem ? "" : escapar(lado.presente.icone) + " "}${escapar(lado.presente.nome.toUpperCase())}</b> pra empilhar <b>MUITO</b> mais`, 6000);
   },
 
   /* Golpe e virada nunca dividem a tela: entram um por vez, o golpe na

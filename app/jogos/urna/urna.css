@@ -229,6 +229,7 @@ b.b, .b { color: var(--b); }
 .chave { display: inline-flex; align-items: center; gap: 10px; padding: 12px 22px; border-radius: 40px;
   background: rgba(8, 16, 42, .82); border: 3px solid rgba(255,255,255,.16); font: 800 32px/1 var(--texto); }
 .chave i { font-style: normal; font-size: 38px; }
+.chave i .icone-presente { height: 1.1em; width: auto; vertical-align: -0.18em; }
 .chave b { font: 900 46px/0.8 var(--display); }
 .chave-a { border-color: var(--a); } .chave-a b { color: #FF5A62; }
 .chave-b { border-color: var(--b); } .chave-b b { color: #2BD97C; }

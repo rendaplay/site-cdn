@@ -16,10 +16,16 @@
       id: "flavio", nome: "Flávio", numero: "22",
       cor: "#00873F", corEscura: "#00351A", acento: "#FFD400",
       arte: ARTE + "flavio.png", foto: ARTE + "flavio.webp",
-      presente: { nome: "Rosa branca", icone: "🤍", aceitos: ["White Rose", "Rosa branca", "Rosa Branca", "GG"], palavras: ["branca", "rosa branca", "gg"] },
+      presente: { nome: "Rosa branca", icone: "🌹", imagem: ARTE + "rosa-branca.svg", aceitos: ["White Rose", "Rosa branca", "Rosa Branca", "GG"], palavras: ["branca", "rosa branca", "gg"] },
       comandos: ["22", "flavio", "verde"],
     },
   ];
+  /* A rosa branca não tem emoji: com 🤍 a live lia "coração branco", que não existe. */
+  function iconeDoPresente(presente) {
+    return presente.imagem ? `<img class="icone-presente" src="${presente.imagem}" alt="${presente.nome}">` : presente.icone;
+  }
+
   raiz.CANDIDATOS = CANDIDATOS;
-  if (typeof module !== "undefined") module.exports = { CANDIDATOS };
+  raiz.iconeDoPresente = iconeDoPresente;
+  if (typeof module !== "undefined") module.exports = { CANDIDATOS, iconeDoPresente };
 })(typeof window !== "undefined" ? window : globalThis);

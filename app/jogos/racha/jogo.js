@@ -45,7 +45,7 @@ const Jogo = {
     });
     Cena.montar(document.getElementById("cena"), "vertical", this.palco);
 
-    this.mudarFormato(opcoes.formato || (innerHeight >= innerWidth ? "vertical" : "horizontal"));
+    this.mudarFormato(opcoes.formato || "vertical");
     addEventListener("resize", () => this.encaixar());
     addEventListener("keydown", e => this.tecla(e));
 

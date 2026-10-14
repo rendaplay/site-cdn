@@ -28,7 +28,7 @@ const Jogo = {
     Som.aplicar(config);
     this.palco = document.getElementById("palco");
     this.forcado = opcoes.formato;
-    this.formato = this.forcado || (innerHeight >= innerWidth ? "vertical" : "horizontal");
+    this.formato = this.forcado || "vertical";
     const aleatorio = opcoes.semente != null ? sorteio(opcoes.semente + 1) : Math.random;
 
     this.partida = new Partida(config, FORMATOS[this.formato].dims, aleatorio, Config.lerRecorde(chave));
@@ -76,7 +76,7 @@ const Jogo = {
   },
 
   aplicarFormato(primeira = false) {
-    const f = this.forcado || (innerHeight >= innerWidth ? "vertical" : "horizontal");
+    const f = this.forcado || "vertical";
     const { W, H, dims } = FORMATOS[f];
     if (f !== this.formato || primeira) {
       this.formato = f;

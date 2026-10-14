@@ -54,7 +54,7 @@ window.RACHA_PRESETS = {
     teto: { vertical: 24, horizontal: 30 },
     destaque: 6,
     nomes: {
-      Rose: "Rosa", GG: "GG", TikTok: "TikTok", "Ice Cream Cone": "Sorvete", "Finger Heart": "Coração",
+      Rose: "Rosa", GG: "GG", TikTok: "TikTok", "Ice Cream Cone": "Sorvete", "Finger Heart": "Coração com os dedos", "White Rose": "Rosa branca",
       Perfume: "Perfume", Doughnut: "Rosquinha", "Hat and Mustache": "Chapéu", "Hand Hearts": "Mãos de coração",
       Confetti: "Confete", "Money Gun": "Arma de dinheiro", Galaxy: "Galáxia", Interstellar: "Interestelar",
       Lion: "Leão", Universe: "Universo", "Ultimate FANDOM": "Fandom",

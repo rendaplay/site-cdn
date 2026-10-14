@@ -48,7 +48,7 @@ const Jogo = {
     Cena.montar(document.getElementById("cena"), "vertical", config.personagem);
     this.recordeDeSempre = Config.recordeDeSempre(chave, 0);
 
-    this.mudarFormato(opcoes.formato || (innerHeight >= innerWidth ? "vertical" : "horizontal"));
+    this.mudarFormato(opcoes.formato || "vertical");
     addEventListener("resize", () => this.encaixar());
     addEventListener("keydown", e => this.tecla(e));
 

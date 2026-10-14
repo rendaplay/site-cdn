@@ -54,7 +54,7 @@ window.CHEFAO_PRESETS = {
       { nome: "Rosa", moedas: 1 },
       { nome: "Coração com os dedos", moedas: 5 },
       { nome: "Rosquinha", moedas: 30 },
-      { nome: "Mãos em coração", moedas: 100 },
+      { nome: "Mãos de coração", moedas: 100 },
       { nome: "Arma de dinheiro", moedas: 500 },
       { nome: "Galáxia", moedas: 1000 },
       { nome: "Interestelar", moedas: 10000 },

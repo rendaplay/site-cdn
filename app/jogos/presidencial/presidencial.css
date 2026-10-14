@@ -149,6 +149,7 @@ body { font-family: var(--fonte); color: var(--texto); -webkit-font-smoothing: a
 .chaves b { font: 900 46px/1 var(--numero); }
 .chaves .ca { color: #FF5A62; }
 .chaves .cb { color: #3BE58A; }
+.chaves .icone-presente { height: 1.15em; width: auto; vertical-align: -0.2em; }
 .aviso .ca { color: var(--a); }
 .aviso .cb { color: var(--b); }
 .legenda {

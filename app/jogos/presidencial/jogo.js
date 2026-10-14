@@ -33,7 +33,7 @@ const Jogo = {
     window.corrida = this.corrida;
     this.palco = document.getElementById("palco");
     Hud.montar(this.palco, candidatos, config);
-    this.formatoAtual = opcoes.formato || (innerHeight >= innerWidth ? "vertical" : "horizontal");
+    this.formatoAtual = opcoes.formato || "vertical";
     this.pronto = Cena.montar(document.getElementById("cena"), this.formatoAtual, candidatos, config.arte).then(() => Hud.cabecas());
     this.mudarFormato(this.formatoAtual);
     addEventListener("resize", () => this.encaixar());

@@ -13,7 +13,6 @@ const APURACAO_MS = 4000;
 const Tela = {
   palco: null,
   formatoAtual: "vertical",
-  formatoFixo: false,
   mostrado: [0, 0],
   alvo: [0, 0],
   apurando: null,
@@ -49,7 +48,7 @@ const Tela = {
     p.querySelector(".cabo-b b").textContent = candidatos[1].numero;
 
     p.querySelector(".chaves").innerHTML = candidatos.map((c, i) =>
-      `<span class="chave chave-${"ab"[i]}"><i>${c.presente.icone}</i>=<b>${c.numero}</b></span>`).join("")
+      `<span class="chave chave-${"ab"[i]}"><i>${iconeDoPresente(c.presente)}</i>=<b>${c.numero}</b></span>`).join("")
       + `<span class="chave chave-comente">comente <b class="a">${candidatos[0].numero}</b> ou <b class="b">${candidatos[1].numero}</b></span>`;
 
     this.mesa = p.querySelector(".mesa");
@@ -57,24 +56,12 @@ const Tela = {
     this.canvasConfete = p.querySelector(".eleito .confete");
     this.cConfete = this.canvasConfete.getContext("2d");
 
-    this.formatoFixo = !!formato;
-    this.aplicarFormato(formato || this.formatoDaJanela());
-    addEventListener("resize", () => {
-      if (!this.formatoFixo) {
-        const f = this.formatoDaJanela();
-        if (f !== this.formatoAtual) return this.aplicarFormato(f);
-      }
-      this.encaixar();
-    });
+    this.aplicarFormato(formato || "vertical");
+    addEventListener("resize", () => this.encaixar());
     requestAnimationFrame(t => this.quadro(t));
   },
 
-  formatoDaJanela() {
-    return innerWidth > innerHeight * 1.1 ? "horizontal" : "vertical";
-  },
-
   alternarFormato() {
-    this.formatoFixo = true;
     this.aplicarFormato(this.formatoAtual === "vertical" ? "horizontal" : "vertical");
   },
 

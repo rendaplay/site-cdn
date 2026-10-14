@@ -305,9 +305,12 @@ async function comecar(simular) {
     if (!simular) guardado.gravar("tiktok", arroba());
     await ligarConector(simular);
     app.aoVivo = { simular, jogo: app.jogo };
+    app.registro = [];
+    anotar(`${simular ? "teste" : "live"} de ${app.jogo} · @${arroba()} · canal ${app.conta.canal} · ${navigator.userAgent}`);
     if (simular) abrirJogo();
     else $("folha-como").hidden = false;
   } catch (e) {
+    anotar(`não ligou o conector: ${e.message}`);
     alert(e.message);
   } finally {
     atualizarAcoes();
@@ -329,6 +332,7 @@ const ROTULOS = {
 function mostrarSelo(estado) {
   const selo = $("selo-jogo");
   const simulado = app.aoVivo && app.aoVivo.simular;
+  if (selo.dataset.estado !== estado) anotar(`selo: ${estado}`);
   selo.dataset.estado = estado;
   const rotulo = simulado && estado === "conectado" ? "teste: plateia simulada" : ROTULOS[estado] || estado;
   $("selo-texto").textContent = simulado ? rotulo : `@${arroba()} · ${rotulo}`;
@@ -361,6 +365,7 @@ async function vigiarConector() {
     mostrarSelo(estado);
     lembrarLive();
   } catch (e) {
+    anotar(`estado do conector falhou: ${e.message}`);
     mostrarSelo("sem internet");
   }
 }
@@ -378,7 +383,11 @@ async function abrirJogo() {
   mostrarSelo("conectando");
   if (!app.aoVivo.id_live) abrirTelemetria();
   clearInterval(app.resumo);
-  app.resumo = setInterval(() => mandarTelemetria([resumoDaLive(false)]), RESUMO_A_CADA_MS);
+  app.resumo = setInterval(() => {
+    mandarTelemetria([resumoDaLive(false)]);
+    mandarRegistro();
+  }, RESUMO_A_CADA_MS);
+  anotar(`jogo aberto · tela ${innerWidth}×${innerHeight}`);
   lembrarLive();
   clearInterval(app.vigia);
   app.vigia = setInterval(vigiarConector, 4000);
@@ -455,13 +464,41 @@ function fecharTelemetria() {
   const duracao = Math.round((Date.now() - app.aoVivo.inicio) / 1000);
   mandarTelemetria([resumoDaLive(true),
     eventoDaLive("live_encerrada", { duracao_s: Math.min(Math.max(duracao, 0), DURACAO_MAX_S) })]);
+  anotar("live encerrada");
+  mandarRegistro();
 }
+
+/* Registro da live pro suporte (aba Celular na ficha do cliente no admin):
+   o que o app e o jogo viram, pra resolver reclamação sem pedir print. */
+
+const REGISTRO_LINHAS = 600;
+
+function anotar(linha) {
+  if (!app.registro) return;
+  const hora = new Date().toTimeString().slice(0, 8);
+  app.registro.push(`${hora} ${String(linha).slice(0, 300)}`);
+  if (app.registro.length > REGISTRO_LINHAS) app.registro.splice(0, app.registro.length - REGISTRO_LINHAS);
+}
+
+function mandarRegistro() {
+  const sessao = guardado.ler("sessao");
+  if (!sessao || !app.aoVivo || !app.aoVivo.id_live || !app.registro || !app.registro.length) return;
+  pedir(API, "/registros", {
+    metodo: "POST",
+    corpo: { id_live: app.aoVivo.id_live, registros: { celular: app.registro.join("\n") } },
+    cabecalhos: { Authorization: "Bearer " + sessao },
+  }).catch(() => {});
+}
+
+addEventListener("error", e => anotar(`ERRO no app: ${e.message} (${e.filename}:${e.lineno})`));
+addEventListener("unhandledrejection", e => anotar(`ERRO no app: ${e.reason && e.reason.message || e.reason}`));
 
 /* O jogo manda o total desde que abriu (jogos_web/comum/live.js). */
 addEventListener("message", evento => {
   const dados = evento.data;
   const vivo = app.aoVivo;
   if (!vivo || !vivo.base || evento.source !== $("quadro-jogo").contentWindow) return;
+  if (dados && dados.rendaplay === "registro") return anotar(`jogo: ${dados.linha}`);
   if (!dados || dados.rendaplay !== "resumo") return;
   vivo.numeros = {};
   for (const campo of Object.keys(vivo.base)) {

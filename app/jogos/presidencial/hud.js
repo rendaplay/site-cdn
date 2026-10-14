@@ -28,7 +28,7 @@ const Hud = {
     this.$(".time-b .num").textContent = b.numero;
     this.$(".time-b .nome").textContent = b.nome;
     this.$(".chaves").innerHTML =
-      `${a.presente.icone} = <b class="ca">${a.numero}</b> · ${b.presente.icone} = <b class="cb">${b.numero}</b> · comente <b class="ca">${a.numero}</b> ou <b class="cb">${b.numero}</b>`;
+      `${iconeDoPresente(a.presente)} = <b class="ca">${a.numero}</b> · ${iconeDoPresente(b.presente)} = <b class="cb">${b.numero}</b> · comente <b class="ca">${a.numero}</b> ou <b class="cb">${b.numero}</b>`;
     this.medir();
   },
 
