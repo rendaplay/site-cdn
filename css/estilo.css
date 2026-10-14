@@ -310,6 +310,8 @@ strong, b { font-weight: 750; }
   box-shadow: inset 0 0 0 1.5px rgba(23, 248, 100, 0.35);
 }
 .hero-selo .ico { width: 1.2em; height: 1.2em; }
+a.hero-selo { text-decoration: none; transition: background 0.2s; }
+a.hero-selo:hover { background: rgba(23, 248, 100, 0.2); }
 .hero-oferta { margin-top: 26px; display: grid; justify-items: start; gap: 12px; }
 .hero-micro { font-size: 0.88rem; color: var(--prata); max-width: 30em; }
 @media (max-width: 480px) { .hero-oferta .botao { width: 100%; font-size: 1.15rem; padding-inline: 0.8em; } }
