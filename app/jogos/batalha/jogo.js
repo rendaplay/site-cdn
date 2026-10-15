@@ -21,6 +21,7 @@ const Jogo = {
   demo: false,
 
   iniciar() {
+    document.getElementById("palco").classList.toggle("tema-politico", chave === "lula-flavio");
     Som.ligado = config.som !== false;
     Som.volume = Math.max(0, Math.min(1, (config.volume ?? 50) / 100));
     Som.destravarNoToque();

@@ -30,9 +30,9 @@ const Hud = {
     this.$(".chaves").innerHTML = candidatos.map((c, i) => `
       <div class="chave chave-${"ab"[i]}">
         <i class="chave-icone">${iconeDoPresente(c.presente)}</i>
-        <span class="chave-texto"><strong>${escapar(c.presente.nome)}</strong><span>acelera o <b>${c.numero}</b></span></span>
+        <span class="chave-texto"><strong>${escapar(c.presente.nome)}</strong><span>apoia o <b>${c.numero}</b></span></span>
       </div>`).join("")
-      + `<div class="chave-comente">ou comente <b class="ca">${a.numero}</b> ou <b class="cb">${b.numero}</b> no chat</div>`;
+      + `<div class="chave-comente">ou comente <b class="ca">${a.numero}</b> ou <b class="cb">${b.numero}</b> no chat para participar</div>`;
     this.medir();
   },
 

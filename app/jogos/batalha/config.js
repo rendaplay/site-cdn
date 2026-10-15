@@ -31,7 +31,11 @@ const Config = {
     if (num("rodada")) config.rodada.segundos = num("rodada");
     if (num("meta") !== null) config.meta.moedas = num("meta");
     if (url.has("som")) config.som = url.get("som") !== "0";
-    if (config.ultraSeguro) config.modoSeguro = true;
+    /* O preset eleitoral nunca pode reativar urgência de presente via ajustes salvos. */
+    if (chave === "lula-flavio") {
+      config.modoSeguro = true;
+      config.dobro = { ...config.dobro, segundos: 0 };
+    } else if (config.ultraSeguro) config.modoSeguro = true;
 
     const formato = url.get("formato");
     return {

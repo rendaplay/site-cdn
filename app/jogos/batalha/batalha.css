@@ -48,6 +48,15 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 }
 .palco.horizontal { width: 1920px; height: 1080px; }
 
+.aviso-ficticio { position: absolute; left: 50%; top: calc(var(--y0) + 10px); transform: translateX(-50%); z-index: 11;
+  padding: 6px 15px 5px; border-radius: 999px; background: rgba(6,16,42,.82); border: 1px solid rgba(255,255,255,.25);
+  color: #E5ECFF; font: 800 19px/1 var(--texto); letter-spacing: .04em; white-space: nowrap; pointer-events: none; }
+.horizontal .aviso-ficticio { top: 10px; }
+
+/* Aplicado apenas no preset eleitoral (Lula x Flávio). */
+.palco.tema-politico::before { content: ""; position: absolute; inset: 0;
+  z-index: 10; pointer-events: none; background: #00873F; opacity: .014; }
+
 /* ───────── fundo ───────── */
 
 .cenario { position: absolute; inset: 0; overflow: hidden; background: #8CCBFA; }

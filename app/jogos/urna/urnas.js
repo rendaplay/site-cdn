@@ -311,7 +311,7 @@ const Urnas = {
     c.fillStyle = "#6E6654";
     c.font = "800 26px Figtree, sans-serif";
     c.textAlign = "center";
-    c.fillText("JUSTIÇA ELEITORAL", 812, 62);
+    c.fillText("DISPUTA FICCIONAL", 812, 62);
 
     this.desenharTela(c, e, t);
     this.desenharTeclado(c, e);
@@ -356,7 +356,7 @@ const Urnas = {
       c.textAlign = "center";
       c.font = "900 92px 'Big Shoulders Display', Impact, sans-serif";
       const v = Math.round(e.fimVotos);
-      c.fillText(`+${v.toLocaleString("pt-BR")} ${v === 1 ? "VOTO" : "VOTOS"}`, X + W / 2, Y + 590);
+      c.fillText(`+${v.toLocaleString("pt-BR")} ${v === 1 ? "PONTO" : "PONTOS"}`, X + W / 2, Y + 590);
       c.restore();
       return;
     }
@@ -365,10 +365,10 @@ const Urnas = {
     c.textBaseline = "alphabetic";
     c.fillStyle = "#3A3A3A";
     c.font = "800 40px Figtree, sans-serif";
-    c.fillText("SEU VOTO PARA", X + 22, Y + 56);
+    c.fillText("SEU APOIO PARA", X + 22, Y + 56);
     c.fillStyle = "#111";
     c.font = "900 92px 'Big Shoulders Display', Impact, sans-serif";
-    c.fillText("PRESIDENTE", X + 20, Y + 142);
+    c.fillText("PARTICIPANTE", X + 20, Y + 142);
 
     const pronto = e.tela === "pronta" || e.digitado >= e.digitos.length;
     c.fillStyle = "#3A3A3A";

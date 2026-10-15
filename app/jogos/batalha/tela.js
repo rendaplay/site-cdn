@@ -584,7 +584,7 @@ const Tela = {
       return;
     }
     this.alerta(
-      `<b>${escapar(a.quem.nick)}</b>, mande o <b>PRESENTE ${lado.presente.imagem ? "" : escapar(lado.presente.icone) + " "}${escapar(lado.presente.nome.toUpperCase())}</b> pra empilhar <b>MUITO</b> mais`, 6000);
+      `<b>${escapar(a.quem.nick)}</b> escolheu o lado <b>${escapar(lado.nome)}</b>`, 4000);
   },
 
   /* Golpe e virada nunca dividem a tela: entram um por vez, o golpe na
