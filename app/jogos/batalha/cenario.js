@@ -143,20 +143,6 @@ function filtroDuo(id, escura, clara) {
   </filter>`;
 }
 
-/* Contorno de adesivo pro PNG recortado: fio branco por dentro, cor do lado por fora. */
-function filtroContorno(id, cor) {
-  return `<filter id="${id}" x="-12%" y="-12%" width="124%" height="124%" color-interpolation-filters="sRGB">
-    <feMorphology in="SourceAlpha" operator="dilate" radius="7" result="fino"/>
-    <feMorphology in="SourceAlpha" operator="dilate" radius="16" result="grosso"/>
-    <feFlood flood-color="#fff"/><feComposite in2="fino" operator="in" result="branco"/>
-    <feFlood flood-color="${cor}"/><feComposite in2="grosso" operator="in" result="cor"/>
-    <feGaussianBlur in="grosso" stdDeviation="18" result="borrado"/>
-    <feOffset in="borrado" dy="22" result="caida"/>
-    <feFlood flood-color="#06102A" flood-opacity=".45"/><feComposite in2="caida" operator="in" result="sombra"/>
-    <feMerge><feMergeNode in="sombra"/><feMergeNode in="cor"/><feMergeNode in="branco"/><feMergeNode in="SourceGraphic"/></feMerge>
-  </filter>`;
-}
-
 const Cenario = {
   montar(palco, cfg) {
     const fundo = palco.querySelector(".cenario");
@@ -172,7 +158,7 @@ const Cenario = {
 
     const filtros = cfg.lados.map((l, i) => {
       const s = i ? "b" : "a";
-      return filtroDuo(`duo-${s}`, l.corEscura, misturar(l.cor, "#ffffff", 0.92)) + filtroContorno(`contorno-${s}`, l.cor);
+      return filtroDuo(`duo-${s}`, l.corEscura, misturar(l.cor, "#ffffff", 0.92));
     }).join("");
     palco.querySelector(".filtros").innerHTML = `<defs>${filtros}</defs>`;
 
@@ -187,11 +173,57 @@ const Cenario = {
         caixa.replaceChildren(moldura);
       };
       if (!l.arte) return adesivo();
-      const arte = el("img", "arte-img");
-      arte.alt = "";
+      const arte = new Image();
       arte.onerror = adesivo;
+      arte.onload = () => caixa.replaceChildren(pintarContorno(arte, l.cor));
       arte.src = l.arte;
-      caixa.replaceChildren(arte);
     });
   },
 };
+
+/* Contorno de adesivo da arte pintado uma vez só. Como filtro SVG o Safari do
+   iPhone refazia tudo a cada quadro: o jogo travava ou a tela ficava na cor do lado.
+   O canvas cobre 124% da caixa (a mesma folga do filtro) e o CSS amplia na mesma conta. */
+function pintarContorno(img, cor) {
+  const W = 750, H = 1000, folga = 0.12;
+  const fx = Math.round(W * folga), fy = Math.round(H * folga);
+  const cv = el("canvas", "arte-img arte-contorno");
+  cv.width = W + fx * 2;
+  cv.height = H + fy * 2;
+  const c = cv.getContext("2d");
+  const k = Math.min(W / img.naturalWidth, H / img.naturalHeight);
+  const w = img.naturalWidth * k, h = img.naturalHeight * k;
+  const x = fx + (W - w) / 2, y = fy + (H - h) / 2;
+
+  const silhueta = (raio, tinta) => {
+    const s = document.createElement("canvas");
+    s.width = cv.width;
+    s.height = cv.height;
+    const sc = s.getContext("2d");
+    for (const [r, passos] of [[raio, 32], [raio / 2, 16]]) {
+      for (let p = 0; p < passos; p++) {
+        const a = (p / passos) * Math.PI * 2;
+        sc.drawImage(img, x + Math.cos(a) * r, y + Math.sin(a) * r, w, h);
+      }
+    }
+    sc.globalCompositeOperation = "source-in";
+    sc.fillStyle = tinta;
+    sc.fillRect(0, 0, s.width, s.height);
+    return s;
+  };
+  const grosso = silhueta(16, cor);
+
+  /* Só a sombra entra na tela: a forma é desenhada longe e a sombra deslocada de volta. */
+  const longe = cv.width * 2;
+  c.save();
+  c.shadowColor = "rgba(6, 16, 42, 0.45)";
+  c.shadowBlur = 36;
+  c.shadowOffsetX = longe;
+  c.shadowOffsetY = 22;
+  c.drawImage(grosso, -longe, 0);
+  c.restore();
+  c.drawImage(grosso, 0, 0);
+  c.drawImage(silhueta(7, "#fff"), 0, 0);
+  c.drawImage(img, x, y, w, h);
+  return cv;
+}

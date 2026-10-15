@@ -622,8 +622,9 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 .vertical .arte { bottom: auto; height: var(--chao); }
 .horizontal .arte { bottom: 150px; width: 960px; }
 .arte-img { position: absolute; top: 520px; width: 750px; height: 1000px; object-fit: contain; }
-.arte-a .arte-img { left: -140px; filter: url(#contorno-a); }
-.arte-b .arte-img { right: -140px; filter: url(#contorno-b); }
+.arte-a .arte-img { left: -140px; }
+.arte-b .arte-img { right: -140px; }
+.arte-contorno { transform: scale(1.24); }
 /* O rosto (28% a 50% da arte) fica ao lado do alto das torres, abaixo dos cartões. */
 .vertical .arte-img { top: calc(var(--teto) - 300px); }
 /* No horizontal o alto das bordas é do placar e do top 3: o rosto vem logo abaixo. */
