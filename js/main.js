@@ -111,9 +111,21 @@ if (modalJogo) {
   const imagemModal = $('.modal-capa', modalJogo);
   const comprar = $('.modal-comprar', modalJogo);
 
+  // O vídeo vem do CDN e o primeiro acesso demora uns segundos: começa a baixar
+  // na intenção (mouse em cima, dedo encostando) pra ganhar esse tempo antes do clique.
+  function carregar({ video, poster }) {
+    if (!video || videoModal.getAttribute('src') === video) return;
+    videoModal.poster = poster;
+    videoModal.preload = 'auto';
+    videoModal.src = video;
+  }
+
   for (const card of $$('.jogo-abrir')) {
+    for (const evento of ['pointerenter', 'pointerdown', 'focus']) {
+      card.addEventListener(evento, () => carregar(card.dataset), { passive: true });
+    }
     card.addEventListener('click', () => {
-      const { video, poster, imagem } = card.dataset;
+      const { video, imagem } = card.dataset;
       const compra = COMPRA_JOGO[card.closest('.jogos-grade-pc') ? 'pc' : 'celular'];
       const frase = [...card.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent).join('').trim();
       $('#modal-jogo-nome').textContent = $('b', card).textContent;
@@ -127,10 +139,7 @@ if (modalJogo) {
       if (imagem) imagemModal.src = imagem;
       modalJogo.showModal();
       if (video) {
-        if (videoModal.getAttribute('src') !== video) {
-          videoModal.poster = poster;
-          videoModal.src = video;
-        }
+        carregar(card.dataset);
         tocar(videoModal);
       }
     });
