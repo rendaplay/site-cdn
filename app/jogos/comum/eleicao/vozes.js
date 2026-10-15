@@ -73,9 +73,13 @@
     _prazo: null,
     _vez: 0,
     _piscinas: new Map(),
+    _aviso: null,
+    /* A Batalha tem o aviso dela (som.js): lá `aviso: false`. */
+    _comAviso: true,
 
-    iniciar({ base, volume, catalogo = raiz.VOZES_CATALOGO || [], efeitos = [] } = {}) {
+    iniciar({ base, volume, catalogo = raiz.VOZES_CATALOGO || [], efeitos = [], aviso = true } = {}) {
       if (base) this.base = base;
+      this._comAviso = aviso;
       if (volume !== undefined) this.volume = volume;
       this.fila = new FilaDeVozes(catalogo);
       this._elMusica = this._criar(SILENCIO);
@@ -123,8 +127,27 @@
 
     _retomarMusica() {
       const m = this._musica;
-      if (m && this.ligado && m.paused) m.play().then(() => anotarSom("música tocando"), e => anotarSom(`música bloqueada no toque (${e.name})`));
+      if (m && this.ligado && m.paused) {
+        m.play().then(() => { anotarSom("música tocando"); this.avisar(false); },
+          e => anotarSom(`música bloqueada no toque (${e.name})`));
+      }
     },
+
+    /* O iPhone só libera o som depois de um toque no jogo: sem o aviso, o
+       streamer abre a live com o jogo mudo e não sabe por quê. */
+    avisar(travado) {
+      if (!this._comAviso || !document.body) return;
+      if (travado && !this._aviso) {
+        const a = this._aviso = document.createElement("div");
+        a.textContent = matchMedia("(pointer: coarse)").matches ? "Toque na tela para ativar o som" : "Clique na tela para ativar o som";
+        a.style.cssText = "position:fixed;left:12px;bottom:12px;z-index:9999;padding:6px 12px;border-radius:999px;"
+          + "background:rgba(0,0,0,.6);color:#fff;font:600 13px system-ui,sans-serif;pointer-events:none";
+        document.body.appendChild(a);
+      }
+      if (this._aviso) this._aviso.hidden = !travado;
+    },
+
+    _bloqueou(e) { if (e && e.name === "NotAllowedError") this.avisar(true); },
 
     /* O iPhone suspende o áudio ao ir pro TikTok e voltar. */
     destravarNoToque() {
@@ -169,7 +192,7 @@
       this._atual = a;
       a.src = this.base + item.arquivo;
       armarPrazo();
-      a.play().catch(e => { anotarSom(`fala bloqueada (${e.name})`); fim(); });
+      a.play().catch(e => { anotarSom(`fala bloqueada (${e.name})`); this._bloqueou(e); fim(); });
       return true;
     },
 
@@ -195,7 +218,8 @@
       a.playbackRate = 1;
       a.volume = Math.min(1, this.volume * volume);
       this._musica = a;
-      a.play().then(() => anotarSom("música tocando"), e => anotarSom(`música bloqueada (${e.name})`));
+      a.play().then(() => { anotarSom("música tocando"); this.avisar(false); },
+        e => { anotarSom(`música bloqueada (${e.name})`); this._bloqueou(e); });
     },
 
     alternar() {

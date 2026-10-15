@@ -24,10 +24,11 @@ const Jogo = {
     document.getElementById("palco").classList.toggle("tema-politico", chave === "lula-flavio");
     Som.ligado = config.som !== false;
     Som.volume = Math.max(0, Math.min(1, (config.volume ?? 50) / 100));
+    Som.musica = Math.max(0, Math.min(1, (config.musica ?? 25) / 100));
     Som.destravarNoToque();
     if (chave === PRESET_COM_VOZES) {
       Tela.vozes = true;
-      Vozes.iniciar({ volume: Som.volume, catalogo: (window.VOZES_CATALOGO || []).filter(v => !VOZES_FORA.includes(v.id)) });
+      Vozes.iniciar({ volume: Som.volume, aviso: false, catalogo: (window.VOZES_CATALOGO || []).filter(v => !VOZES_FORA.includes(v.id)) });
       Vozes.ligado = Som.ligado;
     }
     Tela.montar(config, opcoes.formato);
@@ -204,7 +205,7 @@ const Jogo = {
     else if (k === "n") this.fase === "vitoria" ? this.proximaRodada() : this.encerrar();
     else if (k === "r") { if (this.fase === "vitoria") this.proximaRodada(); this.zerar(); }
     else if (k === "f") Tela.alternarFormato();
-    else if (k === "s") { Som.ligado = !Som.ligado; Som.tique(false); if (Vozes.ligado !== Som.ligado) Vozes.alternar(); }
+    else if (k === "s") { Som.ligado = !Som.ligado; Som.ligarMusica(); Som.avisar(); Som.tique(false); if (Vozes.ligado !== Som.ligado) Vozes.alternar(); }
     else if (k === "d" && !this.demo) this.ligarDemo();
     else if (k === "1" || k === "2") this.presenteTeste(Number(k) - 1);
   },

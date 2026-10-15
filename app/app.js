@@ -209,6 +209,8 @@ function retomarLive() {
   if (!salva || Date.now() - salva.em > RETOMAR_ATE_MS) { guardado.gravar("ao-vivo", null); return; }
   if (!app.conta.ativo || !app.conta.canal || !liberado(salva.jogo)) return;
   app.aoVivo = { simular: salva.simular, jogo: salva.jogo };
+  app.registro = [];
+  anotar(`live de ${salva.jogo} retomada · @${arroba()} · ${navigator.userAgent}`);
   // O jogo recarregado conta do zero: o que já tinha somado vira a base.
   if (salva.id_live) {
     Object.assign(app.aoVivo, { id_live: salva.id_live, inicio: salva.inicio, base: salva.numeros, numeros: salva.numeros });
@@ -558,6 +560,18 @@ function mandarRegistro() {
     cabecalhos: { Authorization: "Bearer " + sessao },
   }).catch(() => {});
 }
+
+/* Toque que o app recebe com o jogo aberto é toque que não chegou no jogo
+   (o iframe não repassa pro app): sem ele o jogo não destrava o som. */
+const toquesForaDoJogo = new Set();
+addEventListener("pointerdown", e => {
+  if ($("tela-jogo").hidden) return;
+  const alvo = e.target.id || e.target.className || e.target.tagName;
+  if (toquesForaDoJogo.has(alvo)) return;
+  toquesForaDoJogo.add(alvo);
+  anotar(`toque no app, fora do jogo: ${alvo} em ${Math.round(e.clientX)},${Math.round(e.clientY)}`);
+  mandarRegistro();
+}, true);
 
 addEventListener("error", e => anotar(`ERRO no app: ${e.message} (${e.filename}:${e.lineno})`));
 addEventListener("unhandledrejection", e => anotar(`ERRO no app: ${e.reason && e.reason.message || e.reason}`));

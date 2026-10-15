@@ -73,6 +73,7 @@ const Painel = {
       <fieldset><legend>Som</legend>
         <label class="linha"><input type="checkbox" name="som" ${config.som ? "checked" : ""}>Som do jogo ligado</label>
         ${campo("Volume (0 a 100)", "volume", config.volume, "number")}
+        ${campo("Volume da música (0 a 100)", "musica", config.musica, "number")}
         ${campo(`Falas gravadas: no máximo uma a cada (segundos, 0 desliga) · ${config.lados.map(l => `${escapar(l.nome)}: ${(l.falas || []).length}`).join(" · ")}`, "fala.intervalo", config.fala.intervalo, "number", "cheia")}
       </fieldset>
       <div class="botoes">
@@ -107,7 +108,7 @@ const Painel = {
   /* Rodada de 0 s encerraria sem parar e tela de vitória de 0 s some antes
      de aparecer: número abaixo do mínimo vira o mínimo. */
   MINIMOS: { "rodada.segundos": 15, "rodada.prorrogacao": 5, "rodada.vitoria": 3, "rodada.prorrogacoesMax": 0, "dobro.intervalo": 10 },
-  MAXIMOS: { volume: 100, "dobro.atras": 95, "ataque.maxPct": 90 },
+  MAXIMOS: { volume: 100, musica: 100, "dobro.atras": 95, "ataque.maxPct": 90 },
   /* Campo com fração (passo do input); o resto arredonda pra inteiro. */
   DECIMAIS: { "comentario.metros": 0.05, "comentario.teto": 0.1, "curtida.metros": 0.05, "curtida.teto": 0.1, "seguiu.metros": 0.1 },
 

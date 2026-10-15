@@ -10,6 +10,7 @@ const Config = {
   PADRAO: {
     som: true,
     volume: 50,
+    musica: 25,
     dobro: { atras: 50, minimo: 150, segundos: 10, intervalo: 45 },
     comentario: { metros: 0.2, intervalo: 5, teto: 6 },
     modoSeguro: true,
