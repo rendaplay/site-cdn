@@ -98,16 +98,31 @@ for (const plano of $$('.plano')) {
 
 // ───────── jogos: tocar no card abre o vídeo (ou a capa grande) ─────────
 
+// Jogo do PC só vem no Pro; o resto entra no Celular, que é o passe mais barato.
+const COMPRA_JOGO = {
+  celular: { micro: 'Vem em todos os planos: Celular a partir de R$ 49,90 ou Pro com os jogos do PC.', selo: 'Roda no celular', icone: 'celular' },
+  pc: { micro: 'Vem no plano Pro e no Vitalício, junto com os 9 jogos do celular.', selo: 'PC com avatar do Roblox', icone: 'windows' },
+};
+
 const modalJogo = $('#modal-jogo');
 if (modalJogo) {
   const videoModal = $('video', modalJogo);
-  const figuraModal = videoModal.closest('figure');
-  const imagemModal = $('img', modalJogo);
+  const telaModal = $('.modal-tela', modalJogo);
+  const imagemModal = $('.modal-capa', modalJogo);
+  const comprar = $('.modal-comprar', modalJogo);
 
   for (const card of $$('.jogo-abrir')) {
     card.addEventListener('click', () => {
       const { video, poster, imagem } = card.dataset;
-      figuraModal.hidden = !video;
+      const compra = COMPRA_JOGO[card.closest('.jogos-grade-pc') ? 'pc' : 'celular'];
+      const frase = [...card.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent).join('').trim();
+      $('#modal-jogo-nome').textContent = $('b', card).textContent;
+      $('.modal-frase', modalJogo).textContent = frase;
+      $('.modal-selo span', modalJogo).textContent = compra.selo;
+      $('.modal-selo use', modalJogo).setAttribute('href', `#i-${compra.icone}`);
+      $('.modal-micro', modalJogo).textContent = compra.micro;
+      comprar.dataset.cta = card.dataset.cta.replace('jogo_', 'planos_');
+      telaModal.hidden = !video;
       imagemModal.hidden = !imagem;
       if (imagem) imagemModal.src = imagem;
       modalJogo.showModal();
@@ -121,6 +136,7 @@ if (modalJogo) {
     });
   }
   $('.modal-fechar', modalJogo).addEventListener('click', () => modalJogo.close());
+  comprar.addEventListener('click', () => modalJogo.close());
   modalJogo.addEventListener('click', (e) => { if (e.target === modalJogo) modalJogo.close(); });
   modalJogo.addEventListener('close', () => videoModal.pause());
 }
