@@ -567,7 +567,11 @@ addEventListener("message", evento => {
   const dados = evento.data;
   const vivo = app.aoVivo;
   if (!vivo || !vivo.base || evento.source !== $("quadro-jogo").contentWindow) return;
-  if (dados && dados.rendaplay === "registro") return anotar(`jogo: ${dados.linha}`);
+  if (dados && dados.rendaplay === "registro") {
+    anotar(`jogo: ${dados.linha}`);
+    if (dados.urgente) mandarRegistro();
+    return;
+  }
   if (!dados || dados.rendaplay !== "resumo") return;
   vivo.numeros = {};
   for (const campo of Object.keys(vivo.base)) {

@@ -142,6 +142,7 @@ const Jogo = {
     this.prorrogacao = false;
     this.prorrogacoes = 0;
     Tela.tempo(0, { numero: r.numero });
+    this.live.anotar(`fase: apuração da rodada ${r.numero}`, true);
     this.urna.novaRodada();
     Urnas.zerar();
     Tela.apuracao(r);
@@ -151,6 +152,7 @@ const Jogo = {
 
   mostrarEleito() {
     this.fase = "vitoria";
+    this.live.anotar("fase: eleito", true);
     const auto = config.rodada.automatica;
     Tela.eleito(this.resultado, auto ? config.rodada.vitoria : null);
     this.novoRelogio(config.rodada.vitoria);
@@ -159,6 +161,7 @@ const Jogo = {
   proximaRodada() {
     if (this.fase === "apuracao") this.mostrarEleito();
     this.fase = "rodada";
+    this.live.anotar("fase: nova rodada", true);
     Tela.fecharEleito();
     this.novoRelogio(config.rodada.segundos);
     Vozes.falar("largada", "narrador");

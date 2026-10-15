@@ -271,13 +271,15 @@
       conector: null,
       parar,
       ligarDemo,
+      anotar,
       simular(evento) { entregar(normalizarEvento(evento)); },
     };
 
     /* No app do celular o jogo roda num iframe: o app junta estas linhas no
-       registro da live que vai pro suporte. */
-    function anotar(linha) {
-      if (raiz.parent && raiz.parent !== raiz) raiz.parent.postMessage({ rendaplay: "registro", linha }, "*");
+       registro da live que vai pro suporte. Com `urgente` o app manda o
+       registro na hora: se a página morrer logo depois, a linha já chegou. */
+    function anotar(linha, urgente = false) {
+      if (raiz.parent && raiz.parent !== raiz) raiz.parent.postMessage({ rendaplay: "registro", linha, urgente }, "*");
     }
 
     function descrever(ev) {
