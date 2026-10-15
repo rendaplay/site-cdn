@@ -59,9 +59,10 @@ b.b, .b { color: var(--b); }
     radial-gradient(120% 60% at 50% 0%, #142A66 0%, transparent 60%),
     radial-gradient(90% 50% at 50% 100%, #0E1E4C 0%, transparent 70%),
     linear-gradient(180deg, #071029 0%, var(--noite) 55%, #060C22 100%); }
-.luz { position: absolute; width: 900px; height: 900px; border-radius: 50%; filter: blur(60px); opacity: .5; }
-.luz-a { left: -420px; top: 120px; background: radial-gradient(circle, var(--a) 0%, transparent 65%); animation: respira 7s ease-in-out infinite; }
-.luz-b { right: -420px; top: 120px; background: radial-gradient(circle, var(--b) 0%, transparent 65%); animation: respira 7s ease-in-out infinite reverse; }
+/* Sem filter blur: o degradê já sai macio, e o blur animado travava o iPhone. */
+.luz { position: absolute; width: 900px; height: 900px; border-radius: 50%; opacity: .5; }
+.luz-a { left: -420px; top: 120px; background: radial-gradient(circle, var(--a) 0%, color-mix(in srgb, var(--a) 45%, transparent) 38%, transparent 72%); animation: respira 7s ease-in-out infinite; }
+.luz-b { right: -420px; top: 120px; background: radial-gradient(circle, var(--b) 0%, color-mix(in srgb, var(--b) 45%, transparent) 38%, transparent 72%); animation: respira 7s ease-in-out infinite reverse; }
 .horizontal .luz-a { top: 140px; left: -380px; }
 .horizontal .luz-b { top: 140px; right: -380px; }
 .grade { position: absolute; inset: 0;
