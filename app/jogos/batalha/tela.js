@@ -77,7 +77,7 @@ const GOLPES = {
 };
 const BOLHAS_VISIVEIS = 3;
 const BOLHAS_FILA = 6;
-const BOLHA_PASSO = 54;
+const BOLHA_PASSO = { vertical: 68, horizontal: 54 };
 
 const Tela = {
   cfg: null,
@@ -162,10 +162,12 @@ const Tela = {
 
   curtidaLigada(cfg) { return !!(cfg.curtida && cfg.curtida.cada > 0 && cfg.curtida.metros > 0); },
 
-  /* Coluna fina em cada borda: ícone + efeito, sem verbo de pedido. */
+  /* Coluna fina em cada borda (horizontal) ou cartões no alto (vertical):
+     ícone + efeito, sem verbo de pedido. */
   montarLegenda(cfg) {
     const faixas = (cfg.ataque && cfg.ataque.faixas) || ATAQUE_PADRAO.faixas;
     const golpe = { vento: "Ventania", raio: "Raio", bola: "Demolição", terremoto: "Terremoto" };
+    this.montarCardapio(cfg, faixas, golpe);
     cfg.lados.forEach((l, i) => {
       const s = i ? "b" : "a";
       const item = (icone, valor, sub) => {
@@ -199,14 +201,64 @@ const Tela = {
     });
   },
 
+  /* Na vertical, em celular mais comprido que 9:16, o palco cresce em
+     altura em vez de sobrar faixa preta; `--sobra` é quanto passou de 1920. */
+  /* Vertical: um cartão por lado com o presente dele (no ultra seguro, o
+     comentário), os golpes numa linha e o resto do que empilha no chão. */
+  montarCardapio(cfg, faixas, golpe) {
+    const p = this.palco;
+    const comenta = cfg.comentario && cfg.comentario.metros > 0;
+    cfg.lados.forEach((l, i) => {
+      const s = i ? "b" : "a";
+      const cartao = p.querySelector(`.cartao-${s}`);
+      const icone = cartao.querySelector(".cartao-icone");
+      const n = `<i class="n">${escapar(l.comandos[0])}</i>`;
+      let nome, vale;
+      if (this.ultra) {
+        icone.replaceChildren(el("i", "tijolo", l.comandos[0]));
+        nome = `Comente ${escapar(l.comandos[0])}`;
+        vale = comenta ? `<em>+${metros(cfg.comentario.metros)}</em> na torre` : `entra na torre`;
+      } else {
+        if (l.presente.imagem) {
+          const img = el("img");
+          img.src = l.presente.imagem;
+          img.alt = l.presente.nome;
+          icone.replaceChildren(img);
+        } else icone.textContent = l.presente.icone;
+        if (l.presente.fundo) icone.style.background = l.presente.fundo;
+        nome = escapar(l.presente.nome);
+        vale = `<em>+1 m</em> no ${n}`;
+      }
+      cartao.querySelector(".cartao-txt").innerHTML = `<b>${nome}</b><span>${vale}</span>`;
+    });
+
+    const golpes = p.querySelector(".golpes");
+    const temGolpe = !this.ultra && cfg.ataque && cfg.ataque.maxPct > 0;
+    golpes.hidden = !temGolpe;
+    golpes.replaceChildren(...(temGolpe ? faixas.map(f => {
+      const g = el("span", "golpe-chip");
+      g.append(el("span", "golpe-chip-ico", GOLPES[f.tipo].icone), el("b", null, fmt.format(f.de)), el("span", null, golpe[f.tipo]));
+      return g;
+    }) : []));
+
+    const regras = [];
+    if (comenta) regras.push(`💬 <b>+${metros(cfg.comentario.metros)}</b>`);
+    if (this.curtidaLigada(cfg)) regras.push(`❤ ${fmt.format(cfg.curtida.cada)} curtidas <b>+${metros(cfg.curtida.metros)}</b>`);
+    if (cfg.seguiu && cfg.seguiu.metros > 0) regras.push(`➕ seguiu <b>+${metros(cfg.seguiu.metros)}</b>`);
+    p.querySelector(".regras").innerHTML = regras.map(t => `<span>${t}</span>`).join("");
+  },
+
   aplicarFormato() {
     const f = this.forcado || "vertical";
-    const { W, H } = CENAS[f];
-    if (f !== this.formato || Torres.canvas.width !== W) {
+    const { W } = CENAS[f];
+    const H = f === "vertical" ? Math.min(2520, Math.max(1920, Math.round(W * innerHeight / innerWidth))) : CENAS[f].H;
+    if (f !== this.formato || Torres.canvas.width !== W || Torres.canvas.height !== H) {
       this.formato = f;
       this.palco.classList.toggle("vertical", f === "vertical");
       this.palco.classList.toggle("horizontal", f === "horizontal");
-      Torres.formato(f);
+      this.palco.style.height = f === "vertical" ? `${H}px` : "";
+      this.palco.style.setProperty("--sobra", `${f === "vertical" ? H - 1920 : 0}px`);
+      Torres.formato(f, H);
       this.caberNomes();
     }
     const s = Math.min(innerWidth / W, innerHeight / H);
@@ -217,6 +269,7 @@ const Tela = {
   caberNomes() {
     this.palco.querySelectorAll(".lado .nome").forEach(e => caber(e, 30));
     this.palco.querySelectorAll(".chave-txt b").forEach(e => caber(e, 34));
+    this.palco.querySelectorAll(".cartao-txt b").forEach(e => caber(e, 38));
   },
 
   alternarFormato() {
@@ -449,9 +502,12 @@ const Tela = {
     if (!ativas.length) return true;
     const n = ativas.length;
     const topo = Torres.topoTela(i).y + 18;
-    const ys = ativas.map((_, k) => topo + 44 + (n - 1 - k) * BOLHA_PASSO);
-    if (ys[0] + 30 > L.chao - 10) return false;
-    ativas.forEach((b, k) => { b.style.transform = `translate(${L.xs[i]}px, ${ys[k]}px) translate(-50%, -50%)`; });
+    const passo = BOLHA_PASSO[this.formato];
+    const ys = ativas.map((_, k) => topo + passo - 4 + (n - 1 - k) * passo);
+    if (ys[0] + passo / 2 > L.chao - 10) return false;
+    /* Um pouco pra fora: nome comprido dos dois lados na mesma altura se encostava. */
+    const x = L.xs[i] + (this.formato === "vertical" ? (i ? 30 : -30) : 0);
+    ativas.forEach((b, k) => { b.style.transform = `translate(${x}px, ${ys[k]}px) translate(-50%, -50%)`; });
     return true;
   },
 
@@ -495,6 +551,7 @@ const Tela = {
   linhaPadrao() {
     const linha = this.palco.querySelector(".linha-ajuda");
     linha.classList.remove("alerta");
+    this.palco.classList.remove("com-alerta");
     linha.innerHTML = this.seguro
       ? `🏆 Torre mais alta no fim do tempo <b class="forte">VENCE</b>`
       : `💥 Presente grande <b class="forte">DERRUBA</b> a torre do outro!`;
@@ -503,6 +560,7 @@ const Tela = {
   alerta(html, ms) {
     const linha = this.palco.querySelector(".linha-ajuda");
     linha.classList.add("alerta");
+    this.palco.classList.add("com-alerta");
     linha.innerHTML = html;
     this.alertaAte = performance.now() + ms;
   },

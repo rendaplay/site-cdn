@@ -58,7 +58,7 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 /* ───────── topo ───────── */
 
 .topo { position: absolute; display: grid; gap: 14px; pointer-events: none; }
-.vertical .topo { top: 214px; left: 20px; right: 20px; height: 116px; grid-template-columns: 236px 1fr 318px; }
+.vertical .topo { top: 18px; left: 20px; right: 20px; grid-template-columns: 250px 1fr; grid-template-rows: 128px 94px; gap: 10px; }
 .horizontal .topo { top: 150px; left: 40px; width: 520px; grid-template-columns: 1fr; grid-auto-rows: min-content; }
 
 .relogio { padding: 12px 18px 14px; display: grid; align-content: center; gap: 4px; }
@@ -94,11 +94,32 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .top li:first-child .pos { color: var(--ouro); }
 .top li .avatar { width: 30px; height: 30px; font-size: 14px; box-shadow: 0 0 0 2px var(--avatar-cor); }
 .top li .nome { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.top li .txt { display: contents; }
 .top li .pts { font: 900 26px/1 var(--display); color: var(--ciano); font-variant-numeric: tabular-nums; }
 .top .vazio { font: 600 19px/1.25 var(--texto); color: rgba(246, 242, 255, .6); text-align: center; }
 .top li.subiu { animation: subiu .6s ease; }
 @keyframes subiu { 30% { transform: translateX(-6px); color: var(--ouro); } }
 .top h3 { display: none; }
+/* Vertical: relógio e Rei em cima, top 3 lado a lado embaixo. */
+.vertical .relogio { padding: 12px 20px 16px; gap: 8px; }
+.vertical .relogio .rotulo { font-size: 36px; letter-spacing: .05em; }
+.vertical .relogio .tempo { font-size: 92px; line-height: .85; }
+.vertical .relogio .barra { height: 10px; }
+.vertical .relogio.fechando .tempo { font-size: 54px; line-height: 1; }
+.vertical .rei { gap: 24px; padding: 10px 24px; }
+.vertical .rei .foto .avatar { width: 100px; height: 100px; font-size: 44px; }
+.vertical .rei .foto::before { top: -34px; width: 58px; height: 40px; }
+.vertical .rei .rotulo { font-size: 36px; }
+.vertical .rei .nome { font-size: 76px; line-height: 1; }
+.vertical .top { grid-column: 1 / -1; grid-template-columns: repeat(3, 1fr); padding: 8px 10px; gap: 8px; }
+.vertical .top li { grid-template-columns: 26px 56px 1fr; gap: 8px; padding: 0 6px 0 4px; border-radius: 14px; }
+.vertical .top li:first-child { background: rgba(255, 210, 74, .12); }
+.vertical .top li .pos { font-size: 48px; }
+.vertical .top li .avatar { width: 56px; height: 56px; font-size: 32px; box-shadow: 0 0 0 3px var(--avatar-cor); }
+.vertical .top li .txt { display: grid; gap: 4px; min-width: 0; }
+.vertical .top li .nome { font: 700 42px/1.05 var(--texto); }
+.vertical .top li .pts { font-size: 44px; line-height: .9; }
+.vertical .top .vazio { grid-column: 1 / -1; align-self: center; font-size: 40px; }
 .horizontal .top { padding: 16px 20px; gap: 10px; }
 .horizontal .top h3 { display: block; font: 800 18px/1 var(--texto); letter-spacing: .12em; text-transform: uppercase; color: rgba(246, 242, 255, .7); margin-bottom: 4px; }
 .horizontal .top li { grid-template-columns: 26px 44px 1fr auto; font-size: 24px; }
@@ -109,23 +130,51 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 /* ───────── legenda ───────── */
 
 .legenda { position: absolute; padding: 18px 14px; pointer-events: none; }
-.vertical .legenda { left: 872px; top: 352px; width: 196px; padding: 18px 14px 20px; }
 .horizontal .legenda { left: 1370px; top: 150px; width: 500px; padding: 22px 26px; }
 .legenda h3 { font: 900 34px/1 var(--display); text-transform: uppercase; letter-spacing: .04em; color: var(--ciano); margin-bottom: 12px; }
 .legenda ol { list-style: none; display: grid; gap: 14px; }
 .legenda li { display: grid; gap: 3px; }
 .legenda .acao { display: flex; align-items: center; gap: 8px; font: 800 23px/1.05 var(--texto); }
 .legenda .acao svg { font-size: 30px; color: var(--cor, var(--ciano)); filter: drop-shadow(0 0 6px var(--cor, var(--ciano))); }
-.legenda .faz { font: 600 21px/1.15 var(--texto); color: rgba(246, 242, 255, .8); padding-left: 38px; }
+.legenda .faz { font: 600 21px/1.15 var(--texto); color: rgba(246, 242, 255, .8); }
 .legenda .faz b { color: var(--cor, var(--ciano)); font-weight: 800; }
-.legenda .div { height: 2px; background: var(--linha); margin: 2px 0; }
-.legenda .moedas { font: 900 22px/1 var(--display); color: var(--ouro); margin-left: auto; }
+.legenda .ico-faixa { color: var(--cor); fill: currentColor; stroke: none; filter: drop-shadow(0 0 8px var(--cor)); }
+.legenda .ico-faixa .luz { fill: #fff; opacity: .7; }
+.legenda .ico-faixa .raio { fill: none; stroke: currentColor; stroke-width: 3; }
+.legenda .faixas .nome { color: var(--cor); }
+.legenda .moedas { font: 900 22px/1 var(--display); color: var(--ouro); }
 .seguro .legenda .moedas { display: none; }
+
 .horizontal .legenda h3 { font-size: 38px; }
 .horizontal .legenda ol { gap: 12px; }
-.horizontal .legenda li { grid-template-columns: 250px 1fr; align-items: center; }
-.horizontal .legenda .faz { padding-left: 0; font-size: 20px; }
-.horizontal .legenda .div { grid-column: 1 / -1; }
+.horizontal .legenda .acoes li { grid-template-columns: 250px 1fr; align-items: center; }
+.horizontal .legenda .faz { font-size: 20px; }
+.horizontal .legenda .faixas { margin-top: 12px; padding-top: 14px; border-top: 2px solid var(--linha); }
+.horizontal .legenda .faixas li { grid-template-columns: 44px 206px 1fr auto; align-items: center; column-gap: 0; }
+.horizontal .legenda .ico-faixa { font-size: 34px; }
+.horizontal .legenda .faixas .nome { font: 800 23px/1.05 var(--texto); padding-left: 4px; }
+
+/* Na vertical a legenda vira o cardápio, de ponta a ponta logo abaixo do
+   placar: é o que o espectador mais precisa ler, e ali o app do TikTok não
+   tampa. Medidas pensadas pra escala ~0,36 do celular (36 px ≈ 13 px). */
+.vertical .legenda { left: 20px; right: 20px; top: 260px; padding: 16px 14px; display: grid; gap: 14px; }
+.vertical .legenda h3, .vertical .legenda .mais { display: none; }
+.vertical .legenda .acoes { grid-template-columns: auto auto; justify-content: space-between; gap: 10px 18px; padding: 0 6px; }
+.vertical .legenda .acoes li { display: flex; align-items: center; gap: 14px; white-space: nowrap; min-width: 0; }
+.vertical .legenda .acao { font: 900 46px/1 var(--display); text-transform: uppercase; letter-spacing: .01em; gap: 10px; }
+.vertical .legenda .acao svg { font-size: 42px; }
+.vertical .legenda .acoes .faz { font: 700 40px/1 var(--texto); color: rgba(246, 242, 255, .9); overflow: hidden; text-overflow: ellipsis; }
+.vertical .legenda .faixas { grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.vertical .legenda .faixas li {
+  position: relative; justify-items: center; align-content: start; text-align: center; gap: 6px;
+  padding: 12px 6px 14px; border-radius: 18px;
+  background: color-mix(in srgb, var(--cor) 13%, rgba(10, 3, 32, .6));
+  border: 2px solid color-mix(in srgb, var(--cor) 55%, transparent);
+}
+.vertical .legenda .ico-faixa { font-size: 64px; }
+.vertical .legenda .faixas .nome { display: none; }
+.vertical .legenda .faixas .faz { font: 900 44px/.95 var(--display); text-transform: uppercase; color: var(--branco); text-wrap: balance; }
+.vertical .legenda .moedas { position: absolute; top: 8px; right: 10px; font-size: 34px; }
 
 /* ───────── fila, anúncio e destaque ───────── */
 
@@ -136,7 +185,9 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 }
 .fila b { color: var(--ciano); font: 900 30px/1 var(--display); }
 .fila:empty { opacity: 0; }
-.vertical .fila { left: 430px; top: 1326px; }
+.vertical .fila { left: 540px; top: 1708px; }
+.vertical .fila { font-size: 36px; }
+.vertical .fila b { font-size: 48px; }
 .horizontal .fila { left: 960px; top: 966px; }
 
 .anuncio {
@@ -144,7 +195,12 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
   display: grid; justify-items: center; gap: 6px; text-align: center;
   transition: opacity .25s, transform .35s cubic-bezier(.2, 1.4, .4, 1);
 }
-.vertical .anuncio { left: 430px; top: 500px; width: 800px; }
+.vertical .anuncio { left: 540px; top: 650px; width: 1000px; }
+.vertical .anuncio .fita { font-size: 84px; }
+.vertical .anuncio.lendario .fita { font-size: 104px; }
+.vertical .anuncio .quem { font-size: 44px; gap: 16px; padding: 8px 28px 8px 8px; max-width: 980px; }
+.vertical .anuncio .quem .avatar { width: 72px; height: 72px; font-size: 32px; }
+.vertical .anuncio .texto { font-size: 40px; background: rgba(10, 3, 32, .82); padding: 8px 24px; border-radius: 16px; max-width: 980px; text-shadow: none; }
 .horizontal .anuncio { left: 960px; top: 300px; width: 900px; }
 .anuncio.on { opacity: 1; transform: translate(-50%, 0) scale(1); }
 .anuncio .fita {
@@ -165,7 +221,7 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
   position: absolute; transform: translate(-50%, -50%) scale(.3); opacity: 0; pointer-events: none;
   display: grid; justify-items: center; gap: 2px; text-align: center;
 }
-.vertical .destaque { left: 430px; top: 860px; }
+.vertical .destaque { left: 540px; top: 1130px; }
 .horizontal .destaque { left: 960px; top: 560px; }
 .destaque.on { animation: destaque 1.9s cubic-bezier(.2, 1.3, .4, 1) forwards; }
 @keyframes destaque {
@@ -188,11 +244,11 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 
 .podio {
   position: absolute; display: flex; flex-direction: column; align-items: center; gap: 16px;
-  background: rgba(8, 2, 28, .93); border: 3px solid var(--ouro); border-radius: 30px;
+  background: rgba(8, 2, 28, .97); border: 3px solid var(--ouro); border-radius: 30px;
   box-shadow: 0 0 60px rgba(255, 210, 74, .35);
   padding: 28px 26px; animation: entra .5s cubic-bezier(.2, 1.3, .4, 1);
 }
-.vertical .podio { left: 24px; top: 372px; width: 812px; height: 928px; }
+.vertical .podio { left: 30px; top: 604px; width: 1020px; height: 1080px; }
 .horizontal .podio { left: 608px; top: 150px; width: 704px; height: 790px; padding: 24px; gap: 12px; }
 @keyframes entra { from { opacity: 0; transform: scale(.85); } }
 .podio h2 { font: 900 64px/1 var(--display); text-transform: uppercase; color: var(--ouro); letter-spacing: .03em; text-shadow: 0 0 24px rgba(255, 210, 74, .6); }
@@ -223,6 +279,26 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .podio .geral li .pts { font: 900 28px/1 var(--display); color: var(--ouro); }
 .podio .proxima { margin-top: auto; font: 700 24px/1 var(--texto); color: rgba(246, 242, 255, .75); }
 .podio .proxima b { color: var(--ciano); font-size: 30px; }
+.vertical .podio { gap: 12px; padding: 20px 30px 22px; }
+.vertical .podio h2 { font-size: 78px; }
+.vertical .podio .degraus { gap: 18px; }
+.vertical .podio .lugar .avatar { width: 104px; height: 104px; font-size: 46px; }
+.vertical .podio .lugar.p1 .avatar { width: 136px; height: 136px; font-size: 62px; }
+.vertical .podio .lugar .nome { font-size: 42px; }
+.vertical .podio .lugar .pts { font-size: 58px; }
+.vertical .podio .p1 .bloco { height: 118px; }
+.vertical .podio .p2 .bloco { height: 88px; }
+.vertical .podio .p3 .bloco { height: 64px; }
+.vertical .podio .novo-rei { font-size: 58px; text-align: center; }
+.vertical .podio .geral { padding: 14px 22px 18px; }
+.vertical .podio .geral h3 { font-size: 38px; margin-bottom: 12px; }
+.vertical .podio .geral ol { gap: 6px; }
+.vertical .podio .geral li { grid-template-columns: 40px 50px 1fr auto; gap: 14px; font-size: 40px; }
+.vertical .podio .geral li .pos { font-size: 44px; }
+.vertical .podio .geral li .avatar { width: 50px; height: 50px; font-size: 30px; }
+.vertical .podio .geral li .pts { font-size: 46px; }
+.vertical .podio .proxima { font-size: 38px; }
+.vertical .podio .proxima b { font-size: 50px; }
 .horizontal .podio h2 { font-size: 52px; }
 .horizontal .podio .lugar .avatar { width: 96px; height: 96px; }
 .horizontal .podio .lugar.p1 .avatar { width: 130px; height: 130px; }
@@ -238,7 +314,7 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
   background: rgba(16, 6, 46, .9); color: var(--branco);
   font: 600 24px/1 var(--texto); padding: 12px 22px; border-radius: 999px; white-space: nowrap;
 }
-.vertical .sem-sinal { top: 1370px; }
+.vertical .sem-sinal { top: 1770px; }
 .horizontal .sem-sinal { top: 1010px; }
 .pausa {
   position: absolute; inset: 0; display: grid; place-items: center;

@@ -59,12 +59,20 @@ const Jogo = {
 
   aplicarFormato() {
     const f = this.forcado || "vertical";
-    const { W, H } = FORMATOS[f];
-    if (f !== this.formato) {
+    /* iPhone às vezes faz o primeiro layout do iframe com 0×0. */
+    if (!innerWidth || !innerHeight) return requestAnimationFrame(() => this.aplicarFormato());
+    const { W } = FORMATOS[f];
+    const H = f === "vertical"
+      ? Math.min(2520, Math.max(FORMATOS.vertical.H, Math.round(W * innerHeight / innerWidth)))
+      : FORMATOS[f].H;
+    if (f !== this.formato || H !== this.altura) {
       this.formato = f;
+      this.altura = H;
       this.palco.classList.toggle("vertical", f === "vertical");
       this.palco.classList.toggle("horizontal", f === "horizontal");
-      Ceu.aplicarFormato(f);
+      this.palco.style.height = f === "vertical" ? `${H}px` : "";
+      this.palco.style.setProperty("--sobra", `${H - FORMATOS[f].H}px`);
+      Ceu.aplicarFormato(f, H);
     }
     const s = Math.min(innerWidth / W, innerHeight / H);
     this.palco.style.transform =

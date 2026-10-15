@@ -15,6 +15,18 @@ const ICONES = {
 
 const COR_FAIXA = ["#39E6FF", "#7CFF6B", "#FFD24A", "#FF7A2E", "#FF3D9A"];
 
+/* Desenho de cada faixa de presente, na ordem do preset: punhado, bolada,
+   ouro, chuva e bolona. Preenchido na cor da faixa (currentColor). */
+const BOLA = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}"/><circle class="luz" cx="${x - r * .35}" cy="${y - r * .35}" r="${r * .3}"/>`;
+const ICONES_FAIXA = [
+  BOLA(15, 31, 8) + BOLA(33, 31, 8) + BOLA(24, 16, 8),
+  BOLA(10, 36, 6) + BOLA(24, 36, 6) + BOLA(38, 36, 6) + BOLA(17, 24, 6) + BOLA(31, 24, 6) + BOLA(24, 12, 6),
+  `<path class="raio" d="M24 2v6M24 40v6M2 24h6M40 24h6M8 8l4 4M36 36l4 4M40 8l-4 4M12 36l-4 4"/>` + BOLA(24, 24, 13),
+  `<path d="M12 22a8 8 0 0 1 3-15 10 10 0 0 1 19 2 7 7 0 0 1 2 13z"/>` + BOLA(14, 32, 4.5) + BOLA(26, 40, 4.5) + BOLA(36, 31, 4.5),
+  BOLA(22, 24, 17) + BOLA(41, 40, 5),
+];
+const iconeFaixa = i => `<svg class="ico-faixa" viewBox="0 0 48 48" aria-hidden="true">${ICONES_FAIXA[i] || ICONES_FAIXA[0]}</svg>`;
+
 function el(tag, cls, texto) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
@@ -61,7 +73,7 @@ const Hud = {
     this.$ = {
       relogio: q(".relogio"), rodada: q(".relogio .rotulo b"), tempo: q(".relogio .tempo"), barra: q(".relogio .barra i"),
       rei: q(".rei"), reiFoto: q(".rei .foto"), reiNome: q(".rei .nome"),
-      top: q(".top"), legenda: q(".legenda ol"), fila: q(".fila"),
+      top: q(".top"), acoes: q(".legenda .acoes"), faixas: q(".legenda .faixas"), fila: q(".fila"),
       anuncio: q(".anuncio"), destaque: q(".destaque"),
       podio: q(".podio"), degraus: q(".podio .degraus"), novoRei: q(".podio .novo-rei"),
       geral: q(".podio .geral ol"), proxima: q(".podio .proxima"),
@@ -74,18 +86,17 @@ const Hud = {
 
   legenda() {
     const c = this.cfg;
-    const item = (icone, cor, acao, faz, moedas = "") =>
-      `<li style="--cor:${cor}"><div class="acao">${ICONES[icone]}<span>${acao}</span>${moedas}</div><div class="faz">${faz}</div></li>`;
-    const faixas = c.faixas.map((f, i) => item("presente", COR_FAIXA[i], escapar(f.nome),
-      escapar(f.texto), `<span class="moedas">${fmt.format(f.moedas)}</span>`));
-    this.$.legenda.innerHTML = [
-      item("comentario", "#39E6FF", "Comente", "solta <b>1 bolinha</b> com sua foto"),
-      item("seguiu", "#FFD24A", "Siga", "<b>bolinha de ouro</b>: pontos em dobro"),
-      item("compartilhou", "#7CFF6B", "Compartilhe", "<b>5 bolinhas</b>"),
-      item("curtida", "#FF3D9A", `${fmt.format(c.chat.curtidas)} curtidas`, "<b>choque</b> nos pinos"),
-      `<li class="div"></li>`,
-      ...faixas,
+    const item = (icone, cor, acao, faz) =>
+      `<li style="--cor:${cor}"><div class="acao">${ICONES[icone]}<span>${acao}</span></div><div class="faz">${faz}</div></li>`;
+    this.$.acoes.innerHTML = [
+      item("comentario", "#39E6FF", "Comente", "<span class=\"mais\">solta </span><b>1 bolinha</b><span class=\"mais\"> com sua foto</span>"),
+      item("seguiu", "#FFD24A", "Siga", "<b>bolinha de ouro</b><span class=\"mais\">: pontos em dobro</span>"),
+      item("compartilhou", "#7CFF6B", "Compartilhe", `<b>${fmt.format(c.chat.compartilhar)} bolinhas</b>`),
+      item("curtida", "#FF3D9A", `${fmt.format(c.chat.curtidas)} curtidas`, "<b>choque</b><span class=\"mais\"> nos pinos</span>"),
     ].join("");
+    this.$.faixas.innerHTML = c.faixas.map((f, i) =>
+      `<li style="--cor:${COR_FAIXA[i]}">${iconeFaixa(i)}<div class="nome">${escapar(f.nome)}</div>` +
+      `<div class="faz">${escapar(f.texto)}</div><span class="moedas">${fmt.format(f.moedas)}</span></li>`).join("");
   },
 
   /* ───────── topo ───────── */
@@ -141,7 +152,9 @@ const Hud = {
     }
     lista.forEach((j, i) => {
       const li = el("li");
-      li.append(el("span", "pos", String(i + 1)), criarAvatar(j), el("span", "nome", j.nome), el("span", "pts", fmt.format(j.pontos)));
+      const txt = el("span", "txt");
+      txt.append(el("span", "nome", j.nome), el("span", "pts", fmt.format(j.pontos)));
+      li.append(el("span", "pos", String(i + 1)), criarAvatar(j), txt);
       if (antes.indexOf(j.id) > i || antes.indexOf(j.id) < 0) li.classList.add("subiu");
       ol.append(li);
     });

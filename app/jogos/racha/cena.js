@@ -21,7 +21,10 @@ const Cena = (() => {
   const COR_IMPULSO = { turbo: [1.0, 0.55, 0.15], nitro: [0.12, 0.45, 1.0], maximo: [0.55, 0.25, 1.0] };
 
   const FORMATOS = {
-    vertical: { W: 1080, H: 1920, fov: 25, dist: 78, angulo: 0.5, alvoZ: 0.2, liderEm: 0.8 },
+    /* Vertical: câmera mais alta e mirando atrás da pista, pra pista ocupar
+       de ~1.020 até o pé da tela: em cima fica o HUD e a faixa do feed,
+       embaixo a pista passa por trás dos comentários do TikTok. */
+    vertical: { W: 1080, H: 1920, fov: 25, dist: 78, angulo: 0.68, alvoZ: -11.4, liderEm: 0.8 },
     horizontal: { W: 1920, H: 1080, fov: 21, dist: 50, angulo: 0.49, alvoZ: 0.4, liderEm: 0.78 },
   };
 
@@ -1189,14 +1192,18 @@ const Cena = (() => {
         vivos.add(id);
         const pos = racha.posicao(p);
         const texto = pos ? `${pos}º` : "";
-        if (et._pos.textContent !== texto) et._pos.textContent = texto;
-        if (et._nome.textContent !== p.nome) et._nome.textContent = p.nome;
+        if (et._pos.textContent !== texto) { et._pos.textContent = texto; et._larg = 0; }
+        if (et._nome.textContent !== p.nome) { et._nome.textContent = p.nome; et._larg = 0; }
         const classes = `etiqueta${pos === 1 && racha.fase !== "espera" ? " lider" : ""}${racha.rei === id ? " rei" : ""}${p.escudoAte > agora ? " escudo" : ""}${pos > 0 && pos <= 3 ? ` p${pos}` : ""}`;
-        if (et.className !== classes) et.className = classes;
+        if (et.className !== classes) { et.className = classes; et._larg = 0; }
         const t = this.telaDe(v.x, (v.giro ? 0.8 : 0) + mod.topo + 0.55, v.z);
-        if (!t.dentro || v.saindo) { et.style.display = "none"; continue; }
+        if (!t.dentro || v.saindo || t.x < 0 || t.x > this.L.W) { et.style.display = "none"; continue; }
         et.style.display = "";
-        et.style.transform = `translate(${t.x.toFixed(1)}px,${t.y.toFixed(1)}px)`;
+        /* Carro saindo pela borda: a etiqueta para na borda em vez de cortar. */
+        if (!et._larg) et._larg = et.offsetWidth;
+        const meia = et._larg / 2 + 8;
+        const x = Math.max(meia, Math.min(this.L.W - meia, t.x));
+        et.style.transform = `translate(${x.toFixed(1)}px,${t.y.toFixed(1)}px)`;
         et.style.zIndex = String(Math.round(100 + v.z * 4));
       }
       for (const [id, et] of this.etiquetas) {

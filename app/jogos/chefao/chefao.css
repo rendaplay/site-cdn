@@ -61,11 +61,16 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 /* ───────── topo ───────── */
 
 .topo { position: absolute; display: flex; align-items: stretch; justify-content: space-between; gap: 16px; }
-.vertical .topo { top: 116px; left: 30px; right: 30px; height: 112px; }
+.vertical .topo { top: 34px; left: 30px; right: 30px; height: 150px; }
 .horizontal .topo { top: 20px; left: 30px; right: 30px; height: 120px; pointer-events: none; }
 
 .moedas, .derrotados { width: 330px; display: flex; flex-direction: column; justify-content: center; gap: 3px; }
 .horizontal .moedas, .horizontal .derrotados { width: 380px; }
+.vertical .moedas, .vertical .derrotados { width: 290px; padding: 10px 16px; }
+.vertical .topo .rotulo { font-size: 36px; }
+.vertical .topo .rotulo svg { font-size: 32px; }
+.vertical .topo .num { font-size: 64px; }
+.vertical .topo .sub { font-size: 36px; }
 .derrotados { text-align: right; }
 .derrotados .rotulo { justify-content: flex-end; }
 .topo .num { font: 900 44px/.95 var(--display); font-variant-numeric: tabular-nums; transform-origin: left center; }
@@ -83,11 +88,13 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
   font: 800 20px/1 var(--display); letter-spacing: .14em; text-transform: uppercase;
   background: var(--ouro); color: var(--tinta); padding: 6px 14px 5px; border-radius: 999px;
 }
+.vertical .titulo-jogo { font-size: 58px; white-space: nowrap; }
+.vertical .rodada { font-size: 40px; padding: 6px 20px 4px; }
 
 /* ───────── vida ───────── */
 
 .vida { position: absolute; }
-.vertical .vida { top: 238px; left: 36px; right: 36px; }
+.vertical .vida { top: 200px; left: 36px; right: 36px; }
 .horizontal .vida { top: 18px; left: 450px; right: 450px; }
 .linha-nome { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
 .nome-chefe {
@@ -96,6 +103,9 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .horizontal .nome-chefe { font-size: 58px; }
+.vertical .linha-nome { margin-bottom: 30px; }
+.vertical .nome-chefe { font-size: 84px; }
+.vertical .chip { font-size: 34px; }
 .chips { display: flex; gap: 8px; flex: none; padding-bottom: 6px; }
 .chip {
   font: 900 22px/1 var(--display); letter-spacing: .08em; text-transform: uppercase;
@@ -134,6 +144,10 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .numeros b { color: var(--creme); font-weight: 900; }
 .numeros svg { color: var(--escudo); vertical-align: -3px; margin-right: 4px; }
 .pct { font: 900 34px/1 var(--display); color: var(--creme); }
+.vertical .numeros { font-size: 40px; margin-top: 14px; }
+.vertical .numeros svg { vertical-align: -5px; }
+.vertical .pct { font-size: 56px; }
+.vertical .barra .marca svg { font-size: 34px; top: -36px; left: -19px; }
 
 /* ───────── faixa de estado ───────── */
 
@@ -144,7 +158,9 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
   padding: 12px 22px 14px; transition: opacity .25s, transform .25s;
 }
 .estado.on { opacity: 1; transform: translateX(-50%); }
-.vertical .estado { top: 414px; width: 920px; }
+.vertical .estado { top: 456px; width: 1000px; }
+.vertical .estado .titulo { font-size: 48px; }
+.vertical .estado .texto { font-size: 36px; }
 .horizontal .estado { top: 190px; width: 900px; }
 .estado .titulo { font: 900 34px/1 var(--display); text-transform: uppercase; color: var(--cor); white-space: nowrap; }
 .estado .texto { font: 600 22px/1.15 var(--texto); }
@@ -162,7 +178,7 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 }
 .aviso b { font-weight: 900; color: var(--ouro); }
 .aviso.on { opacity: 1; }
-.vertical .aviso { top: 1192px; }
+.vertical .aviso { top: 960px; max-width: 1020px; font-size: 38px; padding: 12px 28px; }
 .horizontal .aviso { top: 1012px; }
 
 /* ───────── fala do chefão ───────── */
@@ -179,13 +195,17 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
   border: 16px solid transparent; border-top: 22px solid var(--tinta); border-left: 8px solid var(--tinta);
 }
 .fala.on { opacity: 1; transform: scale(1); }
-.vertical .fala { left: 650px; top: 520px; }
+.vertical .fala { left: 630px; top: 610px; max-width: 420px; font-size: 40px; }
 .horizontal .fala { left: 1230px; top: 250px; }
 
 /* ───────── anúncio grande ───────── */
 
 .anuncio { position: absolute; left: 0; right: 0; display: grid; place-items: center; pointer-events: none; }
-.vertical .anuncio { top: 890px; }
+.vertical .anuncio { top: 700px; }
+.vertical .cartao .fita { font-size: 44px; }
+.vertical .cartao .corpo { max-width: 1020px; }
+.vertical .cartao .nome { font-size: 72px; max-width: 800px; }
+.vertical .cartao .texto { font-size: 38px; }
 .horizontal .anuncio { top: 680px; }
 .cartao { --cor: var(--ouro); display: grid; justify-items: center; filter: drop-shadow(0 14px 24px rgba(5, 0, 15, .55)); }
 .cartao .fita {
@@ -214,18 +234,21 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 }
 .faltam.on { opacity: 1; animation: batida 0.9s ease-in-out infinite; }
 @keyframes batida { 50% { box-shadow: 0 0 70px rgba(232, 40, 63, .95); border-color: #FF6A6A; } }
-.vertical .faltam { top: 1100px; }
+.vertical .faltam { top: 860px; }
 .horizontal .faltam { top: 900px; }
 .faltam { font: 800 30px/1 var(--display); text-transform: uppercase; letter-spacing: .03em; }
 .faltam span { display: flex; align-items: baseline; gap: 12px; }
 .faltam b { font-weight: 900; font-size: 52px; color: #FF6A6A; }
 .faltam small { font: 700 23px/1.1 var(--texto); text-transform: none; letter-spacing: 0; color: rgba(255, 244, 230, .85); margin-top: 4px; }
 .faltam em { font-style: normal; font-weight: 900; color: var(--ouro); }
+.vertical .faltam { font-size: 44px; }
+.vertical .faltam b { font-size: 68px; }
+.vertical .faltam small { font-size: 36px; }
 
 /* ───────── cardápio ───────── */
 
 .cardapio { position: absolute; }
-.vertical .cardapio { top: 1250px; left: 30px; right: 30px; }
+.vertical .cardapio { top: 1046px; left: 20px; right: 20px; }
 .horizontal .cardapio { top: 250px; left: 30px; width: 380px; }
 .chamada { display: flex; gap: 12px; justify-content: center; margin-bottom: 10px; }
 .horizontal .chamada { flex-direction: column; gap: 6px; }
@@ -245,11 +268,23 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .cardapio .valor svg { font-size: 22px; }
 .cardapio .nome { font: 800 21px/1.05 var(--texto); }
 .cardapio .golpe-mae { box-shadow: inset 0 0 0 3px var(--ouro); }
+.vertical .chamada { flex-direction: column; align-items: center; gap: 10px; margin-bottom: 12px; }
+.vertical .chamada span { font-size: 44px; padding: 10px 26px; gap: 12px; background: rgba(20, 10, 34, .9); }
+.vertical .chamada svg { font-size: 44px; }
+.vertical .cardapio ol { gap: 8px; }
+.vertical .cardapio li { padding: 8px 4px 12px; gap: 4px; align-content: start; }
+.vertical .cardapio .icone { width: 120px; height: 120px; }
+.vertical .cardapio .valor { font-size: 50px; gap: 6px; }
+.vertical .cardapio .valor svg { font-size: 36px; }
+.vertical .cardapio .nome { font-size: 34px; line-height: 1; }
+.cardapio .seta { font-style: normal; }
+/* Empilhado (ícone, moedas, nome) a seta só quebra linha à toa. */
+.vertical .cardapio .seta { display: none; }
 
 /* ───────── ranking ───────── */
 
 .ranking { position: absolute; }
-.vertical .ranking { top: 1462px; left: 560px; right: 30px; }
+.vertical .ranking { top: 1470px; left: 300px; right: 170px; }
 .horizontal .ranking { top: 250px; right: 30px; width: 400px; }
 .ranking h3 {
   font: 900 26px/1 var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--ouro);
@@ -267,12 +302,18 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .ranking .quem { flex: 1; min-width: 0; font: 800 22px/1 var(--texto); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ranking .valor { font: 900 28px/1 var(--display); font-variant-numeric: tabular-nums; }
 .ranking li.vazio .quem { color: rgba(255, 244, 230, .5); font-weight: 600; }
+.vertical .ranking h3 { font-size: 40px; }
+.vertical .ranking li { height: 66px; gap: 12px; }
+.vertical .ranking .pos { font-size: 40px; width: 28px; }
+.vertical .ranking .avatar { width: 50px; height: 50px; font-size: 38px; }
+.vertical .ranking .quem { font-size: 36px; }
+.vertical .ranking .valor { font-size: 42px; }
 
 /* ───────── golpe final e vitória ───────── */
 
 .final {
   position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center;
-  background: radial-gradient(ellipse at center, rgba(34, 10, 52, .9), rgba(8, 2, 16, .97) 70%);
+  background: radial-gradient(ellipse at center, rgba(34, 10, 52, .96), rgba(8, 2, 16, .98) 70%);
   text-align: center; padding: 0 50px;
 }
 .final.on { display: flex; animation: aparecer .35s ease-out; }
@@ -286,7 +327,7 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 @keyframes coroar { from { transform: translateY(-200px) rotate(-30deg); opacity: 0; } }
 .avatar.grande { width: 200px; height: 200px; font-size: 100px; box-shadow: 0 0 0 8px var(--ouro), 0 0 60px rgba(255, 210, 63, .6); }
 .nome-final {
-  display: block; width: max-content; max-width: 100%; margin-top: 30px;
+  display: block; width: max-content; max-width: 100%; margin-top: 30px; padding: 0 60px 20px;
   font: 900 150px/.95 var(--display); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   color: var(--creme); text-shadow: 0 8px 0 var(--tinta), 0 0 50px rgba(255, 210, 63, .5);
   animation: bater .5s cubic-bezier(.2, .9, .3, 1.3);
@@ -319,6 +360,18 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .top3 .valor { font: 900 32px/1 var(--display); }
 .horizontal .top3 { display: none; }
 .linha-vitoria { display: flex; gap: 36px; font: 600 28px/1 var(--texto); color: rgba(255, 244, 230, .8); }
+.vertical .final.vitoria { gap: 34px; }
+.vertical .dano-final { font-size: 44px; }
+.vertical .mvp-rotulo { font-size: 40px; }
+.vertical .mvp-dano { font-size: 38px; }
+.vertical .top3 { width: 900px; gap: 10px; }
+.vertical .top3 li { padding: 12px 22px; gap: 16px; }
+.vertical .top3 .pos { font-size: 44px; width: 30px; }
+.vertical .top3 .avatar { width: 56px; height: 56px; font-size: 32px; }
+.vertical .top3 .quem { font-size: 40px; }
+.vertical .top3 .valor { font-size: 46px; }
+.vertical .linha-vitoria { font-size: 38px; gap: 40px; }
+.vertical .proximo { font-size: 44px; text-align: center; }
 .linha-vitoria b { color: var(--creme); font-weight: 900; display: inline-block; max-width: 460px; vertical-align: bottom; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .proximo { font: 800 32px/1.1 var(--display); letter-spacing: .04em; text-transform: uppercase; color: rgba(255, 244, 230, .85); }
 .proximo b { color: var(--ouro); }
@@ -372,3 +425,8 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .seguro .cardapio .icone { width: 52px; height: 52px; }
 .seguro .cardapio .valor { font-size: 20px; }
 .seguro .cardapio .nome { font-size: 18px; }
+/* No vertical a tela vira ~0,36 no celular: discreto, mas ainda legível. */
+.vertical.seguro .cardapio { opacity: .92; }
+.vertical.seguro .cardapio .icone { width: 100px; height: 100px; }
+.vertical.seguro .cardapio .valor { font-size: 44px; }
+.vertical.seguro .cardapio .nome { font-size: 36px; }

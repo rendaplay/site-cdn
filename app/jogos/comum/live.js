@@ -110,7 +110,7 @@
     { nome: "Perfume", moedas: 20, peso: 6 },
     { nome: "Doughnut", moedas: 30, peso: 5 },
     { nome: "Hat and Mustache", moedas: 99, peso: 3 },
-    { nome: "Hand Hearts", moedas: 100, peso: 3 },
+    { nome: "Hand Heart", moedas: 100, peso: 3 },
     { nome: "Confetti", moedas: 100, peso: 2 },
     { nome: "Money Gun", moedas: 500, peso: 0.7 },
     { nome: "Galaxy", moedas: 1000, peso: 0.4 },

@@ -6,13 +6,18 @@
 const FORMATOS = {
   vertical: {
     W: 1080, H: 1920, horizonte: 1590,
-    ceu: { x0: 90, x1: 990, y0: 430, y1: 1270 },
+    ceu: { x0: 90, x1: 990, y0: 1010, y1: 1440 },
     /* Áreas do HUD onde não vale pôr pipa parada (x0, y0, x1, y1). O jogo
        troca por `areas` com o tamanho real dos painéis assim que monta. */
-    evitar: [[0, 330, 500, 760], [730, 330, 1080, 740], [700, 1150, 1080, 1600]],
+    evitar: [[0, 0, 1080, 900]],
     /* Chat do TikTok no celular: pipa pode passar, mas não mora lá. */
-    chat: [0, 1150, 720, 1920],
-    tamanho: 76,
+    chat: [0, 1250, 720, 1920],
+    tamanho: 84,
+    /* No celular o palco vertical sai a ~0,36: o nome da pipa precisa de
+       letra maior pra passar de 13 px na tela. O grito ("Ê, CORTOU!") já é
+       grande e cresce menos, senão tapa o céu. */
+    letra: 1.45,
+    grito: 1.15,
   },
   horizontal: {
     W: 1920, H: 1080, horizonte: 900,
@@ -20,6 +25,8 @@ const FORMATOS = {
     evitar: [[0, 120, 440, 760], [1480, 120, 1920, 1000]],
     chat: null,
     tamanho: 66,
+    letra: 1,
+    grito: 1,
   },
 };
 
@@ -134,9 +141,19 @@ const Ceu = {
     this.ctx = canvas.getContext("2d");
   },
 
-  aplicarFormato(formato) {
+  /* Celular mais comprido que 9:16: o palco vertical cresce em altura e a
+     sobra vai pro céu (a quebrada desce junto, o HUD desce um pouco). */
+  aplicarFormato(formato, H = FORMATOS[formato].H) {
     this.formato = formato;
-    const f = FORMATOS[formato];
+    const base = FORMATOS[formato];
+    const sobra = H - base.H;
+    const f = sobra <= 0 ? base : {
+      ...base, H,
+      horizonte: base.horizonte + sobra,
+      ceu: { ...base.ceu, y0: base.ceu.y0 + sobra * 0.3, y1: base.ceu.y1 + sobra * 0.85 },
+      evitar: base.evitar.map(([a, b, c, d]) => [a, b, c, d + sobra * 0.3]),
+      chat: base.chat && [base.chat[0], base.chat[1] + sobra * 0.65, base.chat[2], H],
+    };
     this.dims = f;
     this.canvas.width = f.W;
     this.canvas.height = f.H;
@@ -652,23 +669,28 @@ const Ceu = {
     /* Nome não pode encavalar: quem importa mais reserva o lugar primeiro
        e o resto encolhe pro nome pequeno ou some naquele quadro. */
     const peso = p => (p.id === info.rei ? 50 : 0) + (p.fogo ? 40 : 0) + (p.gigante ? 30 : 0) + (p.faixa + 1) * 5 + (p.dourada ? 20 : 0);
-    const ocupado = [];
+    /* Os painéis do HUD entram como ocupados: nome que cairia atrás deles
+       some em vez de aparecer pela metade. O "COMENTE APAREI" é instrução
+       e reserva antes de qualquer nome. */
+    const ocupado = (this.areas || []).map(a => [...a]);
+    if (this.dourada) this.etiquetaDourada(c, this.dourada, t, ocupado);
     for (const p of [...frente].sort((a, b) => peso(b) - peso(a))) this.etiqueta(c, p, info, true, ocupado);
     for (const p of fundo) this.etiqueta(c, p, info, false, ocupado);
-    if (this.dourada) this.etiquetaDourada(c, this.dourada, t);
     this.desenharTextos(c);
   },
 
-  etiquetaDourada(c, d, t) {
-    const x = d.corpo.x;
+  etiquetaDourada(c, d, t, ocupado) {
     const y = d.corpo.y - this.dims.tamanho * 1.1 - 14;
-    c.font = "900 34px 'Big Shoulders Display', Impact, sans-serif";
+    c.font = `900 ${Math.round(34 * this.dims.letra)}px 'Big Shoulders Display', Impact, sans-serif`;
+    const txt = "COMENTE APAREI";
+    const meia = c.measureText(txt).width / 2 + 12;
+    const x = Math.max(meia, Math.min(this.dims.W - meia, d.corpo.x));
+    ocupado.push([x - meia, y - 44 * this.dims.letra, x + meia, y]);
     c.textAlign = "center";
     c.textBaseline = "bottom";
     c.lineJoin = "round";
     c.lineWidth = 8;
     c.strokeStyle = "#3A2200";
-    const txt = "COMENTE APAREI";
     c.strokeText(txt, x, y);
     c.fillStyle = `rgb(255,${220 + 30 * Math.sin(t * 8)},120)`;
     c.fillText(txt, x, y);
@@ -922,10 +944,11 @@ const Ceu = {
     if (p.alfa < 0.3) return;
     const s = this.dims.tamanho * p.escala;
     const nome = encurtar(p.jogador.nome, 16);
-    const tam = p.gigante ? 30 : 25;
+    const k = this.dims.letra;
+    const tam = Math.round((p.gigante ? 34 : 30) * k);
     /* Pipa encostada na borda: a etiqueta desliza pra dentro da tela. */
     c.font = `800 ${tam}px Figtree, sans-serif`;
-    const meia = c.measureText(nome).width / 2 + 50;
+    const meia = c.measureText(nome).width / 2 + 50 * k;
     const x = Math.max(meia, Math.min(this.dims.W - meia, p.corpo.x));
     const y = p.corpo.y - s * 0.62 - 10;
     const cabe = (w, h) => {
@@ -940,12 +963,12 @@ const Ceu = {
     }
     c.globalAlpha = p.alfa;
     if (!destaque) {
-      c.font = "700 21px Figtree, sans-serif";
-      if (!cabe(c.measureText(nome).width + 10, 25)) { c.globalAlpha = 1; return; }
-      if (p.id === info.rei) this.coroa(c, x, y - 34, 20);
+      c.font = `700 ${Math.round(25 * k)}px Figtree, sans-serif`;
+      if (!cabe(c.measureText(nome).width + 10, 29 * k)) { c.globalAlpha = 1; return; }
+      if (p.id === info.rei) this.coroa(c, x, y - 40 * k, 20 * k);
       c.textAlign = "center";
       c.textBaseline = "bottom";
-      c.lineWidth = 4;
+      c.lineWidth = 4 * k;
       c.strokeStyle = "rgba(24,10,30,.75)";
       c.strokeText(nome, x, y);
       c.fillStyle = "rgba(255,246,230,.92)";
@@ -953,7 +976,7 @@ const Ceu = {
       c.globalAlpha = 1;
       return;
     }
-    if (p.id === info.rei) this.coroa(c, x, y - 64, 26);
+    if (p.id === info.rei) this.coroa(c, x, y - 70 * k, 26 * k);
     c.font = `800 ${tam}px Figtree, sans-serif`;
     c.textAlign = "left";
     c.textBaseline = "middle";
@@ -990,7 +1013,7 @@ const Ceu = {
       for (let i = 0; i < 5; i++) {
         c.fillStyle = i < p.gas ? "#FFB23A" : "rgba(255,255,255,.25)";
         c.beginPath();
-        c.arc(x - 24 + i * 12, y0 + alt + 9, 4, 0, Math.PI * 2);
+        c.arc(x + (i - 2) * 12 * k, y0 + alt + 9 * k, 4 * k, 0, Math.PI * 2);
         c.fill();
       }
     }
@@ -1025,7 +1048,7 @@ const Ceu = {
     for (const tx of this.textos) {
       const k = tx.vida / tx.max;
       const entra = Math.min(1, tx.vida / 0.12);
-      const escala = tx.tam * (0.6 + 0.5 * entra - 0.1 * k);
+      const escala = tx.tam * this.dims.grito * (0.6 + 0.5 * entra - 0.1 * k);
       c.font = "900 64px 'Big Shoulders Display', Impact, sans-serif";
       const meia = c.measureText(tx.texto).width * escala / 2 + 16;
       c.save();

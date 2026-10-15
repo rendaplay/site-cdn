@@ -1,6 +1,10 @@
 /* Batalha de Torres: palco fixo (1080×1920 ou 1920×1080) escalado pra caber na
    janela, pra captura sair igual em qualquer tamanho. Tudo é posicionado
-   em px do palco. As cores de cada lado chegam do preset como variáveis. */
+   em px do palco. As cores de cada lado chegam do preset como variáveis.
+   Na vertical, em celular mais comprido que 9:16, o palco cresce `--sobra`
+   px: o bloco do alto desce `--y0` (sai de baixo do nome da live no TikTok)
+   e o chão desce mais, pra torre ganhar altura. No celular o palco aparece
+   a ~0,36: 36 px aqui viram 13 px na tela. */
 
 @font-face {
   font-family: "Big Shoulders Display";
@@ -34,8 +38,14 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
   transform-origin: 0 0;
   background: var(--a-escura);
   --x: 540px;
+  --sobra: 0px;
 }
-.palco.vertical { width: 1080px; height: 1920px; }
+.palco.vertical {
+  width: 1080px; height: 1920px;
+  --y0: calc(64px + var(--sobra) * .4);
+  --teto: calc(1084px + var(--sobra) * .4);
+  --chao: calc(1650px + var(--sobra) * .8);
+}
 .palco.horizontal { width: 1920px; height: 1080px; }
 
 /* ───────── fundo ───────── */
@@ -51,7 +61,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 }
 
 /* Cor de cada lado só no alto, atrás do placar: o resto é o cenário. */
-.campo { position: absolute; top: 0; height: 330px; width: 50%; overflow: hidden; opacity: .78; }
+.campo { position: absolute; top: 0; height: calc(var(--y0) + 290px); width: 50%; overflow: hidden; opacity: .78; }
 .campo-a { left: 0; background: linear-gradient(180deg, var(--a-escura) 0%, var(--a) 30%, transparent 100%); }
 .campo-b { right: 0; background: linear-gradient(180deg, var(--b-escura) 0%, var(--b) 30%, transparent 100%); }
 .horizontal .campo { height: 380px; }
@@ -76,7 +86,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
   display: flex; align-items: stretch;
   filter: drop-shadow(0 14px 24px rgba(0, 0, 0, .4));
 }
-.vertical .placar-topo { top: 112px; }
+.vertical .placar-topo { top: calc(var(--y0) + 8px); }
 .horizontal .placar-topo { top: 18px; }
 
 .relogio {
@@ -87,7 +97,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
   border-block: 4px solid var(--branco);
 }
 .tempo { font: 800 84px/0.95 var(--display); font-variant-numeric: tabular-nums; letter-spacing: .01em; }
-.rodada { font: 600 25px/1.1 var(--texto); color: rgba(255, 255, 255, .78); margin-top: 2px; }
+.rodada { font: 700 36px/1.1 var(--texto); color: rgba(255, 255, 255, .78); margin-top: 2px; }
 .serie {
   min-width: 78px;
   display: grid; place-items: center;
@@ -106,9 +116,9 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 .lado { position: absolute; text-shadow: 0 4px 0 rgba(0, 0, 0, .22); }
 .lado-a { text-align: left; }
 .lado-b { text-align: right; }
-.vertical .lado { top: 104px; width: 300px; }
-.vertical .lado-a { left: 36px; }
-.vertical .lado-b { right: 36px; }
+.vertical .lado { top: var(--y0); width: 320px; }
+.vertical .lado-a { left: 28px; }
+.vertical .lado-b { right: 28px; }
 .horizontal .lado { top: 20px; width: 520px; }
 .horizontal .lado-a { left: 40px; }
 .horizontal .lado-b { right: 40px; }
@@ -135,7 +145,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 .horizontal .altura { font-size: 120px; }
 .altura-m { font-size: .4em; margin-left: .08em; }
 .lado.atras .altura { transform: scale(.82); opacity: .88; }
-.info { display: flex; gap: 14px; margin-top: 14px; font: 600 24px/1.1 var(--texto); text-shadow: 0 2px 4px rgba(6, 16, 42, .85), 0 0 14px rgba(6, 16, 42, .6); white-space: nowrap; }
+.info { display: flex; gap: 14px; margin-top: 10px; font: 700 36px/1.1 var(--texto); text-shadow: 0 2px 4px rgba(6, 16, 42, .85), 0 0 14px rgba(6, 16, 42, .6); white-space: nowrap; }
 .lado-b .info { justify-content: flex-end; }
 .info b { font-weight: 800; }
 .torcida { opacity: .85; position: relative; }
@@ -145,7 +155,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 /* ───────── como escolher o lado ───────── */
 
 .instrucao { position: absolute; left: 0; right: 0; z-index: 0; }
-.vertical .instrucao { top: 330px; height: 100px; }
+.vertical .instrucao { position: static; }
 /* No vertical a legenda das bordas faz o papel das chaves de presente. */
 .vertical .chave { display: none; }
 .horizontal .instrucao { top: 0; height: 0; }
@@ -165,7 +175,9 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 }
 .so-presente .n-a { background: var(--a); }
 .so-presente .n-b { background: var(--b); }
-.vertical .so-presente { top: -8px; }
+/* z-index auto: com a .instrucao estática, o 1 furava a tela de vitória. */
+.palco.vertical .so-presente { z-index: auto; top: calc(var(--y0) + 576px); font-size: 44px; letter-spacing: .03em; padding: 6px 26px 4px; }
+.palco.vertical .so-presente .n { font-size: 50px; }
 .horizontal .so-presente { top: 172px; }
 
 .chave {
@@ -209,7 +221,12 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
   color: rgba(255, 255, 255, .88);
   text-shadow: 0 2px 8px rgba(0, 0, 0, .55);
 }
-.vertical .linha-ajuda { top: 52px; background: rgba(10, 21, 48, .72); padding: 0 22px; border-radius: 999px; }
+/* Vertical: a regra fica no chão (fora do essencial); o alerta com nome sobe
+   pro lugar do "faltam", que some enquanto ele está na tela. */
+.vertical .linha-ajuda { top: calc(var(--chao) + 152px); background: rgba(10, 21, 48, .72); padding: 0 24px; border-radius: 999px; font-size: 36px; line-height: 56px; }
+.vertical .linha-ajuda b.forte { font-size: 44px; }
+.vertical .linha-ajuda.alerta { top: calc(var(--y0) + 718px); font-size: 36px; line-height: 60px; max-width: 1050px; overflow: hidden; text-overflow: ellipsis; }
+.palco.vertical.com-alerta .falta { opacity: 0; }
 .horizontal .linha-ajuda { top: 1018px; }
 .linha-ajuda b { font-weight: 800; color: #fff; }
 .linha-ajuda b.forte { font: 900 34px/1 var(--display); letter-spacing: .04em; color: #FFD45A; }
@@ -219,7 +236,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 .ataque { position: absolute; inset: 0; pointer-events: none; display: grid; place-items: center; z-index: 5; }
 /* Mesmo lugar da faixa de presente, logo abaixo dos rostos: mais alto
    cobriria a cara de quem está na arte. */
-.vertical .ataque { align-items: start; padding-top: 990px; }
+.vertical .ataque { align-items: start; padding-top: calc(var(--teto) - 60px); }
 .horizontal .ataque { align-items: start; padding-top: 520px; }
 .golpe {
   display: flex; align-items: center; gap: 24px;
@@ -231,7 +248,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
   max-width: 1000px;
 }
 .golpe-icone { font-size: 96px; line-height: 1; }
-.golpe-tipo { font: 900 34px/1 var(--display); letter-spacing: .1em; text-transform: uppercase; color: #FFD45A; }
+.golpe-tipo { font: 900 42px/1 var(--display); letter-spacing: .1em; text-transform: uppercase; color: #FFD45A; }
 .golpe-txt { font: 600 36px/1.15 var(--texto); margin-top: 6px; max-width: 800px; }
 .golpe-txt b { font-weight: 900; }
 .golpe-txt em { font: 900 64px/0.9 var(--display); font-style: normal; color: #FFD45A; }
@@ -243,6 +260,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 .linha-ajuda.alerta b { color: var(--tinta); }
 .cmd { display: inline-block; min-width: 38px; padding: 0 9px; margin: 0 2px; border-radius: 9px; background: rgba(10, 21, 48, .7); color: #fff; font: 800 25px/36px var(--texto); text-align: center; }
 .linha-ajuda.alerta .cmd { background: var(--tinta); }
+.vertical .cmd { font-size: 36px; line-height: 48px; min-width: 52px; }
 
 /* ───────── falta, 2×, empate ───────── */
 
@@ -261,7 +279,8 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
   transition: opacity .25s;
 }
 .falta b { font: 900 46px/0.8 var(--display); color: var(--cor-lado, #fff); letter-spacing: .01em; }
-.vertical .falta { top: 446px; }
+.vertical .falta { top: calc(var(--y0) + 716px); font-size: 40px; padding: 12px 28px 14px; }
+.vertical .falta b { font-size: 54px; }
 .horizontal .falta { top: 946px; font-size: 30px; }
 .falta.pisca { animation: pisca-falta 1.1s ease-in-out infinite; }
 .palco.com-dobro .falta { opacity: 0; }
@@ -276,10 +295,10 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
   overflow: hidden;
 }
 .palco.com-dobro .dobro { display: block; animation: bate .9s ease-in-out infinite; }
-.vertical .dobro { top: 430px; }
+.vertical .dobro { top: calc(var(--y0) + 690px); }
 .horizontal .dobro { top: 236px; }
 .dobro .grande { display: block; font: 900 50px/0.95 var(--display); text-transform: uppercase; letter-spacing: .01em; }
-.dobro .sub { display: block; font: 700 24px/1.2 var(--texto); margin-top: 2px; }
+.dobro .sub { display: block; font: 700 34px/1.2 var(--texto); margin-top: 2px; }
 .dobro i { position: absolute; left: 0; bottom: 0; height: 7px; background: var(--tinta); width: 100%; transform-origin: left; }
 
 .empate {
@@ -291,7 +310,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
   opacity: 0;
   transition: opacity .25s;
 }
-.vertical .empate { top: 530px; }
+.vertical .empate { top: calc(var(--y0) + 800px); font-size: 38px; }
 .horizontal .empate { top: 880px; }
 .palco.cravado .empate { opacity: 1; animation: bate .8s ease-in-out infinite; }
 .palco.cravado.igual .empate, .palco.com-dobro .empate { opacity: 0; animation: none; }
@@ -314,13 +333,24 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 .maior b { font-weight: 800; }
 .maior .valor { font: 800 30px/1 var(--display); color: var(--cor-lado); }
 .maior .avatar { width: 36px; height: 36px; font-size: 16px; border-width: 2px; }
-.vertical .maior { top: 1668px; }
+.vertical .maior { top: calc(var(--chao) + 22px); font-size: 36px; padding: 6px 24px 6px 8px; }
+.vertical .maior .valor { font-size: 44px; }
+.vertical .maior .avatar { width: 54px; height: 54px; font-size: 31px; }
 .horizontal .maior { display: none; }
 
 .top { position: absolute; list-style: none; display: flex; flex-direction: column; gap: 8px; }
-.vertical .top { top: 1720px; width: 486px; }
+/* Vertical: o top 3 mora dentro do cartão do lado, longe do chat do TikTok. */
+.vertical .top { top: calc(var(--y0) + 408px); width: 480px; gap: 6px; }
 .vertical .top-a { left: 36px; }
 .vertical .top-b { right: 36px; }
+.vertical .top li { height: 48px; font-size: 36px; padding: 0 16px 0 4px; gap: 10px; }
+.vertical .top-b li { flex-direction: row; padding: 0 16px 0 4px; }
+.vertical .top-b li .quem { text-align: left; }
+.vertical .top li .pos { font-size: 38px; width: 26px; opacity: .85; }
+.vertical .top li .valor { font-size: 42px; }
+.vertical .top li .avatar { width: 42px; height: 42px; font-size: 28px; border-width: 2px; }
+.vertical .top li:not(.primeiro) { background: rgba(6, 12, 30, .5); }
+.vertical .top li.vazio { background: rgba(6, 12, 30, .3); color: rgba(255, 255, 255, .75); }
 .horizontal .top { top: 410px; width: 520px; }
 .horizontal .top-a { left: 40px; }
 .horizontal .top-b { right: 40px; }
@@ -354,7 +384,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 
 .meta { position: absolute; transition: opacity .3s; display: flex; flex-direction: column; gap: 4px; text-align: center; font: 700 21px/1 var(--texto); text-shadow: 0 2px 6px rgba(0, 0, 0, .5); }
 .meta[hidden] { display: none; }
-.vertical .meta { top: 262px; left: 350px; right: 350px; }
+.vertical .meta { top: calc(var(--y0) + 158px); left: 330px; right: 330px; font-size: 36px; gap: 6px; }
 .horizontal .meta { top: 228px; left: 820px; right: 820px; }
 .palco.horizontal.com-dobro .meta { opacity: 0; }
 .palco.final .meta { opacity: 0; }
@@ -364,8 +394,9 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 .meta-txt { white-space: nowrap; font-variant-numeric: tabular-nums; }
 
 .creditos { position: absolute; font: 500 14px/1.2 var(--texto); color: rgba(255, 255, 255, .6); white-space: nowrap; }
-.vertical .creditos { left: 50%; transform: translateX(-50%); bottom: 4px; }
+.vertical .creditos { left: 50%; transform: translateX(-50%); bottom: 8px; font-size: 31px; }
 .horizontal .creditos { right: 14px; bottom: 6px; font-size: 13px; }
+.vertical .sem-sinal { font-size: 32px; }
 .horizontal .sem-sinal { top: auto; bottom: 70px; left: 40px; transform: none; }
 
 .sem-sinal {
@@ -386,7 +417,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 
 .destaque { position: absolute; inset: 0; pointer-events: none; display: grid; place-items: center; }
 /* No vertical a faixa sobe pro placar: embaixo o chat do TikTok cobre. */
-.vertical .destaque { align-items: start; padding-top: 990px; }
+.vertical .destaque { align-items: start; padding-top: calc(var(--teto) - 60px); }
 .horizontal .destaque { align-items: start; padding-top: 520px; }
 .faixa {
   display: flex; align-items: center; gap: 30px;
@@ -400,6 +431,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 .faixa .avatar { width: 128px; height: 128px; font-size: 54px; border-width: 6px; }
 .faixa .quem { font: 800 46px/1 var(--texto); max-width: 600px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .faixa .oque { font: 600 28px/1.2 var(--texto); margin-top: 6px; }
+.vertical .faixa .oque { font-size: 36px; font-weight: 700; }
 .faixa .valor { font: 900 108px/0.82 var(--display); margin-top: 10px; text-shadow: 0 6px 0 rgba(0, 0, 0, .25); }
 
 /* ───────── últimos 10 segundos ───────── */
@@ -418,7 +450,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
   text-shadow: 0 24px 0 rgba(10, 21, 48, .55);
   font-variant-numeric: tabular-nums;
 }
-.vertical .contagem { align-items: start; padding-top: 900px; }
+.vertical .contagem { align-items: start; padding-top: calc(var(--teto) - 120px); }
 .vertical .contagem .n { font-size: 440px; }
 .horizontal .contagem .n { font-size: 400px; }
 .horizontal .contagem { align-items: start; padding-top: 330px; }
@@ -440,7 +472,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
   paint-order: stroke fill;
   text-shadow: 14px 16px 0 var(--tinta);
 }
-.vertical .virada .palavra { top: 990px; }
+.vertical .virada .palavra { top: calc(var(--teto) - 60px); }
 .horizontal .virada .palavra { top: 300px; font-size: 300px; }
 .virada .sub {
   position: absolute; left: 50%; transform: translateX(-50%);
@@ -448,7 +480,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
   font: 800 52px/1 var(--texto);
   background: var(--tinta); padding: 18px 34px; border-radius: 20px;
 }
-.vertical .virada .sub { top: 1290px; }
+.vertical .virada .sub { top: calc(var(--teto) + 240px); }
 .horizontal .virada .sub { top: 590px; }
 
 /* ───────── vitória ───────── */
@@ -462,8 +494,8 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
   animation: gira 30s linear infinite;
 }
 .vitoria .foto-vit { position: absolute; left: 50%; transform: translateX(-50%); aspect-ratio: 3 / 4; filter: drop-shadow(0 40px 60px rgba(0, 0, 0, .5)); }
-.vertical .vitoria .foto-vit { top: 940px; height: 1060px; }
-.vertical .vitoria .foto-vit.dupla { height: 900px; top: 1060px; }
+.vertical .vitoria .foto-vit { top: calc(940px + var(--sobra) * .8); height: 1060px; }
+.vertical .vitoria .foto-vit.dupla { height: 900px; top: calc(1060px + var(--sobra) * .8); }
 .vertical .vitoria .foto-vit.dupla-0 { left: 27%; }
 .vertical .vitoria .foto-vit.dupla-1 { left: 73%; }
 .horizontal .vitoria .foto-vit.dupla { height: 620px; top: 460px; }
@@ -471,7 +503,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 .horizontal .vitoria .foto-vit.dupla-1 { left: 34%; }
 .horizontal .vitoria .foto-vit { top: 170px; height: 910px; left: 30%; }
 .vitoria .titulo { position: absolute; left: 0; right: 0; text-align: center; }
-.vertical .vitoria .titulo { top: 150px; }
+.vertical .vitoria .titulo { top: calc(var(--y0) + 70px); }
 .horizontal .vitoria .titulo { top: 120px; left: 46%; right: 40px; text-align: left; }
 .vitoria .rodada-vit { font: 700 40px/1 var(--texto); opacity: .85; }
 .vitoria .vence { font: 900 230px/0.82 var(--display); text-transform: uppercase; margin-top: 46px; text-shadow: 0 10px 0 rgba(0, 0, 0, .25); }
@@ -480,7 +512,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 .horizontal .vitoria .vence { font-size: 200px; }
 .vitoria .placar-vit { font: 800 64px/1 var(--display); margin-top: 18px; font-variant-numeric: tabular-nums; }
 .vitoria .placar-vit span { opacity: .7; }
-.vitoria .serie-vit { display: inline-block; margin-top: 18px; font: 700 30px/1 var(--texto); background: rgba(10, 21, 48, .55); padding: 10px 20px; border-radius: 99px; }
+.vitoria .serie-vit { display: inline-block; margin-top: 18px; font: 700 36px/1 var(--texto); background: rgba(10, 21, 48, .55); padding: 10px 20px; border-radius: 99px; }
 .vitoria .mvp {
   position: absolute;
   display: flex; align-items: center; gap: 26px;
@@ -489,14 +521,14 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
   box-shadow: 0 30px 70px rgba(0, 0, 0, .45);
 }
 /* MVP e "próxima rodada" no alto: o terço de baixo fica sob o chat do TikTok. */
-.vertical .vitoria .mvp { left: 70px; right: 70px; top: 690px; }
+.vertical .vitoria .mvp { left: 70px; right: 70px; top: calc(var(--y0) + 640px); }
 .horizontal .vitoria .mvp { left: 46%; width: 820px; top: 700px; }
 .vitoria .mvp .avatar { width: 140px; height: 140px; font-size: 56px; border-color: var(--cor-lado); border-width: 6px; }
-.vitoria .mvp .rotulo { font: 700 30px/1 var(--texto); color: var(--cor-lado); }
+.vitoria .mvp .rotulo { font: 800 36px/1 var(--texto); color: var(--cor-lado); }
 .vitoria .mvp .quem { font: 800 56px/1.05 var(--texto); max-width: 620px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .vitoria .mvp .valor { font: 800 40px/1 var(--display); margin-top: 6px; }
 .vitoria .proxima { position: absolute; left: 0; right: 0; text-align: center; font: 600 32px/1.3 var(--texto); }
-.vertical .vitoria .proxima { top: 895px; left: 60px; right: 60px; font-size: 30px; text-shadow: 0 2px 8px rgba(0, 0, 0, .6); z-index: 1; }
+.vertical .vitoria .proxima { top: calc(var(--y0) + 850px); left: 60px; right: 60px; font-size: 36px; text-shadow: 0 2px 8px rgba(0, 0, 0, .6); z-index: 1; }
 .horizontal .vitoria .proxima { top: 960px; left: 46%; text-align: left; }
 
 /* ───────── pausa e painel ───────── */
@@ -575,6 +607,10 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 .bolha-pouso .avatar { width: 40px; height: 40px; font-size: 17px; border-width: 2px; }
 .bolha-pouso .quem { max-width: 190px; overflow: hidden; text-overflow: ellipsis; }
 .bolha-pouso b { font: 900 30px/1 var(--display); color: #FFD45A; }
+.vertical .bolha-pouso { font: 800 36px/1 var(--texto); padding: 5px 18px 5px 5px; }
+.vertical .bolha-pouso .avatar { width: 50px; height: 50px; font-size: 28px; }
+.vertical .bolha-pouso .quem { max-width: 200px; }
+.vertical .bolha-pouso b { font-size: 42px; }
 
 /* ───────── arte grande de cada lado ───────── */
 
@@ -583,10 +619,13 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 .arte { position: absolute; top: 0; bottom: 270px; width: 540px; overflow: hidden; pointer-events: none; }
 .arte-a { left: 0; }
 .arte-b { right: 0; }
+.vertical .arte { bottom: auto; height: var(--chao); }
 .horizontal .arte { bottom: 150px; width: 960px; }
 .arte-img { position: absolute; top: 520px; width: 750px; height: 1000px; object-fit: contain; }
 .arte-a .arte-img { left: -140px; filter: url(#contorno-a); }
 .arte-b .arte-img { right: -140px; filter: url(#contorno-b); }
+/* O rosto (28% a 50% da arte) fica ao lado do alto das torres, abaixo dos cartões. */
+.vertical .arte-img { top: calc(var(--teto) - 300px); }
 /* No horizontal o alto das bordas é do placar e do top 3: o rosto vem logo abaixo. */
 .horizontal .arte-img { top: 585px; width: 520px; height: 693px; }
 .horizontal .arte-a .arte-img { left: 40px; }
@@ -611,11 +650,11 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 
 /* Haste escura atrás da régua: os traços brancos somem no céu claro. */
 .regua-fundo {
-  position: absolute; left: 506px; width: 68px; top: 720px; bottom: 270px;
+  position: absolute; left: 506px; width: 68px; top: calc(var(--teto) - 220px); height: calc(var(--chao) - var(--teto) + 220px);
   border-radius: 34px 34px 0 0;
   background: linear-gradient(180deg, transparent, rgba(6, 16, 42, .45) 22%, rgba(6, 16, 42, .5));
 }
-.horizontal .regua-fundo { left: 926px; top: 330px; bottom: 150px; }
+.horizontal .regua-fundo { left: 926px; top: 330px; height: auto; bottom: 150px; }
 
 /* ───────── legenda dos presentes nas bordas ───────── */
 
@@ -628,7 +667,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 }
 .legenda-a { left: 0; border-left: 0; border-radius: 0 26px 26px 0; box-shadow: inset 8px 0 0 var(--a), 0 16px 34px rgba(6, 16, 42, .4); }
 .legenda-b { right: 0; border-right: 0; border-radius: 26px 0 0 26px; box-shadow: inset -8px 0 0 var(--b), 0 16px 34px rgba(6, 16, 42, .4); }
-.horizontal .legenda { display: none; }
+.horizontal .legenda, .vertical .legenda { display: none; }
 .leg { display: flex; flex-direction: column; align-items: center; padding: 10px 4px 9px; text-align: center; }
 .leg + .leg { border-top: 2px solid rgba(255, 255, 255, .14); }
 .leg-ico {
@@ -648,6 +687,62 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 }
 .legenda-a .tijolo { background: var(--a); }
 .legenda-b .tijolo { background: var(--b); }
+
+/* ───────── vertical: cartões, golpes e regras ───────── */
+
+.cardapio, .golpes, .regras { display: none; }
+.vertical .cardapio { display: block; }
+.vertical .golpes:not([hidden]), .vertical .regras { display: flex; }
+
+.cartao {
+  position: absolute; top: calc(var(--y0) + 262px); width: 504px; height: 306px;
+  border: 4px solid var(--branco); border-radius: 28px;
+  box-shadow: 0 16px 34px rgba(6, 16, 42, .4);
+  display: flex; align-items: flex-start; gap: 16px; padding: 12px 14px;
+}
+.cartao-a { left: 24px; background: linear-gradient(180deg, var(--a) 0, var(--a-escura) 100%); }
+.cartao-b { right: 24px; background: linear-gradient(180deg, var(--b) 0, var(--b-escura) 100%); }
+.cartao-icone {
+  flex: none; display: grid; place-items: center;
+  width: 108px; height: 108px; border-radius: 22px;
+  background: var(--branco); box-shadow: inset 0 -7px 0 rgba(0, 0, 0, .12);
+  font: 900 72px/1 var(--display);
+}
+.cartao-icone img { width: 92px; height: 92px; display: block; }
+.cartao-icone .tijolo { width: 84px; height: 62px; border-radius: 12px; font-size: 48px; box-shadow: inset 0 -7px 0 rgba(0, 0, 0, .22); }
+.cartao-a .tijolo { background: var(--a); }
+.cartao-b .tijolo { background: var(--b); }
+.cartao-txt { flex: 1; min-width: 0; padding-top: 2px; text-shadow: 0 3px 0 rgba(0, 0, 0, .2); }
+.cartao-txt b { display: block; overflow: hidden; white-space: nowrap; font: 900 58px/1 var(--display); text-transform: uppercase; letter-spacing: .01em; }
+.cartao-txt span { display: flex; align-items: center; gap: 10px; margin-top: 4px; font: 800 36px/1 var(--texto); white-space: nowrap; }
+.cartao-txt em { font: 900 48px/1 var(--display); font-style: normal; color: #FFD45A; }
+.cartao-b .cartao-txt em { color: var(--b-acento); }
+.cartao-txt .n { font: 900 44px/1 var(--display); font-style: normal; padding: 3px 12px 0; border-radius: 10px; background: var(--branco); }
+.cartao-a .n { color: var(--a); }
+.cartao-b .n { color: var(--b); }
+
+.golpes {
+  position: absolute; top: calc(var(--y0) + 642px); left: 8px; right: 8px;
+  justify-content: center; gap: 6px;
+}
+.golpe-chip {
+  display: flex; align-items: center; gap: 6px;
+  height: 60px; padding: 0 14px 0 6px;
+  background: rgba(10, 21, 48, .86); border: 3px solid rgba(255, 255, 255, .55); border-radius: 999px;
+  font: 800 36px/1 var(--display); text-transform: uppercase; white-space: nowrap;
+}
+.golpe-chip-ico { font-size: 36px; }
+.golpe-chip b { font: 900 42px/1 var(--display); color: #FFD45A; margin-right: 2px; font-variant-numeric: tabular-nums; }
+
+.regras {
+  position: absolute; top: calc(var(--chao) + 86px); left: 20px; right: 20px;
+  justify-content: center; gap: 10px;
+}
+.regras span {
+  background: rgba(10, 21, 48, .72); border-radius: 999px; padding: 0 16px;
+  font: 700 36px/56px var(--texto); white-space: nowrap;
+}
+.regras b { font: 900 38px/1 var(--display); color: #FFD45A; }
 
 /* ───────── modo seguro TikTok ───────── */
 

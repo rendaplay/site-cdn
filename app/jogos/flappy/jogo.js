@@ -6,10 +6,17 @@
 const { chave, config, opcoes } = Config.carregar();
 const PASSO = 1 / 120;
 
-const FORMATOS = {
-  vertical: { W: 1080, H: 1920, dims: { W: 1080, topo: 330, chao: 1420, x: 400 } },
-  horizontal: { W: 1920, H: 1080, dims: { W: 1920, topo: 150, chao: 856, x: 540 } },
-};
+/* Na vertical o palco cresce em altura (até 2520) em celular mais comprido
+   que 9:16, em vez de sobrar faixa preta. Placar e cardápio ficam em cima,
+   longe dos comentários do TikTok; o voo vem logo abaixo e o calçadão leva
+   o resto. Em 9:16 justo o voo encolhe um pouco pra caber. */
+function formatoDe(nome, w, h) {
+  if (nome === "horizontal") return { W: 1920, H: 1080, dims: { W: 1920, topo: 150, chao: 856, x: 540 } };
+  const H = w && h ? Math.min(2520, Math.max(1920, Math.round(1080 * h / w))) : 1920;
+  const cima = 120 + Math.round(Math.min(H - 1920, 600) * 0.2);
+  const topo = cima + 664;
+  return { W: 1080, H, cima, dims: { W: 1080, topo, chao: Math.min(topo + 1090, H - 220), x: 400 } };
+}
 
 const CHAT_DEMO = [
   "boa noite live", "kkkkkk", "kkkkkkkkk", "voa tuca", "cai cai cai", "derruba ele", "salva o tuca",
@@ -31,7 +38,7 @@ const Jogo = {
     this.formato = this.forcado || "vertical";
     const aleatorio = opcoes.semente != null ? sorteio(opcoes.semente + 1) : Math.random;
 
-    this.partida = new Partida(config, FORMATOS[this.formato].dims, aleatorio, Config.lerRecorde(chave));
+    this.partida = new Partida(config, formatoDe(this.formato, innerWidth, innerHeight).dims, aleatorio, Config.lerRecorde(chave));
     this.recordeGravado = this.partida.recordeSalvo;
     this.piloto = new Piloto(config.piloto, aleatorio);
     Cena.montar(document.getElementById("voo"));
@@ -75,23 +82,39 @@ const Jogo = {
     requestAnimationFrame(quadro);
   },
 
+  /* O iPhone às vezes faz o primeiro layout do iframe com 0×0: escalar
+     por zero sumiria com o palco, então espera o próximo quadro. */
   aplicarFormato(primeira = false) {
+    const w = innerWidth, h = innerHeight;
+    if (!w || !h) {
+      requestAnimationFrame(() => this.aplicarFormato(primeira));
+      return;
+    }
     const f = this.forcado || "vertical";
-    const { W, H, dims } = FORMATOS[f];
-    if (f !== this.formato || primeira) {
+    const { W, H, cima, dims } = formatoDe(f, w, h);
+    const chave = `${f}:${H}`;
+    if (chave !== this.chaveFormato) {
+      this.chaveFormato = chave;
       this.formato = f;
       this.palco.classList.toggle("vertical", f === "vertical");
       this.palco.classList.toggle("horizontal", f === "horizontal");
+      const p = this.palco.style;
+      p.height = f === "vertical" ? `${H}px` : "";
+      p.setProperty("--cima", `${cima || 0}px`);
+      p.setProperty("--topo", `${dims.topo}px`);
+      p.setProperty("--chao", `${dims.chao}px`);
+      p.setProperty("--meio", `${Math.round((dims.topo + dims.chao) / 2)}px`);
+      p.setProperty("--linhas", Math.max(1, Math.floor((H - dims.chao - 74) / 70)));
       Cena.aplicarFormato(dims, W, H);
+      this.partida.mundo.dims = dims;
       if (!primeira) {
-        this.partida.mundo.dims = dims;
         this.partida.voos--;
         this.partida.novoVoo();
         Hud.esconderMorte();
       }
     }
-    const s = Math.min(innerWidth / W, innerHeight / H);
-    this.palco.style.transform = `translate(${(innerWidth - W * s) / 2}px, ${(innerHeight - H * s) / 2}px) scale(${s})`;
+    const s = Math.min(w / W, h / H);
+    this.palco.style.transform = `translate(${(w - W * s) / 2}px, ${(h - H * s) / 2}px) scale(${s})`;
   },
 
   /* ───────── quem pilota ───────── */

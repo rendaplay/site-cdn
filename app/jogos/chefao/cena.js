@@ -7,7 +7,7 @@
 "use strict";
 
 const LAYOUTS = {
-  vertical: { W: 1080, H: 1920, x: 540, y: 822, s: 0.98, chao: 1150, plateia: 1500 },
+  vertical: { W: 1080, H: 1920, x: 540, y: 740, s: 0.86, chao: 1030, plateia: 1500 },
   horizontal: { W: 1920, H: 1080, x: 960, y: 556, s: 0.74, chao: 815, plateia: 900 },
 };
 

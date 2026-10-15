@@ -19,7 +19,7 @@ const PLATEIA = {
     { nome: config.times[1].presente.aceitos[0], moedas: 1, peso: 24, lado: 1 },
     { nome: "Finger Heart", moedas: 5, peso: 9 },
     { nome: "Doughnut", moedas: 30, peso: 5 },
-    { nome: "Hand Hearts", moedas: 100, peso: 2.4 },
+    { nome: "Hand Heart", moedas: 100, peso: 2.4 },
     { nome: "Money Gun", moedas: 500, peso: 0.6 },
     { nome: "Galaxy", moedas: 1000, peso: 0.3 },
     { nome: "Interstellar", moedas: 10000, peso: 0.02 },
@@ -122,6 +122,7 @@ const Jogo = {
     const altura = vertical ? Math.min(2520, Math.max(1920, Math.round(1080 * innerHeight / innerWidth))) : 0;
     Cena.formato(this.formatoAtual, altura);
     this.palco.style.height = vertical ? `${altura}px` : "";
+    this.palco.style.setProperty("--sobra", vertical ? `${altura - 1920}px` : "0px");
     const { W, H } = Cena.L;
     const escala = Math.min(innerWidth / W, innerHeight / H);
     this.palco.style.transform = `translate(${(innerWidth - W * escala) / 2}px, ${(innerHeight - H * escala) / 2}px) scale(${escala})`;

@@ -25,14 +25,16 @@
   };
 
   /* Vertical montada pela altura do palco (1920 a 2520): o HUD de baixo
-     ocupa os últimos 450 px, a pista fica logo acima e leva a maior parte da
-     sobra (corredores maiores), a arquibancada fica com o resto. O pé da raia
-     de trás desce o bastante pro tronco ficar na pista e só a cabeça subir
-     sobre o muro. */
+     ocupa os últimos 450 px mais parte da sobra, porque no celular os
+     comentários do TikTok cobrem essa faixa e a raia da frente tem que
+     ficar acima deles. A pista fica logo acima e leva a maior parte do resto
+     (corredores maiores), a arquibancada fica com o que sobra, quase toda
+     atrás do placar. O pé da raia de trás desce o bastante pro tronco ficar
+     na pista e só a cabeça subir sobre o muro. */
   function vertical(base, H) {
     const sobra = H - base.H;
     const cresce = 1 + 0.25 * sobra / 600;
-    const pistaBase = H - 450;
+    const pistaBase = H - 450 - sobra * 0.45;
     const pistaTopo = pistaBase - (600 + sobra * 0.55);
     const arqBase = pistaTopo - 80;
     const pe0 = pistaTopo + 300 * cresce;

@@ -74,9 +74,9 @@ const Hud = {
     };
     q(".titulo-jogo").textContent = cfg.titulo;
     this.$.chamada.innerHTML = cfg.modoSeguro
-      ? `<span>${ICONES.balao}<b>Comentário</b> soco de ${fmt.format(cfg.comentario.dano)}</span>` +
-        `<span>${ICONES.coracao}<b>${fmt.format(cfg.curtida.cada)} curtidas</b> soco</span>`
-      : `<span>${ICONES.balao}<b>Comente</b> soco de ${fmt.format(cfg.comentario.dano)}</span>` +
+      ? `<span>${ICONES.balao}<b>Comentário</b> = soco de ${fmt.format(cfg.comentario.dano)}</span>` +
+        `<span>${ICONES.coracao}<b>${fmt.format(cfg.curtida.cada)} curtidas</b> = 1 soco</span>`
+      : `<span>${ICONES.balao}<b>Comente</b> = soco de ${fmt.format(cfg.comentario.dano)}</span>` +
         `<span>${ICONES.presente}<b>Presente</b> = golpe</span>`;
     const m50 = q(".barra .m50");
     const m25 = q(".barra .m25");
@@ -99,7 +99,9 @@ const Hud = {
       Cena.icone(icone, f.golpe);
       const valor = el("span", "valor");
       valor.innerHTML = `${ICONES.moeda}${fmt.format(f.moedas)}${f === this.cfg.faixas[this.cfg.faixas.length - 1] ? "+" : ""}`;
-      li.append(icone, valor, el("span", "nome", this.cfg.modoSeguro ? "→ " + f.nome : f.nome));
+      const nome = el("span", "nome", f.nome);
+      if (this.cfg.modoSeguro) nome.prepend(el("i", "seta", "→ "));
+      li.append(icone, valor, nome);
       ol.append(li);
     }
   },

@@ -47,7 +47,8 @@ body { font-family: var(--fonte); color: var(--texto); }
 .palco.vertical { width: 1080px; height: 1920px; }
 .palco.horizontal { width: 1920px; height: 1080px; }
 #cena { position: absolute; inset: 0; width: 100%; height: 100%; }
-.hud-pista { position: absolute; inset: 0; pointer-events: none; }
+/* z-index 0 prende as etiquetas (z-index próprio) debaixo do HUD. */
+.hud-pista { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
 
 .ic { display: inline-block; width: 1em; height: 1em; vertical-align: -0.14em; fill: currentColor; flex: none; }
 .ic svg { width: 100%; height: 100%; display: block; }
@@ -289,16 +290,23 @@ body { font-family: var(--fonte); color: var(--texto); }
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.05);
 }
-.cardapio .item .ic { grid-row: span 2; width: 30px; height: 30px; }
+.cardapio .item > .ic { grid-row: span 2; width: 30px; height: 30px; }
 .cardapio .item .nome { font: 900 22px/1 var(--numero); letter-spacing: 0.04em; }
-.cardapio .item .moedas { font-size: 15px; color: var(--apagado); }
+.cardapio .item .moedas { display: flex; align-items: center; gap: 4px; font-size: 15px; color: var(--apagado); }
 .cardapio .item .moedas b { color: var(--ouro); font-weight: 700; }
 .cardapio .item.barato { box-shadow: inset 0 0 0 2px rgba(255, 61, 127, 0.8); }
-.seguro .cardapio { gap: 4px; padding: 5px; border-radius: 12px; opacity: 0.85; }
-.seguro .cardapio .item { grid-template-columns: auto auto 1fr; grid-template-rows: auto; column-gap: 5px; padding: 3px 6px; }
-.seguro .cardapio .item .ic { grid-row: auto; width: 18px; height: 18px; }
-.seguro .cardapio .item .nome { font-size: 14px; }
-.seguro .cardapio .item .moedas { font-size: 12px; }
+
+.chamada {
+  position: absolute;
+  padding: 10px 18px;
+  border-radius: 14px;
+  background: linear-gradient(100deg, rgba(255, 61, 127, 0.42), rgba(255, 61, 127, 0.16)), var(--placa-forte);
+  border: 1px solid rgba(255, 61, 127, 0.6);
+  font-size: 22px;
+  font-weight: 600;
+  text-align: center;
+}
+.chamada b { color: var(--ouro); font-weight: 800; }
 
 /* ───────── cartões de presente ───────── */
 
@@ -558,23 +566,120 @@ body { font-family: var(--fonte); color: var(--texto); }
 }
 
 /* ───────── vertical (1080×1920) ─────────
-   O TikTok cobre o topo (~110 px), os comentários embaixo à esquerda
-   (~1.250 em diante) e os botões embaixo à direita: o que importa fica
-   entre 118 e ~1.250. */
+   No celular o palco sai a ~0,36: 44 px aqui viram 16 px na tela e 36 px
+   viram 13. O TikTok cobre o topo (~110 px) e, de ~1.250 pra baixo, os
+   comentários à esquerda e os botões à direita: o que se lê fica entre 116
+   e ~1.250. O feed tem faixa própria (794–914), entre a barra e a pista, pra
+   não embolar com as etiquetas; a pista desce por baixo dos comentários. */
 
-.vertical .topo { top: 116px; left: 32px; right: 32px; height: 70px; }
-.vertical .placar { top: 194px; left: 24px; right: 24px; }
-.vertical .placar .grade { height: 290px; }
-.vertical .espera, .vertical .podio { top: 194px; left: 24px; right: 24px; height: 456px; }
-.vertical .feed { top: 548px; left: 24px; width: 610px; }
-.vertical .cardapio { top: 548px; right: 24px; width: 416px; }
-.vertical .surpresa { top: 702px; left: 24px; right: 24px; }
-.vertical .anuncios { top: 300px; }
-.vertical .cartoes { top: 548px; left: 24px; right: 24px; }
-.vertical .contagem { top: 820px; }
-.vertical .progresso { top: 1170px; left: 24px; right: 24px; }
-.vertical .marca-site { top: 1262px; right: 30px; }
-.vertical .avisos { top: 1262px; left: 24px; }
+.vertical .topo { top: 116px; left: 28px; right: 28px; height: 72px; }
+.vertical .rodada { font-size: 42px; gap: 10px; }
+.vertical .rodada .pilula { padding: 2px 16px; }
+
+.vertical .chamada { top: 198px; left: 20px; right: 20px; padding: 8px 16px; font-size: 38px; line-height: 1.15; background: linear-gradient(100deg, #6b1d48, #3a1430); }
+
+.vertical .cardapio { top: 270px; left: 20px; right: 20px; grid-template-columns: repeat(6, 1fr); gap: 8px; padding: 8px; background: rgba(10, 11, 26, 0.94); }
+.vertical .cardapio .item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px 6px; border-radius: 12px; background: rgba(255, 255, 255, 0.07); }
+.vertical .cardapio .item > .ic { width: 54px; height: 54px; }
+.vertical .cardapio .item .nome { font-size: 44px; letter-spacing: 0.02em; }
+.vertical .cardapio .item .moedas { gap: 5px; font: 800 44px/1.05 var(--numero); color: var(--texto); }
+.vertical .cardapio .item .moedas .ic { width: 30px; height: 30px; }
+.vertical .cardapio .item .moedas b { font-weight: 800; }
+.vertical .cardapio .item .un { display: none; }
+.vertical .cardapio .item.barato { box-shadow: inset 0 0 0 4px rgba(255, 61, 127, 0.9); }
+
+.vertical .placar { top: 470px; left: 20px; right: 20px; padding: 10px; background: rgba(10, 11, 26, 0.9); }
+.vertical .placar .grade { height: 182px; }
+.vertical .placar .linha { height: 56px; gap: 8px; padding: 0 12px 0 4px; }
+.vertical .placar .linha .pos { width: 34px; font-size: 44px; }
+.vertical .placar .linha .chip { min-width: 50px; height: 44px; font-size: 36px; }
+.vertical .placar .linha .nome { font: 800 46px/1 var(--numero); letter-spacing: 0.01em; }
+.vertical .placar .linha .coroa-mini { width: 32px; height: 26px; vertical-align: -0.05em; margin-right: 4px; }
+.vertical .placar .linha .metros { font-size: 44px; }
+.vertical .placar .rodape { padding: 6px 6px 0; font-size: 36px; }
+.vertical .placar .linha .metros small { font-size: 0.8em; }
+
+.vertical .espera, .vertical .podio { top: 470px; left: 20px; right: 20px; padding: 16px 20px 18px; background: rgba(10, 11, 26, 0.96); }
+.vertical .espera .cab .t { font-size: 56px; }
+.vertical .espera .cab .t small { font-size: 36px; margin-top: 4px; }
+.vertical .espera .cab .n { font-size: 120px; }
+.vertical .espera .cta { display: none; }
+.vertical .espera .colunas { margin-top: 12px; gap: 20px; }
+.vertical .espera h3 { font-size: 40px; letter-spacing: 0.03em; white-space: nowrap; }
+.vertical .espera ol { gap: 8px; }
+.vertical .espera li { gap: 10px; font-size: 38px; }
+.vertical .espera li .chip { min-width: 50px; height: 44px; font-size: 34px; }
+.vertical .espera li .v { font-size: 44px; }
+.vertical .espera li:nth-child(n+5) { display: none; }
+.vertical .espera .vazio { font-size: 36px; }
+.vertical .espera .total { font-size: 34px; }
+
+.vertical .podio .titulo { font-size: 60px; }
+.vertical .podio .degraus { gap: 14px; margin: 12px 0; }
+.vertical .podio .degrau .nome { font-size: 38px; }
+.vertical .podio .degrau .nome .chip { min-width: 48px; height: 42px; font-size: 34px; vertical-align: 0.1em; }
+.vertical .podio .degrau .bloco { font-size: 80px; }
+.vertical .podio .d1 .bloco { height: 130px; }
+.vertical .podio .d2 .bloco { height: 100px; }
+.vertical .podio .d3 .bloco { height: 76px; }
+.vertical .podio .degrau .tempo { font-size: 36px; }
+.vertical .podio .mvp { gap: 16px; padding: 12px 18px; }
+.vertical .podio .mvp .avatar { width: 80px; height: 80px; font-size: 38px; }
+.vertical .podio .mvp .rot { font-size: 36px; }
+.vertical .podio .mvp .nome { font-size: 42px; }
+.vertical .podio .mvp .moedas { font-size: 60px; }
+.vertical .podio .mvp.sem { font-size: 36px; text-align: center; }
+
+.vertical .progresso { top: 732px; left: 20px; right: 20px; height: 56px; }
+.vertical .progresso .trilho { left: 196px; right: 200px; top: 22px; height: 16px; }
+.vertical .progresso .ponta { top: 4px; padding: 2px 12px; font-size: 38px; line-height: 1.15; }
+.vertical .progresso .marco { top: -5px; }
+/* Números dos marcos e dos carrinhos sairiam com 5 px no celular: fica
+   só o risco e a cor. */
+.vertical .progresso .marco span, .vertical .progresso .carro b { display: none; }
+.vertical .progresso .carro { top: 10px; width: 66px; height: 38px; }
+.vertical .progresso .pontos { top: 5px; }
+
+.vertical .feed { top: 794px; left: 20px; width: 1040px; gap: 8px; }
+.vertical .feed .linha { padding: 6px 18px 6px 12px; font-size: 38px; background: #0d0e1f; }
+.vertical .feed .linha .ic { width: 42px; height: 42px; }
+.vertical .feed .linha em { font-size: 42px; }
+
+.vertical .cartoes { top: 1000px; left: 20px; right: 20px; }
+.vertical .cartao { min-width: 700px; max-width: 1040px; }
+.vertical .cartao .avatar { width: 96px; height: 96px; font-size: 44px; }
+.vertical .cartao .l1 { font-size: 40px; }
+.vertical .cartao .l2 { font-size: 60px; }
+.vertical .cartao .l2 .ic { width: 56px; height: 56px; }
+.vertical .cartao .l2 .alvo { font-size: 40px; max-width: 420px; }
+.vertical .cartao .dobro { font-size: 40px; }
+.vertical .cartao.grande .avatar { width: 112px; height: 112px; font-size: 52px; }
+.vertical .cartao.grande .l2 { font-size: 72px; }
+
+.vertical .anuncios { top: 1150px; }
+.vertical .anuncio .t { font-size: 84px; }
+.vertical .anuncio .s { font-size: 42px; }
+.vertical .anuncio.venceu .t { font-size: 96px; }
+
+.vertical .contagem { top: 1000px; }
+
+/* O evento-surpresa cobre a chamada enquanto dura: também é instrução. */
+.vertical .surpresa { top: 196px; left: 20px; right: 20px; height: 66px; gap: 12px; padding: 0 18px 6px; overflow: hidden; font-size: 44px; white-space: nowrap; }
+.vertical .surpresa .ic { width: 44px; height: 44px; }
+.vertical .surpresa .s { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 34px; }
+.vertical .surpresa .barra { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; border-radius: 0; }
+
+.vertical .etiqueta { gap: 8px; height: 50px; padding: 0 16px 0 4px; font-size: 36px; border-width: 3px; }
+.vertical .etiqueta .pos { min-width: 44px; height: 40px; font-size: 36px; }
+.vertical .etiqueta .nome { max-width: 330px; }
+.vertical .etiqueta.lider .coroa { top: -50px; width: 60px; height: 44px; }
+.vertical .etiqueta.rei::after { font-size: 32px; padding: 0 12px; }
+.vertical .flutua { font-size: 60px; }
+
+.vertical .marca-site { top: 1860px; right: 28px; font-size: 32px; }
+.vertical .avisos { top: 1262px; left: 20px; }
+.vertical .aviso { font-size: 36px; }
+.vertical .sem-sinal { font-size: 34px; }
 
 /* ───────── horizontal (1920×1080) ───────── */
 
@@ -586,7 +691,8 @@ body { font-family: var(--fonte); color: var(--texto); }
 .horizontal .espera, .horizontal .podio { top: 146px; left: 24px; width: 560px; }
 .horizontal .espera .colunas { grid-template-columns: 1fr; }
 .horizontal .feed { top: 30px; right: 24px; width: 520px; align-items: flex-end; }
-.horizontal .cardapio { top: 290px; right: 24px; width: 470px; grid-template-columns: repeat(2, 1fr); }
+.horizontal .cardapio { top: 350px; right: 24px; width: 470px; grid-template-columns: repeat(2, 1fr); }
+.horizontal .chamada { top: 570px; right: 24px; width: 470px; }
 .horizontal .surpresa { top: 30px; left: 620px; right: 620px; }
 .horizontal .anuncios { top: 110px; }
 .horizontal .cartoes { top: 250px; left: 520px; right: 520px; }

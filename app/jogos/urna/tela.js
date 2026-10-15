@@ -47,9 +47,14 @@ const Tela = {
     p.querySelector(".cabo-a b").textContent = candidatos[0].numero;
     p.querySelector(".cabo-b b").textContent = candidatos[1].numero;
 
-    p.querySelector(".chaves").innerHTML = candidatos.map((c, i) =>
-      `<span class="chave chave-${"ab"[i]}"><i>${iconeDoPresente(c.presente)}</i>=<b>${c.numero}</b></span>`).join("")
-      + `<span class="chave chave-comente">comente <b class="a">${candidatos[0].numero}</b> ou <b class="b">${candidatos[1].numero}</b></span>`;
+    /* Cada chave fica em cima da urna do seu lado: quem chega na live vê
+       qual presente e qual comentário votam em quem sem procurar. */
+    p.querySelector(".chaves").innerHTML = candidatos.map((c, i) => `
+      <div class="chave chave-${"ab"[i]}">
+        <i class="chave-icone">${iconeDoPresente(c.presente)}</i>
+        <span class="chave-texto"><strong>${escapar(c.presente.nome)}</strong><span>vota no <b>${c.numero}</b></span></span>
+      </div>`).join("")
+      + `<div class="chave-comente">ou comente <b class="a">${candidatos[0].numero}</b> ou <b class="b">${candidatos[1].numero}</b> no chat</div>`;
 
     this.mesa = p.querySelector(".mesa");
     Urnas.montar(document.getElementById("urnas"), candidatos, this.artes);
@@ -120,7 +125,7 @@ const Tela = {
         this.ultimoTop[l] = chave;
         cartao.querySelector(".top").innerHTML = top.length
           ? top.map((d, i) => `<li><span class="pos">${i + 1}º</span>${avatar(d)}<span class="nick">${escapar(d.nick)}</span><b>${fmt(d.votos)}</b></li>`).join("")
-          : `<li class="vazio">Ninguém votou ainda</li>`;
+          : `<li class="vazio">Maiores apoiadores aqui</li>`;
       }
     });
 

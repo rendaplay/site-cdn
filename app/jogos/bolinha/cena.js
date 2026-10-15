@@ -59,9 +59,10 @@ const Cena = {
     this.c = canvas.getContext("2d");
   },
 
-  aplicarFormato(W, H, mesa, potes) {
+  aplicarFormato(W, H, mesa, potes, zoom = 1) {
     this.W = W;
     this.H = H;
+    this.zoom = zoom;
     this.canvas.width = W;
     this.canvas.height = H;
     this.mesa = mesa;
@@ -103,6 +104,9 @@ const Cena = {
     }
     c.globalAlpha = 1;
 
+    /* Daqui pra baixo, tudo em px da mesa. */
+    const z = this.zoom;
+    c.scale(z, z);
     const f = this.moldura();
     const vertical = H > W;
 
@@ -112,7 +116,7 @@ const Cena = {
       base.addColorStop(0, "#1B0B45");
       base.addColorStop(1, "#0B0424");
       c.fillStyle = base;
-      arredondado(c, f.x - 6, f.y + f.h - 30, f.w + 12, H - f.y - f.h + 80, 34);
+      arredondado(c, f.x - 6, f.y + f.h - 30, f.w + 12, H / z - f.y - f.h + 80, 34);
       c.fill();
       c.strokeStyle = "rgba(255,61,154,.35)";
       c.lineWidth = 3;
@@ -267,8 +271,10 @@ const Cena = {
 
   /* ───────── efeitos que o jogo chama ───────── */
 
-  texto(txt, x, y, { cor = "#FFFFFF", tam = 44, dur = 1.1, sobe = 90, sub = null } = {}) {
-    this.textos.push({ txt, x, y, cor, tam, dur, sobe, sub, t: 0 });
+  /* Texto com `chave` substitui o anterior de mesma chave. */
+  texto(txt, x, y, { cor = "#FFFFFF", tam = 44, dur = 1.1, sobe = 90, sub = null, chave = null } = {}) {
+    if (chave) this.textos = this.textos.filter(t => t.chave !== chave);
+    this.textos.push({ txt, x, y, cor, tam, dur, sobe, sub, chave, t: 0 });
     if (this.textos.length > 40) this.textos.shift();
   },
 
@@ -314,8 +320,10 @@ const Cena = {
 
     c.setTransform(1, 0, 0, 1, 0, 0);
     c.drawImage(this.fundo, 0, 0);
+    const z = this.zoom;
+    c.setTransform(z, 0, 0, z, 0, 0);
     this.respirar(agora);
-    c.setTransform(1, 0, 0, 1, tx, ty);
+    c.setTransform(z, 0, 0, z, tx, ty);
 
     this.desenharBocal(m, agora);
     this.desenharPinos(m, agora, partida);
@@ -488,7 +496,7 @@ const Cena = {
       c.fillStyle = "#FFFFFF";
       c.shadowColor = cor;
       c.shadowBlur = 14;
-      const tam = valor >= 10 ? 34 : 38;
+      const tam = Math.round(m.passoX * (valor >= 10 ? 0.54 : 0.6));
       c.font = `900 ${tam}px "Big Shoulders Display", Impact, sans-serif`;
       c.textAlign = "center";
       c.textBaseline = "alphabetic";
@@ -619,6 +627,24 @@ const Cena = {
     c.globalAlpha = 1;
   },
 
+  /* Nome de quem caiu no pote da ponta não pode vazar pra fora da mesa. */
+  dentroDaMesa(t) {
+    if (t.meiaLargura == null) {
+      const c = this.c;
+      c.font = `900 ${t.tam}px "Big Shoulders Display", Impact, sans-serif`;
+      let w = c.measureText(t.txt).width;
+      if (t.sub) {
+        c.font = `800 ${Math.round(t.tam * 0.6)}px Figtree, system-ui, sans-serif`;
+        w = Math.max(w, c.measureText(t.sub).width);
+      }
+      t.meiaLargura = w / 2 + 6;
+    }
+    const d = this.mesa.dims;
+    const min = d.x0 + t.meiaLargura;
+    const max = d.x1 - t.meiaLargura;
+    return min > max ? (d.x0 + d.x1) / 2 : Math.min(max, Math.max(min, t.x));
+  },
+
   desenharTextos(dt) {
     const c = this.c;
     this.textos = this.textos.filter(t => (t.t += dt) < t.dur);
@@ -630,18 +656,21 @@ const Cena = {
       const escala = 0.6 + 0.4 * entra + (k < 0.15 ? 0.15 * Math.sin((k / 0.15) * Math.PI) : 0);
       const y = t.y - t.sobe * (1 - Math.pow(1 - k, 2));
       c.globalAlpha = k > 0.7 ? 1 - (k - 0.7) / 0.3 : 1;
+      const x = this.dentroDaMesa(t);
       c.font = `900 ${Math.round(t.tam * escala)}px "Big Shoulders Display", Impact, sans-serif`;
       c.lineWidth = Math.max(4, t.tam * 0.14);
       c.strokeStyle = "rgba(10,3,32,.9)";
-      c.strokeText(t.txt, t.x, y);
+      c.strokeText(t.txt, x, y);
       c.fillStyle = t.cor;
-      c.fillText(t.txt, t.x, y);
+      c.fillText(t.txt, x, y);
       if (t.sub) {
-        c.font = `800 ${Math.round(t.tam * 0.42)}px Figtree, system-ui, sans-serif`;
-        c.lineWidth = 5;
-        c.strokeText(t.sub, t.x, y + t.tam * 0.62);
+        const sub = Math.round(t.tam * 0.6);
+        const ySub = y + t.tam * 0.5 + sub * 0.6;
+        c.font = `800 ${sub}px Figtree, system-ui, sans-serif`;
+        c.lineWidth = 6;
+        c.strokeText(t.sub, x, ySub);
         c.fillStyle = "#FFFFFF";
-        c.fillText(t.sub, t.x, y + t.tam * 0.62);
+        c.fillText(t.sub, x, ySub);
       }
     }
     c.globalAlpha = 1;

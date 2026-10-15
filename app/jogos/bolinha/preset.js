@@ -43,9 +43,9 @@ window.BOLINHA_PRESETS = {
     faixas: [
       { moedas: 1, nome: "Punhado", texto: "3 bolinhas", bolinhas: 3 },
       { moedas: 10, nome: "Bolada", texto: "10 bolinhas", bolinhas: 10 },
-      { moedas: 100, nome: "Bolinha de ouro", texto: "ouro vale o dobro + 5", bolinhas: 5, ouro: 1 },
-      { moedas: 500, nome: "Chuva", texto: "30 bolinhas do céu", bolinhas: 30, chuva: true },
-      { moedas: 3000, nome: "Bolona", texto: "gigante + 40 bolinhas", bolinhas: 40, chuva: true, bolona: true },
+      { moedas: 100, nome: "Bolinha de ouro", texto: "ouro ×2 + 5", bolinhas: 5, ouro: 1 },
+      { moedas: 500, nome: "Chuva", texto: "chuva de 30", bolinhas: 30, chuva: true },
+      { moedas: 3000, nome: "Bolona", texto: "bolona + 40", bolinhas: 40, chuva: true, bolona: true },
     ],
     lendario: { moedas: 10000, nome: "Tempestade", texto: "bolona + 80 bolinhas", bolinhas: 80 },
     /* Com a bolona na mesa, os 3 potes do meio valem o máximo por tanto tempo. */
@@ -67,7 +67,7 @@ window.BOLINHA_PRESETS = {
         { nome: "Finger Heart", moedas: 5, peso: 10 },
         { nome: "Perfume", moedas: 20, peso: 6 },
         { nome: "Doughnut", moedas: 30, peso: 4 },
-        { nome: "Hand Hearts", moedas: 100, peso: 2 },
+        { nome: "Hand Heart", moedas: 100, peso: 2 },
         { nome: "Money Gun", moedas: 500, peso: 0.7 },
         { nome: "Galaxy", moedas: 1000, peso: 0.4 },
         { nome: "Interstellar", moedas: 10000, peso: 0.05 },

@@ -30,7 +30,7 @@
 html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
 body { font-family: var(--texto); color: var(--creme); -webkit-font-smoothing: antialiased; }
 
-.palco { position: absolute; left: 0; top: 0; overflow: hidden; transform-origin: 0 0; background: #15123A; }
+.palco { position: absolute; left: 0; top: 0; overflow: hidden; transform-origin: 0 0; background: #15123A; --sobra: 0px; --linhas-feed: 5; }
 .palco.vertical { width: 1080px; height: 1920px; }
 .palco.horizontal { width: 1920px; height: 1080px; }
 #ceu { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -48,7 +48,7 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 /* ───────── topo ───────── */
 
 .topo { position: absolute; display: flex; align-items: stretch; justify-content: space-between; gap: 18px; }
-.vertical .topo { top: 150px; left: 28px; right: 28px; height: 146px; }
+.vertical .topo { top: calc(150px + var(--sobra) * .3); left: 28px; right: 28px; height: 176px; }
 .horizontal .topo { top: 18px; left: 28px; right: 28px; height: 124px; }
 
 .rei, .moedas {
@@ -94,14 +94,17 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 /* ───────── chamada e evento ───────── */
 
 .chamada, .evento { position: absolute; left: 50%; transform: translateX(-50%); }
-.vertical .chamada, .vertical .evento { top: 314px; }
+.vertical .chamada, .vertical .evento { top: calc(342px + var(--sobra) * .3); }
 .horizontal .chamada, .horizontal .evento { top: 150px; }
 
 .chamada { display: flex; gap: 14px; transition: opacity .3s; white-space: nowrap; }
 .chamada.escondida { opacity: 0; }
-/* O anúncio usa a mesma faixa: chamada e evento saem enquanto ele passa. */
+/* No horizontal o anúncio usa a mesma faixa: chamada e evento saem
+   enquanto ele passa. No vertical ele cobre o topo (rei e título), que
+   pesa menos que a chamada e o cardápio na hora do presente. */
 .evento { transition: opacity .25s; }
-.palco.anunciando .chamada, .palco.anunciando .evento { opacity: 0; }
+.topo { transition: opacity .25s; }
+.horizontal.anunciando .chamada, .horizontal.anunciando .evento, .vertical.anunciando .topo { opacity: 0; }
 .chamada span {
   display: inline-flex; align-items: center; gap: 10px;
   background: var(--creme); color: var(--tinta);
@@ -131,14 +134,17 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 /* ───────── painéis ───────── */
 
 .feed, .ranking, .cardapio { position: absolute; }
-/* Vertical: feed e ranking estreitos lá em cima, cardápio embaixo à
-   direita (o chat do TikTok fica embaixo à esquerda), e o meio é do céu. */
-.vertical .feed { left: 28px; top: 392px; width: 470px; }
-.vertical .ranking { right: 28px; top: 392px; width: 320px; }
-.vertical .cardapio { right: 28px; bottom: 350px; width: 384px; }
+/* Vertical: tudo numa faixa só lá em cima, na largura toda. Embaixo à
+   esquerda fica o chat do TikTok e à direita os botões dele, então o
+   cardápio não pode morar lá; o céu fica com o meio. */
+.vertical .cardapio { left: 28px; right: 28px; top: calc(434px + var(--sobra) * .3); }
+.vertical .feed { left: 28px; top: calc(664px + var(--sobra) * .3); width: 604px; }
+.vertical .ranking { right: 28px; top: calc(664px + var(--sobra) * .3); width: 404px; }
+/* Fora do modo seguro o cardápio tem o nome da faixa e fica mais alto. */
+.vertical:not(.seguro) .feed, .vertical:not(.seguro) .ranking { top: calc(744px + var(--sobra) * .3); }
 .horizontal .feed { left: 28px; top: 160px; width: 420px; }
 .horizontal .ranking { right: 28px; top: 160px; width: 380px; }
-.horizontal .cardapio { right: 28px; top: 500px; width: 380px; }
+.horizontal .cardapio { right: 28px; top: 524px; width: 380px; }
 
 .fita-titulo {
   display: inline-block;
@@ -172,6 +178,14 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .feed li.aviso { display: block; padding: 9px 16px; font-weight: 500; color: rgba(255, 244, 226, .9); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .feed li.aviso b { font-weight: 800; color: var(--creme); display: inline-block; max-width: 230px; overflow: hidden; text-overflow: ellipsis; vertical-align: bottom; }
 .feed li.aviso.presente { background: rgba(255, 122, 47, .85); color: #fff; }
+/* Começo da live: sem corte ainda, o feed diz o que vai aparecer ali. */
+.feed ol:empty::after {
+  content: "Ninguém cortou ainda";
+  background: var(--tinta-vidro); color: rgba(255, 244, 226, .55);
+  border-radius: 14px; padding: 9px 16px; width: fit-content;
+  font: 600 23px/1.1 var(--texto);
+}
+.vertical .feed ol:empty::after { font-size: 38px; padding: 10px 18px; border-radius: 16px; }
 .feed li:nth-child(4) { opacity: .75; }
 .feed li:nth-child(5) { opacity: .45; }
 
@@ -219,9 +233,9 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 /* ───────── anúncio grande ───────── */
 
 .anuncio { position: absolute; left: 0; right: 0; display: grid; justify-items: center; pointer-events: none; }
-/* Na faixa da chamada, em cima: no meio do céu tapava o corte que ele
-   mesmo anuncia. */
-.vertical .anuncio { top: 298px; }
+/* Em cima, longe do céu: no meio dele tapava o corte que ele mesmo
+   anuncia. */
+.vertical .anuncio { top: calc(132px + var(--sobra) * .3); }
 .horizontal .anuncio { top: 138px; }
 .anuncio .cartao { position: relative; display: grid; justify-items: center; }
 .anuncio .fita {
@@ -244,6 +258,90 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .anuncio .avatar { width: 72px; height: 72px; font-size: 32px; box-shadow: 0 0 0 4px var(--cor); }
 .anuncio .nome { font: 900 58px/.95 var(--display); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 820px; }
 .anuncio .texto { font: 600 25px/1.2 var(--texto); color: rgba(255, 244, 226, .85); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 820px; }
+
+/* ───────── vertical: tamanhos pro celular ─────────
+   O palco vertical chega no celular de quem assiste a ~0,36: 44 px aqui
+   viram 16 px lá, 36 px viram 13. Nada de texto abaixo disso. */
+
+.vertical .topo { gap: 16px; }
+.vertical .rei { width: 500px; padding: 12px 22px; gap: 6px; }
+.vertical .rotulo { font-size: 36px; letter-spacing: .05em; }
+.vertical .rotulo svg { font-size: 38px; }
+.vertical .rei .quem { gap: 14px; min-height: 62px; }
+.vertical .rei .avatar { width: 60px; height: 60px; font-size: 34px; }
+.vertical .rei .nome { font-size: 50px; max-width: 370px; }
+.vertical .rei .nome.vazio { font-size: 44px; }
+.vertical .rei .tempo { font-size: 36px; }
+.vertical .titulo-jogo { font-size: 70px; max-width: 230px; }
+.vertical .moedas { width: 300px; padding: 12px 20px; gap: 2px; }
+.vertical .moedas .rotulo { font-size: 34px; letter-spacing: .02em; }
+.vertical .moedas .num { font-size: 76px; }
+.vertical .moedas .maior { font-size: 36px; max-width: 260px; }
+/* Modo seguro esconde as moedas: o título fica com o lugar inteiro. */
+.vertical.seguro .moedas { display: none; }
+.vertical.seguro .titulo-jogo { font-size: 104px; max-width: 420px; }
+
+.vertical .chamada { gap: 12px; }
+.vertical .chamada span { font-size: 44px; gap: 10px; padding: 12px 22px 12px 16px; }
+.vertical .chamada svg { font-size: 46px; }
+
+.vertical .evento { width: 1024px; padding: 6px 24px 10px; column-gap: 18px; }
+.vertical .evento b { font-size: 54px; }
+.vertical .evento span { font-size: 40px; }
+.vertical .evento i { height: 8px; margin-top: 4px; }
+
+.vertical .fita-titulo { font-size: 36px; padding: 7px 20px 6px; margin-bottom: 8px; }
+
+.vertical .cardapio ol { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.vertical .cardapio li {
+  grid-template-columns: auto 1fr; grid-template-rows: auto 1fr; align-items: center;
+  gap: 2px 6px; padding: 8px 10px 12px 6px; border-radius: 16px;
+}
+.vertical .cardapio .mini { width: 54px; height: 68px; }
+.vertical .cardapio .valor { font-size: 50px; gap: 4px; }
+.vertical .cardapio .valor svg { font-size: 30px; }
+.vertical .cardapio .txt { grid-column: 1 / -1; align-self: start; padding-left: 6px; }
+.vertical .cardapio .txt b { font: 800 36px/1 var(--display); text-transform: uppercase; letter-spacing: .02em; color: var(--fita); margin-bottom: 4px; }
+.vertical .cardapio .txt small { font: 700 37px/1.02 var(--display); text-transform: uppercase; letter-spacing: .02em; color: var(--creme); }
+.vertical .cardapio li:last-child .txt b { color: #fff; }
+/* Modo seguro: o cardápio fica do mesmo tamanho (é o que explica o jogo),
+   só sem o nome da faixa e sem o destaque do mais caro. */
+.vertical.seguro .cardapio { width: auto; opacity: 1; }
+.vertical.seguro .cardapio .fita-titulo { font-size: 36px; padding: 7px 20px 6px; margin-bottom: 8px; }
+.vertical.seguro .cardapio ol { gap: 8px; }
+.vertical.seguro .cardapio li { grid-template-columns: auto 1fr; padding: 8px 10px 12px 6px; border-radius: 16px; }
+.vertical.seguro .cardapio .mini { width: 54px; height: 68px; }
+.vertical.seguro .cardapio .valor { font-size: 50px; }
+.vertical.seguro .cardapio .valor svg { font-size: 30px; }
+.vertical.seguro .cardapio .txt small { font-size: 37px; }
+
+/* Feed e ranking mostram 3 linhas: no celular cinco viravam letra miúda. */
+.vertical { --linhas-feed: 3; }
+.vertical .feed li:nth-child(n+4), .vertical .ranking li:nth-child(n+4) { display: none; }
+/* Sem avatar no feed: a inicial não diz nada e o nome precisa do lugar. */
+.vertical .feed li { font-size: 38px; gap: 10px; padding: 10px 16px; border-radius: 16px; }
+.vertical .feed li .avatar { display: none; }
+.vertical .feed .autor { max-width: 260px; }
+.vertical .feed .vitima { max-width: 220px; text-decoration-thickness: 4px; }
+.vertical .feed .tesoura { width: 46px; height: 46px; font-size: 30px; }
+.vertical .feed .tag { font-size: 30px; padding: 6px 8px 5px; }
+.vertical .feed li.aviso { padding: 12px 18px; }
+.vertical .feed li.aviso b { max-width: 260px; }
+.vertical .feed li:nth-child(3) { opacity: .8; }
+
+.vertical .ranking li { font-size: 38px; gap: 10px; padding: 8px 16px 8px 8px; border-radius: 16px; }
+.vertical .ranking .pos { width: 34px; font-size: 44px; }
+.vertical .ranking .avatar { width: 54px; height: 54px; font-size: 32px; }
+.vertical .ranking .valor { font-size: 48px; }
+.vertical .ranking li.vazio { padding-block: 13px; }
+
+.vertical .anuncio .corpo { max-width: 1024px; padding: 16px 34px 14px 18px; }
+.vertical .anuncio .fita { font-size: 42px; padding: 8px 26px 7px; }
+.vertical .anuncio .avatar { width: 92px; height: 92px; font-size: 42px; }
+.vertical .anuncio .nome { font-size: 72px; max-width: 860px; }
+.vertical .anuncio .texto { font-size: 38px; max-width: 860px; }
+
+.vertical .sem-sinal { font-size: 38px; padding: 16px 28px; bottom: auto; top: calc(970px + var(--sobra) * .3); }
 
 /* ───────── estado ───────── */
 

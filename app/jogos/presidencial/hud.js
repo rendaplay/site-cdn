@@ -27,17 +27,21 @@ const Hud = {
     this.$(".time-a .nome").textContent = a.nome;
     this.$(".time-b .num").textContent = b.numero;
     this.$(".time-b .nome").textContent = b.nome;
-    this.$(".chaves").innerHTML =
-      `${iconeDoPresente(a.presente)} = <b class="ca">${a.numero}</b> · ${iconeDoPresente(b.presente)} = <b class="cb">${b.numero}</b> · comente <b class="ca">${a.numero}</b> ou <b class="cb">${b.numero}</b>`;
+    this.$(".chaves").innerHTML = candidatos.map((c, i) => `
+      <div class="chave chave-${"ab"[i]}">
+        <i class="chave-icone">${iconeDoPresente(c.presente)}</i>
+        <span class="chave-texto"><strong>${escapar(c.presente.nome)}</strong><span>acelera o <b>${c.numero}</b></span></span>
+      </div>`).join("")
+      + `<div class="chave-comente">ou comente <b class="ca">${a.numero}</b> ou <b class="cb">${b.numero}</b> no chat</div>`;
     this.medir();
   },
 
   medir() {
     this.largura = this.trilho.offsetWidth || 1;
     this.W = this.palco.offsetWidth || 1080;
-    /* bolha não sobe por cima do placar */
-    const prog = this.$(".progresso");
-    this.topoBolhas = prog.offsetTop + prog.offsetHeight + 130;
+    /* bolha não sobe por cima do placar nem do cardápio */
+    const chaves = this.$(".chaves");
+    this.topoBolhas = chaves.offsetTop + chaves.offsetHeight + 110;
   },
 
   cabecas() {

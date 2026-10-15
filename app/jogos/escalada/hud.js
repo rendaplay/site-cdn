@@ -69,7 +69,7 @@ const Hud = {
       col.innerHTML = `
         <div class="cab">
           <h2>${escapar(time.nome)}</h2>
-          <p class="comando">comente <b>${escapar(time.comandos[0])}</b><span>${this.seguro ? "" : "ou mande "}${escapar(time.presente.nome)}</span></p>
+          <p class="comando">comente <b>${escapar(time.comandos[0])}</b><span>${this.seguro ? "ou " : "ou mande "}${escapar(time.presente.nome)}</span></p>
           <p class="torcida">0 na torcida</p>
         </div>
         <ol class="cardapio"></ol>
@@ -86,7 +86,7 @@ const Hud = {
         lista.append(li);
       });
     });
-    this.tops = ["", ""];
+    this.tops = [null, null];
     this.ultimos = [];
 
     /* Horizontal: as laterais embaixo das colunas viram recordes e últimos presentes. */

@@ -47,7 +47,7 @@ window.PIPA_PRESETS = {
         { nome: "Finger Heart", moedas: 5, peso: 10 },
         { nome: "Perfume", moedas: 20, peso: 6 },
         { nome: "Doughnut", moedas: 30, peso: 4 },
-        { nome: "Hand Hearts", moedas: 100, peso: 2 },
+        { nome: "Hand Heart", moedas: 100, peso: 2 },
         { nome: "Galaxy", moedas: 1000, peso: 0.5 },
         { nome: "Lion", moedas: 29999, peso: 0.04 },
       ],

@@ -105,7 +105,7 @@ const Hud = {
     this.$ = $;
     this.el = {
       rodada: $(".rodada"), placar: $(".placar"), espera: $(".espera"), podio: $(".podio"),
-      feed: $(".feed"), cardapio: $(".cardapio"), surpresa: $(".surpresa"), anuncios: $(".anuncios"),
+      feed: $(".feed"), cardapio: $(".cardapio"), chamada: $(".chamada"), surpresa: $(".surpresa"), anuncios: $(".anuncios"),
       cartoes: $(".cartoes"), contagem: $(".contagem"), progresso: $(".progresso"), avisos: $(".avisos"),
       pista: $(".hud-pista"),
     };
@@ -121,10 +121,10 @@ const Hud = {
     const seguro = this.config.modoSeguro;
     this.el.cardapio.innerHTML = this.config.faixas.map(f => {
       const e = EFEITOS[f.efeito] || { nome: f.efeito, cor: "" };
-      if (seguro) return `<div class="item"><span class="moedas"><b>${fmt.format(f.moedas)}</b> →</span>${icone(f.efeito, e.cor)}<span class="nome ${e.cor}">${e.nome}</span></div>`;
-      const barato = promo && f.efeito === "missil";
+      const barato = !seguro && promo && f.efeito === "missil";
+      const valor = seguro ? fmt.format(f.moedas) : `${fmt.format(barato ? promo : f.moedas)}+`;
       return `<div class="item${barato ? " barato" : ""}">${icone(f.efeito, e.cor)}<span class="nome ${e.cor}">${e.nome}</span>` +
-        `<span class="moedas"><b>${fmt.format(barato ? promo : f.moedas)}+</b> moedas</span></div>`;
+        `<span class="moedas">${icone("moeda", "cor-ouro")}<b>${valor}</b>${seguro ? "" : '<span class="un"> moedas</span>'}</span></div>`;
     }).join("");
   },
 
@@ -256,7 +256,7 @@ const Hud = {
     const linha = el("div", "linha", `${ic}<span>${html}</span>`);
     this.el.feed.prepend(linha);
     this.feedLinhas.unshift({ el: linha, t: this.tempo });
-    const max = this.formatoAtual === "horizontal" ? 6 : 3;
+    const max = this.formatoAtual === "horizontal" ? 6 : 2;
     while (this.feedLinhas.length > max) this.feedLinhas.pop().el.remove();
   },
 
@@ -264,7 +264,7 @@ const Hud = {
     const f = el("div", "flutua");
     f.textContent = texto;
     f.style.color = cor;
-    f.style.fontSize = `${Math.round(34 * escala)}px`;
+    f.style.fontSize = `${Math.round((this.formatoAtual === "horizontal" ? 34 : 60) * escala)}px`;
     this.el.pista.appendChild(f);
     this.flutuantes.push({ el: f, id, t: this.tempo, dur: 1.4 });
   },
@@ -301,9 +301,9 @@ const Hud = {
     const emPodio = fase === "podio";
     const naEspera = fase === "espera";
     this.el.placar.hidden = emPodio || naEspera;
-    /* Na vertical, espera e pódio ocupam também a faixa do feed. */
-    const cheio = (emPodio || naEspera) && this.formatoAtual !== "horizontal";
-    this.el.feed.hidden = this.el.cardapio.hidden = cheio;
+    /* Na vertical, espera e pódio ocupam também a faixa do feed; o cardápio
+       e a chamada continuam: é na espera que se entra na corrida. */
+    this.el.feed.hidden = this.el.progresso.hidden = (emPodio || naEspera) && this.formatoAtual !== "horizontal";
     this.el.espera.hidden = !naEspera;
     if (!emPodio) this.el.podio.hidden = true;
 
@@ -333,14 +333,20 @@ const Hud = {
     else status = '<span class="pilula vivo">Ao vivo</span>';
     const html = `<span class="pilula">Rodada ${racha.rodada}</span>${status}`;
     if (this.el.rodada.innerHTML !== html) this.el.rodada.innerHTML = html;
+    const chamada = racha.fase === "espera" && !racha.config.modoSeguro
+      ? "<b>Comente</b> pra entrar na corrida · presente agora vira <b>nitro na largada</b>"
+      : "<b>Comente</b> pra entrar na corrida · <b>curta</b> pra empurrar";
+    if (this.el.chamada.innerHTML !== chamada) this.el.chamada.innerHTML = chamada;
   },
 
   placar(dt, racha) {
     const vertical = this.formatoAtual !== "horizontal";
-    const top = racha.ordem.slice(0, 10);
+    /* Na vertical, top 6 em duas colunas: com 10 a letra não cabe no celular. */
+    const porColuna = vertical ? 3 : 10;
+    const top = racha.ordem.slice(0, vertical ? 6 : 10);
     const ids = new Set(top.map(p => p.id));
     const largura = this.grade.clientWidth || 1000;
-    const alt = 58;
+    const alt = vertical ? 62 : 58;
     top.forEach((p, i) => {
       let l = this.linhasPlacar.get(p.id);
       if (!l) {
@@ -349,11 +355,13 @@ const Hud = {
         this.grade.appendChild(l);
         this.linhasPlacar.set(p.id, l);
       }
-      const col = vertical && i >= 5 ? 1 : 0;
-      const yAlvo = (vertical ? i % 5 : i) * alt;
+      const col = Math.floor(i / porColuna);
+      const yAlvo = (i % porColuna) * alt;
       const w = vertical ? (largura - 10) / 2 : largura;
       l.style.width = `${w}px`;
-      l._y = l._y == null ? yAlvo : l._y + (yAlvo - l._y) * (1 - Math.exp(-dt * 22));
+      /* Em duas colunas a linha que troca de coluna deslizaria por cima
+         da vizinha: na vertical a troca é seca. */
+      l._y = l._y == null || vertical ? yAlvo : l._y + (yAlvo - l._y) * (1 - Math.exp(-dt * 22));
       l.style.transform = `translate(${col * (w + 10)}px, ${l._y.toFixed(1)}px)`;
       const cls = `linha l${i + 1}`;
       if (l.className !== cls) l.className = cls;
@@ -495,14 +503,18 @@ const Hud = {
       const idade = this.tempo - f.t;
       const entrada = Math.min(1, idade / 0.25);
       const saida = idade > 9 ? Math.max(0, 1 - (idade - 9) / 0.6) : 1;
-      f.el.style.opacity = String(entrada * saida * (1 - i * 0.12));
+      /* Na vertical a linha passa por cima das etiquetas: esmaecer deixa
+         o nome de baixo vazar. */
+      const fundo = this.formatoAtual === "horizontal" ? 1 - i * 0.12 : 1;
+      f.el.style.opacity = String(entrada * saida * fundo);
       f.el.style.transform = `translateX(${((1 - entrada) * -40).toFixed(1)}px)`;
       if (saida <= 0) { f.el.remove(); this.feedLinhas.splice(i, 1); }
     }
   },
 
   animarCartoes() {
-    const max = this.formatoAtual === "horizontal" ? 3 : 2;
+    /* Na vertical cabe um cartão por vez sem tampar o anúncio e a pista. */
+    const max = this.formatoAtual === "horizontal" ? 3 : 1;
     this.filaCartoes = this.filaCartoes.filter(c => this.tempo - c.quando < 6 || c.faixa >= 3);
     while (this.cartoesAtivos.length < max && this.filaCartoes.length) {
       this.filaCartoes.sort((a, b) => b.faixa - a.faixa || a.quando - b.quando);

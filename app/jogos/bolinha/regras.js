@@ -6,16 +6,17 @@
 
 const MesaFisica = typeof module !== "undefined" ? require("./fisica.js").Mesa : Mesa;
 
-/* Mesa em px do palco. Vertical respeita as zonas do TikTok: cabeçalho até
-   11%, HUD em 12–18%, tabuleiro até 61%, potes até 68% e o resto fica pro
-   chat e os botões do app. */
+/* Mesa em px da física. Na vertical, placar e cardápio ficam em cima (o
+   que o espectador precisa ler, fora do chat do app) e a mesa é desenhada
+   com `zoom` pra ocupar a largura toda: a física continua com a medida de
+   sempre, então a raridade das pontas não muda. Palco = mesa × zoom. */
 const FORMATOS = {
   vertical: {
-    W: 1080, H: 1920,
-    mesa: { x0: 24, x1: 836, topo: 372, y0: 440, poteTopo: 1196, poteFundo: 1300 },
+    W: 1080, H: 1920, zoom: 1.1,
+    mesa: { x0: 84, x1: 896, topo: 580, y0: 648, poteTopo: 1404, poteFundo: 1508 },
   },
   horizontal: {
-    W: 1920, H: 1080,
+    W: 1920, H: 1080, zoom: 1,
     mesa: { x0: 608, x1: 1312, topo: 150, y0: 205, poteTopo: 850, poteFundo: 940 },
   },
 };

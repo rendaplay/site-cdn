@@ -56,7 +56,7 @@ const Jogo = {
           { nome: "Rose", moedas: 1, peso: 30, lado: 0 },
           { nome: "White Rose", moedas: 1, peso: 30, lado: 1 },
           { nome: "Doughnut", moedas: 30, peso: 4 },
-          { nome: "Hand Hearts", moedas: 100, peso: 1 },
+          { nome: "Hand Heart", moedas: 100, peso: 1 },
           { nome: "Galaxy", moedas: 1000, peso: 0.2 },
         ],
         lados: [{ comentarios: ["13", "lula"] }, { comentarios: ["22", "flavio"] }],

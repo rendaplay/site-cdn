@@ -497,24 +497,110 @@ body { font-family: var(--fonte); color: var(--texto); }
 }
 
 /* ───────── vertical (1080×1920) ─────────
-   O TikTok cobre o topo (~110 px), os comentários embaixo à esquerda
-   (~1250 em diante) e os botões embaixo à direita: tudo que importa
-   fica entre 118 e ~1180. */
+   No celular o palco escala ~0,36: 44 px aqui viram 16 px na tela, e nada
+   fica abaixo de 30 px. O TikTok cobre o topo (~10%) e os comentários
+   embaixo à esquerda (~35% de baixo). Em tela mais comprida que 9:16 o
+   palco cresce (`--sobra`): o Zé desce metade disso e o HUD um quarto, pra
+   sair de baixo do topo do TikTok sem entrar nos comentários. */
 
-.vertical .placar { top: 118px; left: 60px; right: 60px; }
-.vertical .altura { top: 232px; font-size: 168px; }
-.vertical .sub { top: 392px; }
-.vertical .surpresa { top: 438px; }
-.vertical .coluna { top: 540px; width: 300px; }
-.vertical .c0 { left: 22px; }
-.vertical .c1 { right: 22px; }
-.vertical .anuncios { top: 528px; }
-.vertical .avisos { top: 1122px; width: 420px; }
-.vertical .pendentes { top: 384px; }
+.vertical { --desce: calc(var(--sobra, 0px) / 4); }
+
+.vertical .placar {
+  top: calc(140px + var(--desce));
+  left: 24px;
+  right: 24px;
+  gap: 20px;
+  padding: 14px 24px;
+}
+.vertical .placar .lado { flex-direction: row; align-items: center; gap: 14px; }
+.vertical .placar .l1 { flex-direction: row-reverse; }
+.vertical .placar .nome { font-size: 46px; }
+.vertical .placar .moedas { margin-top: 0; font-size: 52px; }
+.vertical .placar .moedas::before { width: 30px; height: 30px; }
+.vertical .placar .barra { height: 26px; border-radius: 13px; }
+
+.vertical .altura { top: calc(226px + var(--desce)); font-size: 150px; }
+.vertical .sub { top: calc(364px + var(--desce)); font-size: 36px; }
+.vertical .surpresa {
+  top: calc(420px + var(--desce));
+  min-width: 640px;
+  max-width: 1030px;
+  padding: 10px 26px 18px;
+}
+.vertical .surpresa .titulo { font-size: 50px; }
+.vertical .surpresa .linha { font-size: 34px; }
+.vertical .surpresa .resta { font-size: 70px; }
+.vertical.com-pendente .surpresa { top: calc(446px + var(--desce)); }
+
+.vertical .pendentes { top: calc(358px + var(--desce)); }
 .vertical .pendente + .pendente { display: none; }
 .com-pendente .sub { visibility: hidden; }
-.vertical.com-pendente .surpresa { top: 450px; }
-.vertical .aviso { font-size: 19px; }
+.vertical .pendente { height: 76px; gap: 14px; padding: 0 20px 0 8px; }
+.vertical .pendente .avatar { width: 60px; height: 60px; font-size: 28px; }
+.vertical .pendente .nome { max-width: 280px; font-size: 36px; }
+.vertical .pendente .moedas { font-size: 44px; }
+.vertical .pendente .moedas::before { width: 24px; height: 24px; }
+.vertical .pendente .linha { font-size: 34px; }
+.vertical .pendente .linha i { min-width: 52px; height: 52px; font-size: 44px; border-radius: 12px; }
+.vertical .pendente .resta { font-size: 44px; }
+.vertical .pendente .barra { height: 6px; }
+
+/* As duas colunas abraçam o coqueiro e deixam livre só a faixa do Zé
+   (x 440–640). A de derrubar é espelhada: o preço fica do lado de dentro,
+   longe dos botões do TikTok na borda direita. */
+.vertical .coluna { top: calc(586px + var(--desce)); width: 428px; padding: 16px 18px 14px; }
+.vertical .c0 { left: 10px; }
+.vertical .c1 { right: 10px; text-align: right; }
+.vertical .coluna .cab h2 { font-size: 78px; }
+.vertical .coluna .comando { gap: 4px 14px; margin-top: 10px; font-size: 40px; font-weight: 600; }
+.vertical .c1 .comando { justify-content: flex-end; }
+.vertical .coluna .comando b { min-width: 76px; height: 76px; border-radius: 16px; font-size: 66px; }
+.vertical .coluna .comando span { font-size: 36px; }
+.vertical .coluna .torcida { margin-top: 2px; font-size: 36px; }
+.vertical .coluna .cardapio { margin-top: 12px; }
+.vertical .coluna .cardapio li { grid-template-columns: 62px 1fr auto; gap: 12px; height: auto; min-height: 78px; padding: 4px 0; }
+.vertical .c1 .cardapio li { grid-template-columns: auto 1fr 62px; }
+.vertical .c1 .cardapio canvas { order: 3; }
+.vertical .c1 .cardapio .preco { order: 1; }
+.vertical .c1 .cardapio .efeito { order: 2; }
+.vertical .coluna .cardapio canvas { width: 62px; height: 62px; }
+.vertical .coluna .cardapio .efeito { font-size: 37px; line-height: 1; letter-spacing: -0.01em; white-space: normal; }
+.vertical .coluna .cardapio .preco { font-size: 50px; line-height: 1; }
+.vertical .coluna h3 { margin: 14px 0 4px; font-size: 36px; letter-spacing: 0; text-transform: none; }
+/* Nome em cima, pontos embaixo: nome do TikTok é comprido e não cabe na
+   mesma linha dos pontos com letra de celular. */
+.vertical .coluna .top li {
+  grid-template-columns: 30px 60px 1fr;
+  grid-template-areas: "pos foto nome" "pos foto moedas";
+  gap: 6px 12px;
+  height: 88px;
+  align-content: center;
+}
+.vertical .c1 .top li { grid-template-columns: 1fr 60px 30px; grid-template-areas: "nome foto pos" "moedas foto pos"; }
+.vertical .coluna .top .pos { grid-area: pos; font-size: 42px; }
+.vertical .coluna .top .avatar { grid-area: foto; width: 60px; height: 60px; font-size: 34px; }
+.vertical .coluna .top .nome { grid-area: nome; font-size: 36px; line-height: 1.05; }
+.vertical .coluna .top .moedas { grid-area: moedas; font-size: 38px; line-height: 1.1; }
+.vertical .coluna .top li.vazio { display: block; height: auto; font-size: 34px; }
+.vertical .coluna .maior-queda { font-size: 30px; }
+.vertical .coluna .maior-queda b { font-size: 40px; }
+
+.vertical .anuncios { top: calc(592px + var(--desce)); }
+.vertical .anuncio { max-width: 1000px; }
+.vertical .anuncio .quem { font-size: 38px; }
+.vertical .anuncio .linha { font-size: 38px; }
+.vertical .anuncio.surpresa .linha { max-width: 860px; }
+
+.vertical .voo .avatar { width: 60px; height: 60px; font-size: 32px; }
+.vertical .voo .valor { font-size: 48px; }
+.vertical .voo.pequeno .avatar { width: 46px; height: 46px; font-size: 30px; }
+.vertical .voo.pequeno .valor { font-size: 38px; }
+
+/* Embaixo das colunas: recado de quem entrou no time não é essencial e
+   pode ficar por baixo dos comentários do TikTok. */
+.vertical .avisos { top: calc(1560px + var(--desce)); width: 1040px; }
+.vertical .aviso { padding: 10px 24px; font-size: 36px; }
+.vertical .sem-sinal { font-size: 30px; }
 
 /* ───────── horizontal (1920×1080) ───────── */
 

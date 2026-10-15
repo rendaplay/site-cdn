@@ -133,7 +133,7 @@ window.CHEFAO_PRESETS = {
         { nome: "Finger Heart", moedas: 5, peso: 10 },
         { nome: "Perfume", moedas: 20, peso: 6 },
         { nome: "Doughnut", moedas: 30, peso: 5 },
-        { nome: "Hand Hearts", moedas: 100, peso: 2.5 },
+        { nome: "Hand Heart", moedas: 100, peso: 2.5 },
         { nome: "Money Gun", moedas: 500, peso: 0.7 },
         { nome: "Galaxy", moedas: 1000, peso: 0.4 },
         { nome: "Lion", moedas: 29999, peso: 0.02 },

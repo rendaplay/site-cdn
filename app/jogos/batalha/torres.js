@@ -16,7 +16,7 @@
 "use strict";
 
 const CENAS = {
-  vertical: { W: 1080, H: 1920, chao: 1650, teto: 940, xs: [390, 690], larg: 250, regua: 540 },
+  vertical: { W: 1080, H: 1920, chao: 1650, teto: 1084, xs: [390, 690], larg: 250, regua: 540 },
   horizontal: { W: 1920, H: 1080, chao: 930, teto: 450, xs: [720, 1200], larg: 280, regua: 960 },
 };
 const ESCALA_MAX = 30;
@@ -138,8 +138,13 @@ const Torres = {
     this.torres = cfg.lados.map(() => this.novaTorre());
   },
 
-  formato(nome) {
-    this.L = CENAS[nome];
+  /* No vertical o palco cresce em celular mais comprido que 9:16 (`H` >
+     1920): a sobra desce o teto junto com o placar e o chão pra torre
+     ganhar altura. */
+  formato(nome, H = CENAS[nome].H) {
+    const sobra = nome === "vertical" ? H - 1920 : 0;
+    const base = CENAS[nome];
+    this.L = { ...base, H: base.H + sobra, teto: base.teto + sobra * 0.4, chao: base.chao + sobra * 0.8 };
     this.canvas.width = this.L.W;
     this.canvas.height = this.L.H;
   },
@@ -721,7 +726,7 @@ const Torres = {
     c.moveTo(L.regua, L.chao);
     c.lineTo(L.regua, L.teto - 120);
     c.stroke();
-    c.font = `700 22px ${FONTE_TXT}`;
+    c.font = `800 32px ${FONTE_TXT}`;
     c.textAlign = "left";
     c.textBaseline = "middle";
     let ultimo = L.chao;
@@ -731,8 +736,8 @@ const Torres = {
     for (let m = passo; ; m += passo) {
       const y = this.yDaMoeda(i, m);
       if (y <= L.teto - 110) break;
-      if (ultimo - y < 40) continue;
-      if (falta && y > falta.y - 62 && y < falta.y + 14) continue;
+      if (ultimo - y < 48) continue;
+      if (falta && y > falta.y - 70 && y < falta.y + 20) continue;
       ultimo = y;
       c.beginPath();
       c.moveTo(L.regua - 10, y);
@@ -785,7 +790,7 @@ const Torres = {
     const lado = this.cfg.lados[i];
     const x = L.xs[i];
     const w = L.larg * 0.86;
-    const h = 150;
+    const h = 176;
     const y = L.chao - 18 - PLACA.haste - PLACA.foto - PLACA.faixa - 18 - h - 26;
     c.save();
     c.globalAlpha = 0.55 + 0.25 * Math.sin(this.t * 3 + i * 1.6);
@@ -805,11 +810,11 @@ const Torres = {
       c.font = `900 60px ${FONTE_NUM}`;
       c.fillText(lado.presente.icone, x, y + 50);
     }
-    c.font = `800 26px ${FONTE_TXT}`;
+    c.font = `800 34px ${FONTE_TXT}`;
     /* Modo seguro: o fantasma não pede presente. */
-    c.fillText(this.cfg.modoSeguro !== false ? `Comente ${lado.comandos[0]}` : `Mande ${lado.presente.nome}`, x, y + 102);
-    c.font = `600 21px ${FONTE_TXT}`;
-    c.fillText("pra começar a torre", x, y + 130);
+    c.fillText(this.cfg.modoSeguro !== false ? `Comente ${lado.comandos[0]}` : `Mande ${lado.presente.nome}`, x, y + 112);
+    c.font = `700 30px ${FONTE_TXT}`;
+    c.fillText("pra começar", x, y + 148);
     c.restore();
   },
 
@@ -1048,16 +1053,16 @@ const Torres = {
     c.stroke();
     c.setLineDash([]);
     const texto = `faltam ${fmtM1.format(ft.metros)} m`;
-    c.font = `800 26px ${FONTE_TXT}`;
-    const tw = c.measureText(texto).width + 28;
+    c.font = `800 34px ${FONTE_TXT}`;
+    const tw = c.measureText(texto).width + 32;
     const ladoX = ft.lado === 0 ? L.regua - 10 - tw : L.regua + 10;
     c.fillStyle = corLider;
-    retangulo(c, ladoX, y - 44, tw, 38, 19);
+    retangulo(c, ladoX, y - 54, tw, 48, 24);
     c.fill();
     c.fillStyle = "#FFFFFF";
     c.textAlign = "left";
     c.textBaseline = "middle";
-    c.fillText(texto, ladoX + 14, y - 25);
+    c.fillText(texto, ladoX + 16, y - 29);
     c.restore();
   },
 

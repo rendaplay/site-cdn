@@ -29,6 +29,7 @@ const Jogo = {
   ultimoTop: 0,
   lentoAte: 0,
   ultimoDestaque: -Infinity,
+  ultimoNome: -Infinity,
   ultimoBip: -1,
   vistos: new Set(),
 
@@ -76,13 +77,13 @@ const Jogo = {
 
   aplicarFormato(primeira = false) {
     const f = this.forcado || "vertical";
-    const { W, H } = FORMATOS[f];
+    const { W, H, zoom } = FORMATOS[f];
     if (f !== this.formato || primeira) {
       this.formato = f;
       this.palco.classList.toggle("vertical", f === "vertical");
       this.palco.classList.toggle("horizontal", f === "horizontal");
       if (!primeira) this.partida.trocarFormato(f);
-      Cena.aplicarFormato(W, H, this.partida.mesa, config.potes);
+      Cena.aplicarFormato(W, H, this.partida.mesa, config.potes, zoom);
       Hud.chaveTop = "";
     }
     const s = Math.min(innerWidth / W, innerHeight / H);
@@ -109,6 +110,12 @@ const Jogo = {
     this.contar(lista);
   },
 
+  /* Texto que voa na mesa: no celular a mesa sai a ~0,4 do tamanho, então
+     na vertical ele cresce pra continuar legível. */
+  tam(px) {
+    return Math.round(px * (this.formato === "vertical" ? 1.4 : 1));
+  },
+
   /* Ponto de aviso perto do bocal. Avisos seguidos descem um degrau cada,
      pra dois "seguiu!" no mesmo segundo não virarem um borrão. */
   bocal() {
@@ -116,7 +123,7 @@ const Jogo = {
     const agora = performance.now();
     this.degrau = agora - (this.ultimoBocal || 0) < 700 ? ((this.degrau || 0) + 1) % 4 : 0;
     this.ultimoBocal = agora;
-    return { x: (d.x0 + d.x1) / 2, y: d.topo + 40 + this.degrau * 70 };
+    return { x: (d.x0 + d.x1) / 2, y: d.topo + 40 + this.degrau * this.tam(70) };
   },
 
   contar(lista) {
@@ -145,13 +152,13 @@ const Jogo = {
         case "seguiu": {
           Som.seguiu();
           const b = this.bocal();
-          Cena.texto(`${encurtar(j.nome, 16)} seguiu!`, b.x, b.y + 30, { cor: OURO, tam: 40, dur: 1.6, sobe: 30, sub: "bolinha de ouro" });
+          Cena.texto(`${encurtar(j.nome, 16)} seguiu!`, b.x, b.y + 30, { cor: OURO, tam: this.tam(40), dur: 1.6, sobe: 30, sub: "bolinha de ouro" });
           break;
         }
         case "compartilhou": {
           Som.seguiu();
           const b = this.bocal();
-          Cena.texto(`${encurtar(j.nome, 16)} compartilhou!`, b.x, b.y + 30, { cor: "#7CFF6B", tam: 40, dur: 1.6, sobe: 30, sub: `+${config.chat.compartilhar} bolinhas` });
+          Cena.texto(`${encurtar(j.nome, 16)} compartilhou!`, b.x, b.y + 30, { cor: "#7CFF6B", tam: this.tam(40), dur: 1.6, sobe: 30, sub: `+${config.chat.compartilhar} bolinhas` });
           break;
         }
         case "choque": {
@@ -160,7 +167,7 @@ const Jogo = {
           Cena.flashCor = "#39E6FF";
           Cena.tremor = Math.max(Cena.tremor, 10);
           const f = Cena.moldura();
-          Cena.texto("CHOQUE!", f.x + f.w / 2, f.y + f.h * 0.6, { cor: "#39E6FF", tam: 96, dur: 1.3, sobe: 40, sub: `${fmt.format(config.chat.curtidas)} curtidas` });
+          Cena.texto("CHOQUE!", f.x + f.w / 2, f.y + f.h * 0.6, { cor: "#39E6FF", tam: this.tam(96), dur: 1.3, sobe: 40, sub: `${fmt.format(config.chat.curtidas)} curtidas` });
           break;
         }
         case "pinoDeOuro":
@@ -196,7 +203,11 @@ const Jogo = {
     Cena.faiscas(x, y, [cor, "#FFFFFF"], 6 + Math.min(24, a.pontos), 260 + Math.min(400, a.pontos * 8));
     Som.pote(a.pontos, max);
     const nome = j ? encurtar(j.nome, 12) : "";
-    Cena.texto(`+${fmt.format(a.pontos)}`, x, y - 50, { cor, tam: a.pontos >= 10 ? 52 : 40, dur: 1.2, sub: a.pontos >= 5 ? nome : null });
+    /* Um texto por pote, e nome só em pote bom e um de cada vez: na chuva
+       caem dezenas juntas e os nomes, maiores no celular, viravam um borrão. */
+    const comNome = a.pontos >= config.destaque && p.t - this.ultimoNome > 0.6;
+    if (comNome) this.ultimoNome = p.t;
+    Cena.texto(`+${fmt.format(a.pontos)}`, x, y - 50, { cor, tam: this.tam(a.pontos >= 10 ? 46 : 40), dur: 1.2, sub: comNome ? nome : null, chave: "pote" + a.pote });
     if (!a.grande) return;
     Cena.anel(x, y, cor, 160);
     Cena.tremor = Math.max(Cena.tremor, a.pontos >= max ? 14 : 8);
@@ -218,7 +229,7 @@ const Jogo = {
     Som.presente(a.lendario ? 4 : a.faixa);
     if (a.moedas < config.destaqueMoedas && !a.lendario) {
       const b = this.bocal();
-      Cena.texto(encurtar(j.nome, 14), b.x, b.y + 30, { cor: COR_FAIXA[a.faixa] || "#FFFFFF", tam: 40, dur: 1.4, sobe: 30, sub: `+${a.bolinhas} bolinhas` });
+      Cena.texto(encurtar(j.nome, 14), b.x, b.y + 30, { cor: COR_FAIXA[a.faixa] || "#FFFFFF", tam: this.tam(40), dur: 1.4, sobe: 30, sub: `+${a.bolinhas} bolinhas` });
     } else {
       Hud.anunciar({
         fita: f.nome,

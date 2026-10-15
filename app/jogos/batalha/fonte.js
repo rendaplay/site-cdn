@@ -43,7 +43,7 @@ const Demo = {
     "paty.sp", "marcos_taxi", "lu_professora", "biel.mc", "keka_goiania", "robson.eletricista",
   ],
   OUTROS: [
-    ["Finger Heart", 5, 30], ["Perfume", 20, 14], ["Doughnut", 30, 10], ["Hand Hearts", 100, 5],
+    ["Finger Heart", 5, 30], ["Perfume", 20, 14], ["Doughnut", 30, 10], ["Hand Heart", 100, 5],
     ["Hat and Mustache", 99, 5], ["Galaxy", 1000, 1.4], ["Lion", 29999, 0.05],
   ],
   CHAT: ["boraaa", "vira vira", "kkkkkk", "manda rosa galera", "tá pegando fogo", "ninguém segura",

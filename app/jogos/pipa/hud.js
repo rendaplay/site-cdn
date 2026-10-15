@@ -245,7 +245,9 @@ const Hud = {
       [sec.offsetLeft, sec.offsetTop, sec.offsetLeft + largura, sec.offsetTop + altura];
     const feed = this.$.feed.parentElement;
     const largura = Math.max(400, ...[...this.$.feed.children].map(li => li.offsetWidth));
-    const altura = Math.max(feed.offsetHeight, feed.querySelector("h3").offsetHeight + 10 + 5 * 62);
+    const linhas = Number(getComputedStyle(this.palco).getPropertyValue("--linhas-feed")) || 5;
+    const alturaLinha = (this.$.ranking.firstElementChild?.offsetHeight || 54) + 8;
+    const altura = Math.max(feed.offsetHeight, feed.querySelector("h3").offsetHeight + 10 + linhas * alturaLinha);
     return [caixa(feed, largura, altura), caixa(this.$.ranking.parentElement), caixa(this.$.cardapio.parentElement)];
   },
 
