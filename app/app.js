@@ -248,6 +248,7 @@ function montarInicio() {
   aviso.hidden = conta.ativo && conta.canal && algumLiberado;
 
   if (!liberado(app.jogo)) app.jogo = (JOGOS.find(j => liberado(j.id)) || {}).id || null;
+  if (app.jogo) prepararJogo(app.jogo);
   const lista = $("lista-jogos");
   lista.replaceChildren(...JOGOS.map(jogo => {
     const item = document.createElement("li");
@@ -270,6 +271,7 @@ function montarInicio() {
 
 function escolherJogo(id) {
   app.jogo = id;
+  prepararJogo(id);
   guardado.gravar("jogo", id);
   for (const b of document.querySelectorAll(".jogo")) b.setAttribute("aria-pressed", "false");
   const indice = JOGOS.findIndex(j => j.id === id);
@@ -370,13 +372,79 @@ async function vigiarConector() {
   }
 }
 
+/* ───────────── arquivos do jogo ───────────── */
+
+/* O service worker guarda o jogo no aparelho (sw.js). Começa a baixar quando o
+   jogo é escolhido, então na hora de abrir costuma já estar pronto. A promessa
+   resolve quando o que trava a primeira pintura (código, estilo, fontes) chegou;
+   as imagens seguem por trás. */
+const preparos = {};
+
+function prepararJogo(jogo) {
+  if (preparos[jogo]) return preparos[jogo].essenciais;
+  const sw = navigator.serviceWorker && navigator.serviceWorker.controller;
+  if (!CONFIG.assets || !sw) return Promise.resolve();
+  const preparo = { prontos: 0, total: 0 };
+  preparo.essenciais = new Promise(resolve => { preparo.liberar = resolve; });
+  preparos[jogo] = preparo;
+  sw.postMessage({ tipo: "preparar", base: CONFIG.assets, jogo });
+  return preparo.essenciais;
+}
+
+function aoPreparo(dados) {
+  const preparo = preparos[dados.jogo];
+  if (!preparo) return;
+  if (dados.total) Object.assign(preparo, { prontos: dados.prontos, total: dados.total });
+  if (dados.essenciais) {
+    preparo.pronto = true;
+    preparo.liberar();
+  }
+  if (dados.falhas) anotar(`preparo de ${dados.jogo}: ${dados.falhas} falhas ${dados.erro || ""}`);
+  // Falhou de vez: a próxima escolha tenta de novo.
+  if (dados.fim && dados.falhas) delete preparos[dados.jogo];
+  if (app.aoVivo && app.aoVivo.jogo === dados.jogo) mostrarCarregando();
+}
+
+function mostrarCarregando() {
+  const aviso = $("carregando-jogo");
+  if (aviso.hidden) return;
+  const preparo = app.aoVivo && preparos[app.aoVivo.jogo];
+  const parte = preparo && preparo.total ? Math.round((100 * preparo.prontos) / preparo.total) : 0;
+  $("carregando-barra").style.width = `${Math.max(4, parte)}%`;
+  const demorando = Date.now() - app.abertoEm > 12000;
+  $("carregando-texto").textContent = demorando
+    ? "Internet lenta, ainda baixando o jogo. Ele fica salvo no celular pra próxima vez."
+    : "Preparando o jogo…";
+}
+
 async function abrirJogo() {
   $("folha-como").hidden = true;
   const quadro = $("quadro-jogo");
   const parametros = new URLSearchParams({ canal: app.conta.canal, relay: RELAY });
-  // O iOS às vezes mostra o quadro ainda com 0×0 na primeira pintura e não avisa o jogo quando cresce.
-  quadro.onload = reajustarAosPoucos;
-  quadro.src = `jogos/${app.aoVivo.jogo}/index.html?${parametros}`;
+  const jogo = app.aoVivo.jogo;
+  app.abertoEm = Date.now();
+  $("carregando-jogo").hidden = false;
+  mostrarCarregando();
+  clearInterval(app.relogioCarregando);
+  app.relogioCarregando = setInterval(mostrarCarregando, 1000);
+  quadro.onload = () => {
+    if (quadro.src === "about:blank") return;
+    $("carregando-jogo").hidden = true;
+    clearInterval(app.relogioCarregando);
+    anotar(`jogo carregou em ${Math.round((Date.now() - app.abertoEm) / 1000)} s`);
+    // O iOS às vezes mostra o quadro ainda com 0×0 na primeira pintura e não avisa o jogo quando cresce.
+    reajustarAosPoucos();
+  };
+  quadro.src = "about:blank";
+  // Se o service worker sumir no meio (o iOS mata o que fica parado), abre
+  // assim mesmo: cada arquivo ainda passa por ele, com a VPS de reserva.
+  const prazo = new Promise(resolve => setTimeout(() => {
+    if (preparos[jogo] && !preparos[jogo].pronto) delete preparos[jogo];
+    resolve();
+  }, 25000));
+  Promise.race([prepararJogo(jogo), prazo]).then(() => {
+    if (app.aoVivo && app.aoVivo.jogo === jogo) quadro.src = `jogos/${jogo}/index.html?${parametros}`;
+  });
   $("tela-jogo").hidden = false;
   document.documentElement.classList.add("jogando");
   $("menu-jogo").hidden = true;
@@ -416,6 +484,7 @@ async function pararLive() {
   app.aoVivo = null;
   lembrarLive();
   $("quadro-jogo").src = "about:blank";
+  clearInterval(app.relogioCarregando);
   $("tela-jogo").hidden = true;
   document.documentElement.classList.remove("jogando");
   if (app.trava) { app.trava.release().catch(() => {}); app.trava = null; }
@@ -593,6 +662,15 @@ document.addEventListener("visibilitychange", () => {
 addEventListener("pageshow", aoVoltar);
 addEventListener("resize", () => setTimeout(reajustarJogo, 250));
 
-if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+  navigator.serviceWorker.addEventListener("message", evento => {
+    if (evento.data && evento.data.tipo === "preparo") aoPreparo(evento.data);
+  });
+  // Primeira visita: o service worker só passa a cuidar da página depois de ativar.
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (app.jogo && app.conta) prepararJogo(app.jogo);
+  });
+}
 
 carregarConta();

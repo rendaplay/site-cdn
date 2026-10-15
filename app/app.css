@@ -261,7 +261,27 @@ input:focus { border-color: var(--rp-verde); outline: none; }
 /* Com o jogo aberto a página de trás não rola: no iOS, voltar do segundo
    plano rolava a página e o jogo saía da tela. */
 html.jogando, html.jogando body { overflow: hidden; height: 100%; }
-.tela-jogo iframe { width: 100%; height: 100%; border: 0; display: block; }
+/* 1px + min 100%: no iOS um iframe de 100% cresce até o tamanho do conteúdo, e
+   o palco de 1080 px dos jogos virava um jogo gigante cortado à direita. */
+.tela-jogo iframe { width: 1px; min-width: 100%; height: 1px; min-height: 100%; border: 0; display: block; }
+
+.carregando-jogo {
+  z-index: 2;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px;
+  background: #000;
+  text-align: center;
+}
+.carregando-jogo[hidden] { display: none; }
+.carregando-jogo p { max-width: 280px; margin: 0; font-size: 16px; color: var(--texto-2); }
+.carregando-trilho { width: min(260px, 70%); height: 6px; border-radius: 999px; background: var(--linha); overflow: hidden; }
+.carregando-barra { width: 4%; height: 100%; border-radius: inherit; background: var(--rp-verde); transition: width 0.3s; }
 
 /* Pequeno e discreto: aparece na transmissão junto com o jogo. */
 .selo {
