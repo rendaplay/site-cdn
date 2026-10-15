@@ -47,6 +47,16 @@
   const SILENCIO = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
   const COPIAS_POR_EFEITO = 3;
 
+  /* Vai pro registro da live no app do celular (como o anotar de
+     comum/live.js), uma vez por linha: no iPhone é o único jeito de saber se
+     o Safari deixou o som tocar. */
+  const anotadas = new Set();
+  function anotarSom(linha) {
+    if (anotadas.has(linha) || !raiz.parent || raiz.parent === raiz) return;
+    anotadas.add(linha);
+    raiz.parent.postMessage({ rendaplay: "registro", linha: `som: ${linha}`, urgente: true }, "*");
+  }
+
   /* No navegador: HTMLAudio por arquivo (funciona por file://, onde fetch de
      mp3 pro Web Audio falha). Celular só libera cada elemento de áudio depois
      de tocar dentro de um toque; por isso os elementos são criados na
@@ -113,7 +123,7 @@
 
     _retomarMusica() {
       const m = this._musica;
-      if (m && this.ligado && m.paused) m.play().catch(() => {});
+      if (m && this.ligado && m.paused) m.play().then(() => anotarSom("música tocando"), e => anotarSom(`música bloqueada no toque (${e.name})`));
     },
 
     /* O iPhone suspende o áudio ao ir pro TikTok e voltar. */
@@ -122,6 +132,7 @@
       let preparado = false;
       const destravar = () => {
         if (!preparado) {
+          anotarSom("primeiro toque no jogo");
           preparado = true;
           const todos = [this._elMusica, this._elVoz, ...[...this._piscinas.values()].flat()];
           for (const el of todos) if (el && el !== this._musica) this._preparar(el);
@@ -158,7 +169,7 @@
       this._atual = a;
       a.src = this.base + item.arquivo;
       armarPrazo();
-      a.play().catch(fim);
+      a.play().catch(e => { anotarSom(`fala bloqueada (${e.name})`); fim(); });
       return true;
     },
 
@@ -184,7 +195,7 @@
       a.playbackRate = 1;
       a.volume = Math.min(1, this.volume * volume);
       this._musica = a;
-      a.play().catch(() => {});
+      a.play().then(() => anotarSom("música tocando"), e => anotarSom(`música bloqueada (${e.name})`));
     },
 
     alternar() {
