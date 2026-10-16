@@ -16,6 +16,7 @@ window.URNA_PRESETS = {
     curtida: { cada: 25, pontos: 1, intervalo: 5, teto: 3 },
     seguiu: { pontos: 1 },
     modoSeguro: true,
+    ultraSeguro: true,
     som: true,
     volume: 80,
     musica: 100,

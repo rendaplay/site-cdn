@@ -5,7 +5,11 @@
 "use strict";
 
 const { chave, config, opcoes } = Config.carregar();
-const candidatos = window[config.candidatos] || window.CANDIDATOS;
+/* Ultra seguro: nome de político na tela ou na voz é o que mais derruba a
+   live no TikTok. Fica só o número; as falas dos candidatos saem e o
+   narrador continua. */
+const lista = window[config.candidatos] || window.CANDIDATOS;
+const candidatos = config.ultraSeguro ? lista.map(c => ({ ...c, nome: "" })) : lista;
 
 /* A plateia de demonstração do live.js entrega o evento já normalizado;
    as regras falam o pacote do conector. */
@@ -40,7 +44,8 @@ const Jogo = {
       avancado: () => Painel.alternar(true),
     });
 
-    Vozes.iniciar({ volume: (config.volume ?? 80) / 100, efeitos: ["rufar", "confete", "fanfarra", "urna-confirma", "tecla"] });
+    const catalogo = (window.VOZES_CATALOGO || []).filter(v => !config.ultraSeguro || v.quem === "narrador");
+    Vozes.iniciar({ volume: (config.volume ?? 80) / 100, catalogo, efeitos: ["rufar", "confete", "fanfarra", "urna-confirma", "tecla"] });
     Vozes.ligado = config.som !== false;
     Vozes.musica("musica-urna", (config.musica ?? 100) / 100);
     Vozes.falar("entrada", "narrador");

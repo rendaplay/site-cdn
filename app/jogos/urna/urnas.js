@@ -396,12 +396,14 @@ const Urnas = {
     }
 
     if (pronto) {
-      c.fillStyle = "#3A3A3A";
-      c.font = "800 40px Figtree, sans-serif";
-      c.fillText("Nome:", X + 22, Y + 420);
-      c.fillStyle = "#111";
-      c.font = "900 84px 'Big Shoulders Display', Impact, sans-serif";
-      c.fillText(e.cand.nome.toUpperCase(), X + 22, Y + 498);
+      if (e.cand.nome) {
+        c.fillStyle = "#3A3A3A";
+        c.font = "800 40px Figtree, sans-serif";
+        c.fillText("Nome:", X + 22, Y + 420);
+        c.fillStyle = "#111";
+        c.font = "900 84px 'Big Shoulders Display', Impact, sans-serif";
+        c.fillText(e.cand.nome.toUpperCase(), X + 22, Y + 498);
+      }
       this.desenharRetrato(c, e, X + 446, Y + 420, 88);
     }
 
