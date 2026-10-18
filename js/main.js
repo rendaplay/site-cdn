@@ -34,6 +34,66 @@ function aplicarLinks() {
 
 aplicarLinks();
 
+// ───────── WhatsApp: origem ─────────
+
+// O wa.me só leva o texto: sem isto as UTMs do anúncio morrem no clique e a venda
+// fechada no zap cai na Utmify como "sem UTM". O código vai no fim do texto pronto
+// e as UTMs ficam no TrelaDesk esperando a primeira mensagem com ele.
+const ORIGEM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'src', 'fbclid'];
+// 32 símbolos (sem 0/O/1/I): byte % 32 não puxa nenhum para mais vezes.
+const ALFABETO_REF = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+function novoRef() {
+  return [...crypto.getRandomValues(new Uint8Array(5))].map((b) => ALFABETO_REF[b % 32]).join('');
+}
+
+// A Utmify guarda as UTMs da página de entrada no localStorage, com "<chave>_exp".
+function origemGuardada(chave) {
+  try {
+    const valor = localStorage.getItem(chave);
+    const expira = localStorage.getItem(chave + '_exp');
+    return valor && (!expira || new Date(expira) > new Date()) ? valor : '';
+  } catch (e) {
+    return '';
+  }
+}
+
+function origemDaVisita() {
+  const daUrl = new URLSearchParams(location.search);
+  const temNaUrl = ORIGEM.some((k) => daUrl.get(k));
+  const origem = {};
+  for (const k of ORIGEM) {
+    const valor = temNaUrl ? daUrl.get(k) : origemGuardada(k);
+    if (valor) origem[k] = valor;
+  }
+  return origem;
+}
+
+// Form-urlencoded não dispara preflight: o beacon sai mesmo com a aba indo para o WhatsApp.
+function registrarOrigem(ref) {
+  const dados = new URLSearchParams({ ref, page: location.href.slice(0, 2000), ...origemDaVisita() });
+  if (navigator.sendBeacon && navigator.sendBeacon(CONFIG.leadRef, dados)) return;
+  fetch(CONFIG.leadRef, { method: 'POST', body: dados, keepalive: true, mode: 'no-cors' }).catch(() => {});
+}
+
+// encodeURIComponent e não searchParams: o "+" no lugar do espaço aparece cru em alguns WhatsApp.
+function comRef(href, ref) {
+  const url = new URL(href);
+  const texto = (url.searchParams.get('text') || '').replace(/\s*\(ref [A-Z2-9]{5}\)$/, '');
+  return `${url.origin}${url.pathname}?text=${encodeURIComponent(`${texto} (ref ${ref})`.trim())}`;
+}
+
+document.addEventListener('click', (e) => {
+  const link = e.target.closest('a[href*="wa.me/"]');
+  if (!link || !CONFIG.leadRef) return;
+  // Qualquer falha aqui abre o wa.me como estava: o clique nunca trava.
+  try {
+    const ref = novoRef();
+    link.href = comRef(link.href, ref);
+    registrarOrigem(ref);
+  } catch (err) { /* segue sem código */ }
+}, true);
+
 // ───────── topo e barra de CTA ─────────
 
 const topo = $('#topo');
