@@ -118,6 +118,8 @@ if (barraCta) {
 // ───────── vídeos: só baixam no play ─────────
 
 // Vídeo parado com play: tocar já liga o som, um vídeo por vez.
+// Tirar o mudo e dar play têm que sair no mesmo toque, sem await no meio: o navegador do
+// Instagram só libera o som dentro do gesto, e no Clarity o 1º toque ficava mudo.
 function tocar(video) {
   for (const outro of $$('video')) if (outro !== video) outro.pause();
   video.muted = false;
@@ -128,26 +130,45 @@ function botaoDePlay(video) {
   const botao = document.createElement('button');
   botao.type = 'button';
   botao.className = 'video-play';
-  botao.innerHTML = '<svg class="ico ico-cheio" aria-hidden="true"><use href="#i-play"/></svg><span>Assistir com som</span>';
+  botao.innerHTML = `${video.hasAttribute('data-auto') ? icone('som') : icone('play', true)}<span>Assistir com som</span>`;
   const rotulo = botao.querySelector('span');
   let carregando = false;
   botao.addEventListener('click', () => { if (!carregando) tocar(video); });
   // No Clarity tinha gente tocando várias vezes enquanto o vídeo baixava: o 2º toque pausava.
   video.addEventListener('click', () => {
     if (carregando) return;
-    if (video.paused) tocar(video); else video.pause();
+    if (video.paused || video.muted) tocar(video); else video.pause();
   });
+  // Mudo não conta como carregando: o toque pra ligar o som nunca pode ser ignorado.
   const mostrar = () => {
-    carregando = !video.paused && video.readyState < HTMLMediaElement.HAVE_FUTURE_DATA;
+    carregando = !video.paused && !video.muted && video.readyState < HTMLMediaElement.HAVE_FUTURE_DATA;
     botao.classList.toggle('carregando', carregando);
     rotulo.textContent = carregando ? 'Carregando…' : 'Assistir com som';
-    botao.hidden = !video.paused && !carregando;
+    botao.hidden = !video.paused && !video.muted && !carregando;
     video.closest('.moldura')?.classList.toggle('tocando', !video.paused);
   };
   video.addEventListener('play', mostrar);
   video.addEventListener('playing', mostrar);
   video.addEventListener('pause', mostrar);
+  video.addEventListener('volumechange', mostrar);
   video.after(botao);
+}
+
+// O criativo do topo roda mudo sozinho, mas só depois que a página carregou, pra não
+// disputar banda com a primeira tela. Volta a rodar quando reaparece, enquanto ninguém ligou o som.
+function tocarMudo(video) {
+  let visivel = false;
+  let liberado = false;
+  const seguir = () => {
+    if (visivel && liberado && video.paused && video.muted) video.play().catch(() => {});
+  };
+  const liberar = () => { liberado = true; seguir(); };
+  if (document.readyState === 'complete') liberar();
+  else {
+    window.addEventListener('load', liberar, { once: true });
+    setTimeout(liberar, 2500);
+  }
+  quandoVisivel(video, (v) => { visivel = v; seguir(); }, 0.25);
 }
 
 // No Clarity tinha gente tocando no preço: o cartão inteiro vale como o botão dele.
@@ -351,4 +372,5 @@ for (const video of $$('video')) {
   botaoDePlay(video);
   if (video.hasAttribute('data-controles')) barraDeControle(video);
   quandoVisivel(video, (visivel) => { if (!visivel) video.pause(); }, 0.25);
+  if (video.hasAttribute('data-auto')) tocarMudo(video);
 }
