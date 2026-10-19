@@ -52,7 +52,7 @@ const Tela = {
     p.querySelector(".chaves").innerHTML = candidatos.map((c, i) => `
       <div class="chave chave-${"ab"[i]}">
         <i class="chave-icone">${iconeDoPresente(c.presente)}</i>
-        <span class="chave-texto"><strong>${escapar(c.presente.nome)}</strong><span>apoia o <b>${c.numero}</b></span></span>
+        <span class="chave-texto"><span>apoie o <b>${c.numero}</b></span></span>
       </div>`).join("")
       + `<div class="chave-comente">ou comente <b class="a">${candidatos[0].numero}</b> ou <b class="b">${candidatos[1].numero}</b> no chat para participar</div>`;
 

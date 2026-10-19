@@ -255,7 +255,7 @@ window.VOZES_CATALOGO = [
   "arquivo": "narrador/narr-ultrapassagem-2.mp3",
   "quem": "narrador",
   "momento": "ultrapassagem",
-  "texto": "Tomou a ponta!"
+  "texto": "Assumiu a ponta!"
  },
  {
   "id": "narr-ultrapassagem-3",

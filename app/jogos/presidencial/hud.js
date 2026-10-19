@@ -5,6 +5,8 @@
 
 const BOLHAS_MAX = 7;
 const TEXTO_EFEITO = { impulso: "IMPULSO!", nitro: "NITRO!", banana: "CASCA!", jato: "JATO!" };
+const ICONE_EFEITO = { impulso: "⚡", nitro: "🔥", banana: "🍌", jato: "🚀" };
+const NOME_EFEITO = { impulso: "impulso", nitro: "nitro", banana: "casca no rival", jato: "jato" };
 
 const Hud = {
   montar(palco, candidatos, config) {
@@ -24,13 +26,11 @@ const Hud = {
 
     const [a, b] = candidatos;
     this.$(".time-a .num").textContent = a.numero;
-    this.$(".time-a .nome").textContent = a.nome;
     this.$(".time-b .num").textContent = b.numero;
-    this.$(".time-b .nome").textContent = b.nome;
     this.$(".chaves").innerHTML = candidatos.map((c, i) => `
       <div class="chave chave-${"ab"[i]}">
         <i class="chave-icone">${iconeDoPresente(c.presente)}</i>
-        <span class="chave-texto"><strong>${escapar(c.presente.nome)}</strong><span>apoia o <b>${c.numero}</b></span></span>
+        <span class="chave-texto"><span>apoie o <b>${c.numero}</b></span></span>
       </div>`).join("")
       + `<div class="chave-comente">ou comente <b class="ca">${a.numero}</b> ou <b class="cb">${b.numero}</b> no chat para participar</div>`;
     this.medir();
@@ -102,7 +102,6 @@ const Hud = {
         this.bolha(a.lado, a.quem, TEXTO_EFEITO[a.efeito] || "!", a.efeito !== "impulso");
         if (a.efeito === "banana") this.emSeguida(() => this.faixa("🍌 Casca!", `${a.quem.nick} derrubou ${this.candidatos[a.alvo].nome}`, a.lado), 2200);
         if (a.efeito === "jato") this.emSeguida(() => this.faixa("🚀 Jato!", `${a.quem.nick} ligou o jato de ${this.candidatos[a.lado].nome}`, a.lado), 2200);
-        this.torcedores(corrida);
       } else if (a.tipo === "ultrapassagem") this.emSeguida(() => this.faixa("Passou!", `${this.candidatos[a.lado].nome} assumiu a ponta`, a.lado), 2200);
       else if (a.tipo === "retaFinal") this.emSeguida(() => this.faixa("Reta final", `faltam ${Math.ceil(corrida.config.pista * (1 - corrida.config.retaFinal))} m`, -1), 2200);
       else if (a.tipo === "encostou") this.aviso(`<b>${escapar(this.candidatos[a.lado].nome)}</b> encostou!`);
@@ -169,15 +168,21 @@ const Hud = {
     el.classList.add("on");
   },
 
-  torcedores(corrida) {
-    for (let l = 0; l < 2; l++) {
-      const top = [...corrida.doadores[l].values()].sort((x, y) => y.moedas - x.moedas || x.desde - y.desde).slice(0, 3);
-      const el = this.$(`.torcedores-${"ab"[l]}`);
-      const html = `<h3>Torcida do ${this.candidatos[l].numero}</h3>` + (top.length
-        ? `<ol>${top.map(d => `<li>${avatar(d)}<span>${escapar(d.nick)}</span></li>`).join("")}</ol>`
-        : `<p class="vazio">Comente <b>${this.candidatos[l].numero}</b> pra torcer</p>`);
-      if (el._html !== html) el.innerHTML = el._html = html;
+  /* Cada efeito com os presentes que o disparam: o que o streamer escolheu
+     no ⚙ ou, sem escolha, o preço. As rosas das chaves ficam de fora. */
+  legenda(faixas, faixaDe) {
+    const ordem = [...faixas].sort((x, y) => x.de - y.de);
+    const daChave = new Set(this.candidatos.flatMap(c => c.presente.aceitos));
+    const icones = ordem.map(() => []);
+    for (const p of PRESENTES_TIKTOK) {
+      if (daChave.has(p.api)) continue;
+      const escolhida = faixaDe(p.api, p.moedas);
+      const i = escolhida ?? Math.max(0, ordem.findLastIndex(f => p.moedas >= f.de));
+      if (icones[i] && icones[i].length < 2) icones[i].push(p.icone);
     }
+    const html = ordem.map((f, i) => `<li><i>${ICONE_EFEITO[f.efeito]}</i><span>${NOME_EFEITO[f.efeito]}</span><em>${icones[i].join("")}</em></li>`).join("");
+    const el = this.$(".legenda");
+    if (el._html !== html) el.innerHTML = el._html = html;
   },
 
   fotoFinish(vencedor) {

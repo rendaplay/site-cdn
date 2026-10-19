@@ -22,6 +22,7 @@ const Painel = {
       <fieldset><legend>Som</legend>
         <label class="linha cheia"><input type="checkbox" name="som" ${config.som !== false ? "checked" : ""}>Som do jogo ligado</label>
         ${campo("Volume (0 a 100)", "volume", config.volume, "number")}
+        ${Vozes.campoLocutor(config.locutor)}
         ${campo("Volume da música (0 a 100)", "musica", config.musica, "number")}
       </fieldset>
       <fieldset><legend>Modo seguro TikTok</legend>
@@ -67,6 +68,7 @@ const Painel = {
       caminho.slice(0, -1).forEach(k => { alvo = alvo[k]; });
       alvo[caminho[caminho.length - 1]] = valor;
     }
+    c.locutor = this.form.elements.locutor.value;
     return c;
   },
 

@@ -566,7 +566,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 .painel label { display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: 22px; }
 .painel label.cheia { grid-column: 1 / -1; }
 .painel label.linha { flex-direction: row; align-items: center; gap: 14px; }
-.painel input[type=text], .painel input[type=number] {
+.painel input[type=text], .painel input[type=number], .painel select {
   font: 500 26px/1.2 var(--texto); padding: 12px 14px;
   border: 2px solid #B9C2D6; border-radius: 12px; background: #fff; color: var(--tinta);
 }

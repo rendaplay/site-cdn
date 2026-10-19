@@ -125,7 +125,7 @@ const Tela = {
       } else icone.textContent = l.presente.icone;
       if (l.presente.fundo) icone.style.background = l.presente.fundo;
       chave.querySelector(".chave-txt").innerHTML =
-        `<small>Presente</small><b>${escapar(l.presente.nome)} = ${escapar(l.nome)}</b>`;
+        `<small>apoie o</small><b>${escapar(l.nome)}</b>`;
     });
     /* Modo seguro: sem chaves "Presente Rosa = Vermelho" e sem nada que peça
        presente; o vínculo fica pelo ícone na legenda do próprio lado. */
@@ -226,8 +226,8 @@ const Tela = {
           icone.replaceChildren(img);
         } else icone.textContent = l.presente.icone;
         if (l.presente.fundo) icone.style.background = l.presente.fundo;
-        nome = escapar(l.presente.nome);
-        vale = `<em>+1 m</em> no ${n}`;
+        nome = `apoie o ${n}`;
+        vale = `<em>+1 m</em> na torre`;
       }
       cartao.querySelector(".cartao-txt").innerHTML = `<b>${nome}</b><span>${vale}</span>`;
     });

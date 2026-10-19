@@ -29,6 +29,7 @@ const Painel = {
       <fieldset><legend>Som</legend>
         <label class="linha cheia"><input type="checkbox" name="som" ${config.som !== false ? "checked" : ""}>Som do jogo ligado</label>
         ${campo("Volume (0 a 100)", "volume", config.volume, "number")}
+        ${Vozes.campoLocutor(config.locutor)}
         ${campo("Volume da música (0 a 100)", "musica", config.musica, "number")}
       </fieldset>
       <fieldset><legend>Modo seguro TikTok</legend>
@@ -76,6 +77,7 @@ const Painel = {
     }
     /* faixa fora de ordem trocaria o efeito de lugar */
     for (let i = 1; i < c.faixas.length; i++) c.faixas[i].de = Math.max(c.faixas[i].de, c.faixas[i - 1].de + 1);
+    c.locutor = this.form.elements.locutor.value;
     return c;
   },
 

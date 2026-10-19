@@ -73,6 +73,7 @@ const Painel = {
       <fieldset><legend>Som</legend>
         <label class="linha"><input type="checkbox" name="som" ${config.som ? "checked" : ""}>Som do jogo ligado</label>
         ${campo("Volume (0 a 100)", "volume", config.volume, "number")}
+        ${Vozes.campoLocutor(config.locutor)}
         ${campo("Volume da música (0 a 100)", "musica", config.musica, "number")}
         ${campo(`Falas gravadas: no máximo uma a cada (segundos, 0 desliga) · ${config.lados.map(l => `${escapar(l.nome)}: ${(l.falas || []).length}`).join(" · ")}`, "fala.intervalo", config.fala.intervalo, "number", "cheia")}
       </fieldset>
@@ -125,6 +126,7 @@ const Painel = {
       caminho.slice(0, -1).forEach(k => { alvo = alvo[k]; });
       alvo[caminho[caminho.length - 1]] = valor;
     }
+    c.locutor = this.form.elements.locutor.value;
     return c;
   },
 

@@ -28,7 +28,7 @@ const Jogo = {
     Som.destravarNoToque();
     if (chave === PRESET_COM_VOZES) {
       Tela.vozes = true;
-      Vozes.iniciar({ volume: Som.volume, aviso: false, catalogo: (window.VOZES_CATALOGO || []).filter(v => !VOZES_FORA.includes(v.id)) });
+      Vozes.iniciar({ locutor: config.locutor, volume: Som.volume, aviso: false, catalogo: (window.VOZES_CATALOGO || []).filter(v => !VOZES_FORA.includes(v.id)) });
       Vozes.ligado = Som.ligado;
     }
     Tela.montar(config, opcoes.formato);

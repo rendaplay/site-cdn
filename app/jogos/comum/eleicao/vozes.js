@@ -61,9 +61,19 @@
      mp3 pro Web Audio falha). Celular só libera cada elemento de áudio depois
      de tocar dentro de um toque; por isso os elementos são criados na
      abertura, preparados no primeiro toque e reaproveitados. */
+  /* Vozes do narrador (ferramentas_audio/locutores.py): cada uma tem a
+     pasta audio/narrador-<id>. O streamer escolhe no painel. */
+  const LOCUTORES = [
+    { id: "diego", nome: "Masculina (Diego)" },
+    { id: "aline", nome: "Feminina (Aline)" },
+    { id: "carolina", nome: "Feminina (Carolina)" },
+  ];
+
   const Vozes = {
+    LOCUTORES,
     ligado: true,
     volume: 0.8,
+    locutor: LOCUTORES[0].id,
     base: "../comum/eleicao/audio/",
     fila: null,
     _atual: null,
@@ -77,8 +87,9 @@
     /* A Batalha tem o aviso dela (som.js): lá `aviso: false`. */
     _comAviso: true,
 
-    iniciar({ base, volume, catalogo = raiz.VOZES_CATALOGO || [], efeitos = [], aviso = true } = {}) {
+    iniciar({ base, volume, locutor, catalogo = raiz.VOZES_CATALOGO || [], efeitos = [], aviso = true } = {}) {
       if (base) this.base = base;
+      if (LOCUTORES.some(l => l.id === locutor)) this.locutor = locutor;
       this._comAviso = aviso;
       if (volume !== undefined) this.volume = volume;
       this.fila = new FilaDeVozes(catalogo);
@@ -190,10 +201,16 @@
       a.onerror = fim;
       a.onloadedmetadata = armarPrazo;
       this._atual = a;
-      a.src = this.base + item.arquivo;
+      a.src = this.base + (item.quem === "narrador" ? item.arquivo.replace(/^narrador\//, `narrador-${this.locutor}/`) : item.arquivo);
       armarPrazo();
       a.play().catch(e => { anotarSom(`fala bloqueada (${e.name})`); this._bloqueou(e); fim(); });
       return true;
+    },
+
+    /* Campo do painel de cada jogo; o `ler()` do painel pega pelo name. */
+    campoLocutor(atual) {
+      const opcoes = LOCUTORES.map(l => `<option value="${l.id}"${l.id === (atual || LOCUTORES[0].id) ? " selected" : ""}>${l.nome}</option>`).join("");
+      return `<label>Voz do locutor<select name="locutor">${opcoes}</select></label>`;
     },
 
     efeito(nome, volume = 1) {

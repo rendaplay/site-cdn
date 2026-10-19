@@ -71,8 +71,8 @@ body { font-family: var(--fonte); color: var(--texto); -webkit-font-smoothing: a
   text-shadow: 0 5px 0 rgba(0, 0, 0, .28);
 }
 .time-b .num { color: var(--ouro); }
-.time .nome { font: 900 40px/1 var(--fonte); text-transform: uppercase; letter-spacing: .5px; flex: 1; }
-.time-b .nome { text-align: right; }
+.time .nome { font: 900 34px/1 var(--fonte); text-transform: uppercase; letter-spacing: .5px; flex: 1; text-align: right; opacity: .92; }
+.time-b .nome { text-align: left; }
 .time .vitorias {
   min-width: 74px; height: 80px; display: grid; place-items: center; padding: 0 10px;
   font: 900 70px/1 var(--numero); color: var(--tinta); background: #fff; border-radius: 16px;
@@ -117,24 +117,6 @@ body { font-family: var(--fonte); color: var(--texto); -webkit-font-smoothing: a
 }
 .falta b { color: var(--ouro); font: 900 44px/1 var(--numero); }
 
-/* ───────── torcedores (maiores apoios da corrida, sem valor) ───────── */
-
-.torcedores {
-  position: absolute; width: 494px; bottom: calc(28px + var(--sobra, 0px) * .9);
-  background: var(--vidro); border: 3px solid var(--vidro-borda); border-radius: 22px;
-  padding: 14px 18px 12px; min-height: 140px;
-}
-.torcedores-a { left: 28px; border-top: 6px solid var(--a); }
-.torcedores-b { right: 28px; border-top: 6px solid var(--b); }
-.torcedores h3 { margin: 0 0 10px; font: 800 36px/1 var(--fonte); color: var(--apagado); text-transform: uppercase; letter-spacing: 1px; }
-.torcedores ol { margin: 0; padding: 0; list-style: none; }
-.torcedores li { display: flex; align-items: center; gap: 12px; height: 54px; font: 700 36px/1 var(--fonte); white-space: nowrap; }
-.torcedores li span { overflow: hidden; text-overflow: ellipsis; }
-.torcedores li:first-child { font-size: 40px; }
-.torcedores .vazio { margin: 0; font: 600 37px/1.3 var(--fonte); color: var(--apagado); }
-.torcedores-a .vazio b { color: var(--a); }
-.torcedores-b .vazio b { color: var(--b); }
-
 .avatar {
   flex: none; width: 46px; height: 46px; border-radius: 50%; object-fit: cover;
   display: grid; place-items: center; font: 900 24px/1 var(--fonte); color: #fff;
@@ -149,11 +131,16 @@ body { font-family: var(--fonte); color: var(--texto); -webkit-font-smoothing: a
   position: absolute; left: 0; right: 0; bottom: 0; height: calc(400px + var(--sobra, 0px) * .9); pointer-events: none;
   background: linear-gradient(180deg, rgba(5, 8, 20, 0), rgba(5, 8, 20, .62) 34%, rgba(5, 8, 20, .82));
 }
+/* Efeitos na direita, em pé: cada um com os presentes que o disparam. */
 .legenda {
-  position: absolute; left: 0; right: 0; bottom: calc(272px + var(--sobra, 0px) * .9); display: flex; justify-content: center; gap: 30px;
-  font: 700 36px/1 var(--fonte); color: var(--apagado); white-space: nowrap;
+  position: absolute; z-index: 2; right: 20px; top: calc(620px + var(--sobra, 0px) * .75); margin: 0; padding: 14px 14px 6px; pointer-events: none;
+  list-style: none; background: var(--vidro); border: 3px solid var(--vidro-borda); border-radius: 22px;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, .35);
 }
-.legenda i { font-style: normal; margin-right: 6px; }
+.legenda li { display: grid; grid-template-columns: 56px auto; grid-template-rows: auto auto; column-gap: 10px; align-items: center; margin-bottom: 12px; }
+.legenda li i { grid-row: span 2; font: normal 50px/1 var(--fonte); text-align: center; }
+.legenda li span { font: 900 28px/1 var(--fonte); color: #fff; text-transform: uppercase; white-space: nowrap; }
+.legenda li em { font: normal 36px/1.15 var(--fonte); letter-spacing: 4px; }
 .aviso .ca { color: var(--a); }
 .aviso .cb { color: var(--b); }
 
@@ -175,7 +162,6 @@ body { font-family: var(--fonte); color: var(--texto); -webkit-font-smoothing: a
 }
 .chave-icone .icone-presente { width: 112px; height: 112px; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .5)); }
 .chave-texto { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
-.chave-texto strong { font: 900 54px/0.9 var(--numero); text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; text-shadow: 0 3px 0 rgba(0, 0, 0, .25); }
 .chave-texto span { display: flex; align-items: center; gap: 12px; font: 800 37px/1 var(--fonte); white-space: nowrap; }
 .chave-texto b { font: 900 66px/0.8 var(--numero); padding: 10px 12px 2px; border-radius: 14px; background: var(--tinta); color: #fff; }
 .chave-b .chave-texto b { color: var(--ouro); }
@@ -380,7 +366,7 @@ body { font-family: var(--fonte); color: var(--texto); -webkit-font-smoothing: a
 .painel label { display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: 22px; }
 .painel label.cheia { grid-column: 1 / -1; }
 .painel label.linha { flex-direction: row; align-items: center; gap: 14px; }
-.painel input[type=text], .painel input[type=number] {
+.painel input[type=text], .painel input[type=number], .painel select {
   font: 500 26px/1.2 var(--fonte); padding: 12px 14px;
   border: 2px solid #B9C2D6; border-radius: 12px; background: #fff; color: var(--tinta);
 }
@@ -408,23 +394,21 @@ body { font-family: var(--fonte); color: var(--texto); -webkit-font-smoothing: a
 .horizontal .bandeira { width: 50px; height: 58px; right: -80px; }
 .horizontal .falta { font-size: 24px; }
 .horizontal .falta b { font-size: 30px; }
-.horizontal .torcedores { top: 18px; bottom: auto; width: 400px; min-height: 0; padding: 12px 16px 8px; }
-.horizontal .torcedores li { height: 40px; font-size: 24px; }
-.horizontal .torcedores li:first-child { font-size: 26px; }
-.horizontal .torcedores-a { left: 22px; }
-.horizontal .torcedores-b { right: 22px; }
 .horizontal .base { height: 170px; }
 .horizontal .chaves { top: auto; bottom: 18px; left: 40px; right: auto; grid-template-columns: auto auto auto; align-items: center; gap: 16px; }
 .horizontal .chave { height: 96px; gap: 12px; padding: 0 18px 0 8px; border-radius: 22px; }
 .horizontal .chave-icone { width: 80px; height: 80px; font-size: 58px; }
 .horizontal .chave-icone .icone-presente { width: 74px; height: 74px; }
 .horizontal .chave-texto { gap: 4px; }
-.horizontal .chave-texto strong { font-size: 40px; }
 .horizontal .chave-texto span { font-size: 28px; gap: 8px; }
 .horizontal .chave-texto b { font-size: 40px; padding: 6px 8px 1px; border-radius: 10px; }
 .horizontal .chave-comente { grid-column: auto; font-size: 30px; padding: 10px 22px; }
 .horizontal .chave-comente b { font-size: 40px; }
-.horizontal .legenda { left: auto; right: 40px; bottom: 36px; font-size: 25px; gap: 24px; }
+.horizontal .legenda { top: 240px; right: 22px; padding: 10px 12px 2px; }
+.horizontal .legenda li { grid-template-columns: 44px auto; margin-bottom: 8px; }
+.horizontal .legenda li i { font-size: 40px; }
+.horizontal .legenda li span { font-size: 22px; }
+.horizontal .legenda li em { font-size: 28px; }
 .horizontal .faixa { top: 250px; }
 .horizontal .faixa .txt { font-size: 130px; }
 .horizontal .contagem { top: 200px; font-size: 380px; }

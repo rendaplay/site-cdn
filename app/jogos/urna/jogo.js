@@ -45,7 +45,7 @@ const Jogo = {
     });
 
     const catalogo = (window.VOZES_CATALOGO || []).filter(v => !config.ultraSeguro || v.quem === "narrador");
-    Vozes.iniciar({ volume: (config.volume ?? 80) / 100, catalogo, efeitos: ["rufar", "confete", "fanfarra", "urna-confirma", "tecla"] });
+    Vozes.iniciar({ locutor: config.locutor, volume: (config.volume ?? 80) / 100, catalogo, efeitos: ["rufar", "confete", "fanfarra", "urna-confirma", "tecla"] });
     Vozes.ligado = config.som !== false;
     Vozes.musica("musica-urna", (config.musica ?? 100) / 100);
     Vozes.falar("entrada", "narrador");

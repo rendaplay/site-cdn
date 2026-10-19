@@ -250,9 +250,8 @@ b.b, .b { color: var(--b); }
   font: normal 100px/1 var(--texto); background: radial-gradient(circle, rgba(255,255,255,.2), rgba(255,255,255,0) 70%); }
 .chave-icone .icone-presente { width: 128px; height: 128px; filter: drop-shadow(0 4px 6px rgba(0,0,0,.5)); }
 .chave-texto { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
-.chave-texto strong { font: 900 54px/0.9 var(--display); letter-spacing: .02em; text-transform: uppercase; white-space: nowrap; }
-.chave-texto span { display: flex; align-items: center; gap: 12px; font: 800 36px/1 var(--texto); color: #E3EAFF; white-space: nowrap; }
-.chave-texto b { font: 900 70px/0.8 var(--display); padding: 10px 12px 2px; border-radius: 16px; color: #fff;
+.chave-texto span { display: flex; align-items: center; gap: 14px; font: 900 44px/1 var(--texto); text-transform: uppercase; color: #E3EAFF; white-space: nowrap; }
+.chave-texto b { font: 900 84px/0.8 var(--display); padding: 10px 12px 2px; border-radius: 16px; color: #fff;
   background: linear-gradient(180deg, color-mix(in srgb, var(--cor) 80%, #fff), var(--cor) 60%, color-mix(in srgb, var(--cor) 70%, #000));
   box-shadow: 0 5px 0 color-mix(in srgb, var(--cor) 55%, #000); }
 .chave-b .chave-texto b { color: var(--amarelo); }
@@ -444,7 +443,7 @@ b.b, .b { color: var(--b); }
 .painel label { display: flex; flex-direction: column; gap: 6px; font-weight: 700; color: #26324F; }
 .painel label.cheia { grid-column: 1 / -1; }
 .painel label.linha { flex-direction: row; align-items: center; gap: 14px; }
-.painel input[type=text], .painel input[type=number] { font: 600 26px/1 var(--texto); padding: 14px 16px; border-radius: 14px;
+.painel input[type=text], .painel input[type=number], .painel select { font: 600 26px/1 var(--texto); padding: 14px 16px; border-radius: 14px;
   border: 2px solid #B9C3D8; background: #fff; color: #0A1530; }
 .painel input[type=checkbox] { width: 30px; height: 30px; accent-color: #0A1433; }
 .painel input:focus-visible, .painel button:focus-visible { outline: 4px solid #6C4BFF; outline-offset: 2px; }
@@ -487,9 +486,8 @@ b.b, .b { color: var(--b); }
 .horizontal .chave-icone { width: 104px; height: 104px; font-size: 78px; }
 .horizontal .chave-icone .icone-presente { width: 100px; height: 100px; }
 .horizontal .chave-texto { gap: 8px; }
-.horizontal .chave-texto strong { font-size: 48px; }
-.horizontal .chave-texto span { font-size: 30px; }
-.horizontal .chave-texto b { font-size: 54px; }
+.horizontal .chave-texto span { font-size: 38px; }
+.horizontal .chave-texto b { font-size: 66px; }
 .horizontal .chave-comente { padding: 6px 22px 5px; font-size: 30px; }
 .horizontal .chave-comente b { font-size: 40px; }
 .horizontal .massa { top: 330px; left: 460px; right: 460px; }

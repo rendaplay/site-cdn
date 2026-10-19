@@ -46,7 +46,7 @@ const Jogo = {
       avancado: () => Painel.alternar(true),
     });
 
-    Vozes.iniciar({ volume: (config.volume ?? 80) / 100, efeitos: ["nitro", "escorregao", "jato", "torcida-forte", "tiro", "apito"] });
+    Vozes.iniciar({ locutor: config.locutor, volume: (config.volume ?? 80) / 100, efeitos: ["nitro", "escorregao", "jato", "torcida-forte", "tiro", "apito"] });
     Vozes.ligado = config.som !== false;
     this.ligarSomDeFundo();
 
@@ -159,7 +159,7 @@ const Jogo = {
     Hud.fecharPodio();
     Hud.fecharFoto();
     Hud.placar(this.corrida);
-    Hud.torcedores(this.corrida);
+    Hud.legenda(config.faixas, (nome, moedas) => this.configurar.faixa(nome, moedas));
     this.ritmoDaMusica(1);
     Vozes.falar("largada", "narrador");
   },
