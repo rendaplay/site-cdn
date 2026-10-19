@@ -1,12 +1,5 @@
 (() => {
   const SUGESTOES_INICIAIS = ['Roda só no celular?', 'Tem tutorial?', 'Quanto custa?', 'É confiável?', 'Como ganho dinheiro?', 'Preciso aparecer?'];
-  const CDN = 'https://cdn.jsdelivr.net/gh/rendaplay/site-cdn@2c133e6700c4/video/';
-  const VIDEOS_JOGOS = 'https://r2.fivemanage.com/q2mFLddn9Ulmua6uY0t2n/rendaplay/jogos/';
-  const NOMES_JOGOS = {
-    batalha: 'Batalha de Torres', urna: 'Urna Eletrônica', presidencial: 'Corrida Presidencial', pipa: 'Pipa Combate',
-    escalada: 'Escalada', racha: 'Racha da Live', chefao: 'Chefão Coletivo', flappy: 'Voa, Tuca!', bolinha: 'Chuva de Bolinha',
-    baile: 'Baile da Live', corrida: 'Corrida da Live', duelo: 'Duelo de Aura', desfile: 'Desfile', show: 'Show da Live', ilha: 'Sobreviva à Ilha',
-  };
   const PLANOS = {
     celular: { nome: 'Celular', preco: 'R$ 49,90', de: '', detalhe: '9 jogos · só o celular · 30 dias', checkout: 'celularPasse' },
     pro: { nome: 'Pro', preco: 'R$ 79,90', de: 'R$ 119,90', detalhe: '15 jogos · celular + Roblox no PC · lançamentos', checkout: 'proPasse', destaque: true },
@@ -29,10 +22,25 @@
     try { localStorage.setItem('rendaplay.atendimento', lado); } catch (e) { /* aba privada */ }
     return lado;
   })();
+  const visitante = (() => {
+    let id = null;
+    try { id = localStorage.getItem('rendaplay.visitante'); } catch (e) { /* aba privada */ }
+    if (!id) {
+      id = Math.random().toString(36).slice(2, 12);
+      try { localStorage.setItem('rendaplay.visitante', id); } catch (e) { /* aba privada */ }
+    }
+    return id;
+  })();
+  // Funil próprio do teste (visitou, abriu, perguntou, clicou), independente do GA4 e de bloqueador de anúncio.
+  const contar = (tipo) => navigator.sendBeacon?.('/chat/evento', JSON.stringify({ tipo, variante, visitante }));
   const evento = (nome) => { if (typeof gtag === 'function') gtag('event', nome, { variante_atendimento: variante }); };
   if (typeof gtag === 'function') gtag('set', 'user_properties', { variante_atendimento: variante });
   evento('ab_atendimento');
-  if (variante === 'zap') return;
+  contar('visita');
+  if (variante === 'zap') {
+    document.querySelector('.zap')?.addEventListener('click', () => contar('zap'));
+    return;
+  }
 
   document.querySelector('.zap')?.remove();
 
@@ -124,8 +132,8 @@
         sugestoes.push(...lista.split('|').map((s) => s.trim()).filter(Boolean).slice(0, 3));
         return '';
       })
-      .replace(/\[\[\s*(?!plano|video|humano|erro)[^\]]*\]\]/gi, '');
-    const regex = /\[\[\s*(plano|video|humano|erro)\s*:?\s*([\w-]*)\s*\]\]/gi;
+      .replace(/\[\[\s*(?!plano|humano|erro)[^\]]*\]\]/gi, '');
+    const regex = /\[\[\s*(plano|humano|erro)\s*:?\s*([\w-]*)\s*\]\]/gi;
     let ultimo = 0;
     for (const m of resto.matchAll(regex)) {
       partes.push({ tipo: 'texto', valor: resto.slice(ultimo, m.index) });
@@ -155,21 +163,7 @@
       <span class="chat-plano-detalhe">${p.detalhe}</span>
       <span class="chat-plano-cta">Garantir meu acesso</span>
       <span class="chat-plano-garantia">7 dias de garantia · acesso na hora</span>`;
-    el.addEventListener('click', () => evento('chat_checkout'));
-    return el;
-  }
-
-  function cartaoVideo(id) {
-    let src, titulo;
-    if (id === 'tutorial-celular') { src = CDN + 'tutorial-celular.mp4'; titulo = 'Tutorial: live pelo celular · 1:29'; }
-    else if (id === 'tutorial-pc') { src = CDN + 'tutorial-pc.mp4'; titulo = 'Tutorial: live pelo PC · 4:55'; }
-    else if (NOMES_JOGOS[id]) { src = VIDEOS_JOGOS + id + '.mp4'; titulo = NOMES_JOGOS[id]; }
-    else return null;
-    const el = document.createElement('figure');
-    el.className = 'chat-video' + (id.startsWith('tutorial') ? '' : ' chat-video-jogo');
-    el.innerHTML = `<video src="${src}#t=0.5" preload="metadata" playsinline controls></video><figcaption>${titulo}</figcaption>`;
-    el.querySelector('video').addEventListener('loadedmetadata', () => enquadrar(el.closest('.chat-resposta')), { once: true });
-    el.querySelector('video').addEventListener('play', () => evento('chat_video'), { once: true });
+    el.addEventListener('click', () => { evento('chat_checkout'); contar('checkout'); });
     return el;
   }
 
@@ -179,7 +173,7 @@
     el.innerHTML = `
       <a href="${ZAP_EQUIPE}" target="_blank" rel="noopener">Falar com a equipe no WhatsApp</a>
       <a href="mailto:${EMAIL_EQUIPE}">${EMAIL_EQUIPE}</a>`;
-    el.querySelector('a').addEventListener('click', () => evento('chat_humano'));
+    el.querySelector('a').addEventListener('click', () => { evento('chat_humano'); contar('humano'); });
     return el;
   }
 
@@ -198,7 +192,7 @@
         bolha.textContent = 'Opa, travei aqui. Manda de novo?';
         pedacos.push(bolha, cartaoHumano());
       } else if (final) {
-        const cartao = p.tipo === 'plano' ? cartaoPlano(p.valor) : p.tipo === 'video' ? cartaoVideo(p.valor) : cartaoHumano();
+        const cartao = p.tipo === 'plano' ? cartaoPlano(p.valor) : cartaoHumano();
         if (cartao) pedacos.push(cartao);
       }
     }
@@ -260,7 +254,7 @@
       const r = await fetch('/chat/mensagem', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ conversa: conversaId, origem, mensagens: conversa }),
+        body: JSON.stringify({ conversa: conversaId, visitante, origem, mensagens: conversa }),
       });
       if (!r.ok || !r.body) throw new Error(r.status);
       const leitor = r.body.getReader();
@@ -305,6 +299,7 @@
     if (celular.matches) history.pushState({ chat: true }, '');
     if (!conversa.length && !lista.querySelector('.chat-sugestoes')) mostrarSugestoes(SUGESTOES_INICIAIS, true);
     evento('chat_abrir');
+    contar('abrir');
     if (!celular.matches) campo.focus();
   }
 
