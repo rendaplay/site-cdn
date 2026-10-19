@@ -1294,7 +1294,8 @@ a.hero-selo:hover { background: rgba(23, 248, 100, 0.2); }
 .oferta-card h2 { font-size: 0.85rem; font-family: var(--texto); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--verde); }
 .oferta-itens { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 10px; color: var(--prata); }
 .oferta-itens li { position: relative; padding-left: 28px; }
-.oferta-itens li::before { content: "✔"; position: absolute; left: 0; color: var(--verde); font-weight: 800; }
+/* Check desenhado: o caractere ✔ vira emoji roxo no Safari e ignora a cor. */
+.oferta-itens li::before { content: ""; position: absolute; left: 5px; top: 0.3em; width: 7px; height: 13px; border: solid var(--verde); border-width: 0 3px 3px 0; rotate: 45deg; }
 .oferta-itens b { color: var(--branco); }
 .oferta-preco { margin-top: 8px; font-size: 0.9rem; color: var(--prata); }
 .oferta-preco b { display: block; font-family: var(--display); font-weight: 400; font-size: 2.6rem; line-height: 1.05; color: var(--ouro); }
