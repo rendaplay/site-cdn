@@ -302,10 +302,30 @@ async function ligarConector(simular) {
   return pedir(RELAY, "/api/conector/iniciar", { metodo: "POST", corpo, cabecalhos: cabecalhosDoCanal() });
 }
 
+/* O canal é um por conta: outro aparelho ou aba já em live ou teste divide os
+   mesmos eventos (a live conta em dobro) e o teste troca a live real pela
+   plateia simulada. */
+async function canalLivre(simular) {
+  let atual;
+  try {
+    atual = await pedir(RELAY, "/api/conector/estado", { cabecalhos: { "x-canal": app.conta.canal } });
+  } catch (e) {
+    return true;
+  }
+  if (!atual || atual.estado === "parado") return true;
+  anotar(`canal já ocupado: ${atual.simulado ? "teste" : `live de @${atual.usuario}`} (${atual.estado})`);
+  const aberto = atual.simulado ? "um teste" : "uma live";
+  const efeito = simular && !atual.simulado
+    ? "Se testar agora, a live de lá passa a receber a plateia de teste no lugar do TikTok."
+    : "Feche lá antes, senão os dois jogos recebem os mesmos presentes.";
+  return confirm(`Já tem ${aberto} aberto nesta conta em outro celular, computador ou aba. ${efeito}\n\nContinuar mesmo assim?`);
+}
+
 async function comecar(simular) {
   const botao = simular ? $("botao-testar") : $("botao-iniciar");
   botao.disabled = true;
   try {
+    if (!(await canalLivre(simular))) return;
     if (!simular) guardado.gravar("tiktok", arroba());
     await ligarConector(simular);
     app.aoVivo = { simular, jogo: app.jogo };
@@ -587,9 +607,12 @@ addEventListener("message", evento => {
     return;
   }
   if (!dados || dados.rendaplay !== "resumo") return;
+  // Na live real a plateia simulada não conta: veio de um teste em outro aparelho.
+  const simulados = vivo.simular && dados.simulados || {};
   vivo.numeros = {};
   for (const campo of Object.keys(vivo.base)) {
-    vivo.numeros[campo] = vivo.base[campo] + Math.max(0, Math.round(Number(dados[campo]) || 0));
+    const soma = (Number(dados[campo]) || 0) + (Number(simulados[campo]) || 0);
+    vivo.numeros[campo] = vivo.base[campo] + Math.max(0, Math.round(soma));
   }
 });
 

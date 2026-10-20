@@ -314,16 +314,20 @@
 
     /* O app do celular abre o jogo num iframe e manda a telemetria da live:
        recebe daqui o total desde que o jogo abriu. Só conta o que veio do
-       conector (o "Testar" do ⚙ e a plateia de demonstração ficam fora). */
+       conector (o "Testar" do ⚙ e a plateia de demonstração ficam fora).
+       A plateia simulada da nuvem vai à parte: um teste aberto em outro
+       aparelho da mesma conta cai no mesmo canal, no meio da live real. */
     const totais = { moedas: 0, comentarios: 0, curtidas: 0 };
+    const simulados = { moedas: 0, comentarios: 0, curtidas: 0 };
 
     function contar(ev) {
       if (!ev) return;
-      if (ev.tipo === "presente") totais.moedas += ev.presente.total;
-      else if (ev.tipo === "comentario") totais.comentarios += 1;
-      else if (ev.tipo === "curtida") totais.curtidas += ev.curtidas;
+      const alvo = ev.simulado ? simulados : totais;
+      if (ev.tipo === "presente") alvo.moedas += ev.presente.total;
+      else if (ev.tipo === "comentario") alvo.comentarios += 1;
+      else if (ev.tipo === "curtida") alvo.curtidas += ev.curtidas;
       else return;
-      if (raiz.parent && raiz.parent !== raiz) raiz.parent.postMessage({ rendaplay: "resumo", ...totais }, "*");
+      if (raiz.parent && raiz.parent !== raiz) raiz.parent.postMessage({ rendaplay: "resumo", ...totais, simulados }, "*");
     }
 
     function receber(pacote) {
