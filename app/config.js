@@ -8,6 +8,7 @@ const CONFIG = {
   relay: "https://relay.rendaplay.com.br",
   // Capas, marca e arquivos dos jogos: o montar.py --cdn aponta pro jsDelivr.
   assets: "",
+  guia: "https://rendaplay.com.br/guia-restricoes.pdf",
   suporte: "https://wa.me/5511941867789?text=" + encodeURIComponent("Oi! Preciso de ajuda com o app da Renda Play no celular."),
 };
 
@@ -19,6 +20,7 @@ const JOGOS = [
   { id: "racha", nome: "Racha da Live", descricao: "Cada comentário vira um carro na pista." },
   { id: "chefao", nome: "Chefão Coletivo", descricao: "O chat inteiro contra o Boleto Gigante." },
   { id: "flappy", nome: "Voa, Tuca!", descricao: "O chat paga pra derrubar ou salvar o tucano." },
+  // indisponivel: aparece na lista sem deixar abrir.
   { id: "urna", nome: "Disputa da Live", descricao: "Uma disputa fictícia ao vivo: cada interação soma pontos para um dos lados." },
   { id: "presidencial", nome: "Corrida da Live", descricao: "Uma corrida fictícia ao vivo em que as interações movimentam a disputa." },
   { id: "bolinha", nome: "Chuva de Bolinha", descricao: "Cada comentário solta uma bolinha com a sua foto." },

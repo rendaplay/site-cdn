@@ -207,7 +207,7 @@ function retomarLive() {
   let salva = null;
   try { salva = JSON.parse(guardado.ler("ao-vivo")); } catch (e) { /* lixo antigo */ }
   if (!salva || Date.now() - salva.em > RETOMAR_ATE_MS) { guardado.gravar("ao-vivo", null); return; }
-  if (!app.conta.ativo || !app.conta.canal || !liberado(salva.jogo)) return;
+  if (!app.conta.ativo || !app.conta.canal || !jogavel(salva.jogo)) return;
   app.aoVivo = { simular: salva.simular, jogo: salva.jogo };
   app.registro = [];
   anotar(`live de ${salva.jogo} retomada · @${arroba()} · ${navigator.userAgent}`);
@@ -221,6 +221,11 @@ function retomarLive() {
 function liberado(id) {
   const jogos = app.conta && app.conta.jogos;
   return !Array.isArray(jogos) || jogos.includes(id);
+}
+
+function jogavel(id) {
+  const jogo = JOGOS.find(j => j.id === id);
+  return !!jogo && !jogo.indisponivel && liberado(id);
 }
 
 function montarInicio() {
@@ -249,7 +254,7 @@ function montarInicio() {
   }
   aviso.hidden = conta.ativo && conta.canal && algumLiberado;
 
-  if (!liberado(app.jogo)) app.jogo = (JOGOS.find(j => liberado(j.id)) || {}).id || null;
+  if (!jogavel(app.jogo)) app.jogo = (JOGOS.find(j => jogavel(j.id)) || {}).id || null;
   if (app.jogo) prepararJogo(app.jogo);
   const lista = $("lista-jogos");
   lista.replaceChildren(...JOGOS.map(jogo => {
@@ -257,11 +262,12 @@ function montarInicio() {
     const botao = document.createElement("button");
     botao.type = "button";
     botao.className = "jogo";
-    botao.disabled = !liberado(jogo.id);
+    botao.disabled = !jogavel(jogo.id);
     botao.setAttribute("aria-pressed", String(jogo.id === app.jogo));
+    const selo = jogo.indisponivel ? '<span class="selo-indisponivel">Temporariamente indisponível</span>' : "";
     botao.innerHTML = `<img src="${CONFIG.assets}capas/${jogo.id}.webp" alt="" loading="lazy">
-      <span class="jogo-texto"><b></b><small></small></span>
-      ${botao.disabled ? '<span class="cadeado" aria-label="Não está no seu plano">🔒</span>' : ""}`;
+      <span class="jogo-texto">${selo}<b></b><small></small></span>
+      ${botao.disabled && !jogo.indisponivel ? '<span class="cadeado" aria-label="Não está no seu plano">🔒</span>' : ""}`;
     botao.querySelector("b").textContent = jogo.nome;
     botao.querySelector("small").textContent = jogo.descricao;
     botao.addEventListener("click", () => escolherJogo(jogo.id));
@@ -286,7 +292,7 @@ function arroba() {
 }
 
 function atualizarAcoes() {
-  const pode = !!(app.conta && app.conta.ativo && app.conta.canal && app.jogo && liberado(app.jogo));
+  const pode = !!(app.conta && app.conta.ativo && app.conta.canal && app.jogo && jogavel(app.jogo));
   $("botao-testar").disabled = !pode;
   $("botao-iniciar").disabled = !pode || !/^[A-Za-z0-9._]{2,24}$/.test(arroba());
 }
@@ -619,6 +625,7 @@ addEventListener("message", evento => {
 /* ───────────── ligações ───────────── */
 
 for (const link of document.querySelectorAll("[data-suporte]")) link.href = CONFIG.suporte;
+for (const link of document.querySelectorAll("[data-guia]")) link.href = CONFIG.guia;
 
 $("form-entrar").addEventListener("submit", entrar);
 $("trocar-modo").addEventListener("click", () => modoEntrar(!ativando));

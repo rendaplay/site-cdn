@@ -4,6 +4,24 @@
    do formato. */
 "use strict";
 
+/* Mesmo esquema da tela: o último dígito do número é imagem, pintada na cor do lado. */
+function pintarDigito(digito, cor) {
+  const tela = document.createElement("canvas");
+  tela.width = 0;
+  const img = new Image();
+  img.onload = () => {
+    tela.width = img.width;
+    tela.height = img.height;
+    const c = tela.getContext("2d");
+    c.drawImage(img, 0, 0);
+    c.globalCompositeOperation = "source-in";
+    c.fillStyle = cor;
+    c.fillRect(0, 0, tela.width, tela.height);
+  };
+  img.src = `arte/digitos/${digito}.png`;
+  return tela;
+}
+
 const TECLA_MOVE = 150;
 const TECLA_APERTA = 120;
 const TECLA_PASSO = TECLA_MOVE + TECLA_APERTA + 40;
@@ -109,7 +127,7 @@ const Urnas = {
       const img = new Image();
       img.src = (artes && artes[lado]) || cand.arte;
       return {
-        lado, cand, img, digitos: cand.numero.split(""),
+        lado, cand, img, digitos: cand.numero.split(""), digitoFinal: pintarDigito(cand.numero.slice(-1), cand.cor),
         fila: [], atual: null, tela: "pronta", digitado: 0, fimAte: 0, fimVotos: 0,
         treme: 0, brilho: 0, acesas: {}, mao: { x: 810, y: 2000, escala: 1.08, aperto: 0 },
       };
@@ -365,7 +383,7 @@ const Urnas = {
     c.textBaseline = "alphabetic";
     c.fillStyle = "#3A3A3A";
     c.font = "800 40px Figtree, sans-serif";
-    c.fillText("SEU APOIO PARA", X + 22, Y + 56);
+    c.fillText("SEU APOI0 PARA", X + 22, Y + 56);
     c.fillStyle = "#111";
     c.font = "900 92px 'Big Shoulders Display', Impact, sans-serif";
     c.fillText("PARTICIPANTE", X + 20, Y + 142);
@@ -384,11 +402,17 @@ const Urnas = {
       c.stroke();
       const visivel = e.tela === "pronta" || i < e.digitado;
       if (visivel) {
-        c.fillStyle = cor;
-        c.textAlign = "center";
-        c.font = "900 138px 'Big Shoulders Display', Impact, sans-serif";
-        c.fillText(e.digitos[i], bx + 59, by + 124);
-        c.textAlign = "left";
+        const final = e.digitoFinal;
+        if (i === e.digitos.length - 1 && final.width) {
+          const h = 138 * 0.81, w = h * final.width / final.height;
+          c.drawImage(final, bx + 59 - w / 2, by + 124 - h, w, h);
+        } else {
+          c.fillStyle = cor;
+          c.textAlign = "center";
+          c.font = "900 138px 'Big Shoulders Display', Impact, sans-serif";
+          c.fillText(e.digitos[i], bx + 59, by + 124);
+          c.textAlign = "left";
+        }
       } else if (i === e.digitado && Math.floor(t / 260) % 2 === 0) {
         c.fillStyle = "#1E1E1E";
         c.fillRect(bx + 30, by + 120, 58, 8);

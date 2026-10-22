@@ -5,11 +5,12 @@
 "use strict";
 
 const { chave, config, opcoes } = Config.carregar();
-/* Ultra seguro: nome de político na tela ou na voz é o que mais derruba a
-   live no TikTok. Fica só o número; as falas dos candidatos saem e o
-   narrador continua. */
+/* Ultra seguro: rosto ou nome de político na tela ou na voz é o que mais
+   derruba a live no TikTok. Fica a silhueta preta com o número numa máscara
+   verde; as falas dos candidatos saem e o narrador continua. */
 const lista = window[config.candidatos] || window.CANDIDATOS;
 const candidatos = config.ultraSeguro ? lista.map(c => ({ ...c, nome: "" })) : lista;
+const artes = config.ultraSeguro ? candidatos.map(c => `arte/silhueta-${c.numero}.webp`) : config.arte;
 
 /* A plateia de demonstração do live.js entrega o evento já normalizado;
    as regras falam o pacote do conector. */
@@ -35,7 +36,7 @@ const Jogo = {
   iniciar() {
     this.urna = new Urna({ ...config, faixa: (nome, moedas) => this.configurar.faixa(nome, moedas) }, candidatos);
     window.urna = this.urna;
-    Tela.montar(config, opcoes.formato, candidatos, config.arte);
+    Tela.montar(config, opcoes.formato, candidatos, artes);
     Painel.montar(chave, config);
     this.configurar = montarConfigurar({
       jogo: "urna",

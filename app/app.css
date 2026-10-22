@@ -148,6 +148,19 @@ input:focus { border-color: var(--rp-verde); outline: none; }
 .aviso { margin-bottom: 16px; display: flex; flex-direction: column; gap: 14px; }
 .aviso .rp-botao { text-align: center; text-decoration: none; }
 
+.guia {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: inherit;
+  text-decoration: none;
+}
+.guia > span:first-child { display: flex; flex-direction: column; gap: 4px; }
+.guia small { font-size: 13px; line-height: 1.35; }
+.guia-abrir { flex: none; color: var(--rp-verde); font-weight: 700; font-size: 14px; }
+
 .instalar { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
 .instalar-acoes { display: flex; align-items: center; gap: 4px; margin-top: 6px; }
 .instalar-acoes .rp-botao { padding: 0.6em 1.4em; }
@@ -199,6 +212,15 @@ input:focus { border-color: var(--rp-verde); outline: none; }
 .jogo-texto b { font-size: 16px; }
 .jogo-texto small { color: var(--texto-2); font-size: 13px; line-height: 1.35; }
 .cadeado { position: absolute; top: 10px; right: 12px; }
+.selo-indisponivel {
+  align-self: flex-start;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--rp-breu);
+  color: var(--texto-2);
+  font-size: 11px;
+  font-weight: 600;
+}
 
 .acoes {
   position: fixed;

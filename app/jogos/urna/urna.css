@@ -52,11 +52,6 @@ b.b, .b { color: var(--b); }
 .palco.vertical { width: 1080px; height: 1920px; }
 .palco.horizontal { width: 1920px; height: 1080px; }
 
-.aviso-ficticio { position: absolute; left: 50%; top: calc(204px + var(--sobra) * .32); transform: translateX(-50%); z-index: 3;
-  padding: 7px 16px 6px; border-radius: 999px; background: rgba(4, 8, 23, .8); border: 1px solid rgba(255,255,255,.2);
-  color: #D5DEF9; font: 800 21px/1 var(--texto); letter-spacing: .04em; white-space: nowrap; }
-.horizontal .aviso-ficticio { top: 176px; }
-
 /* Matiz verde de identidade eleitoral: presente, mas abaixo do limiar de
    percepção como "filtro". Fica acima de toda a composição sem interferir
    nos cliques, nos canvases ou na leitura do placar. */
@@ -235,7 +230,7 @@ b.b, .b { color: var(--b); }
 .ultimos .texto b.a { color: #FF5A62; } .ultimos .texto b.b { color: #2BD97C; }
 .ultimos li:nth-child(n+4) { opacity: .75; }
 .ultimos li:nth-child(n+6) { opacity: .5; }
-.ultimos:empty::before { content: "Os últimos apoios aparecem aqui"; display: flex; align-items: center; justify-content: center; height: 64px;
+.ultimos:empty::before { content: "Os últimos apoi0s aparecem aqui"; display: flex; align-items: center; justify-content: center; height: 64px;
   border-radius: 32px; border: 2px dashed rgba(255,255,255,.16); color: #8C9BC5; font: 700 36px/1 var(--texto); }
 @keyframes entra-linha { from { transform: translateY(-30px) scale(.94); opacity: 0; } to { transform: none; opacity: 1; } }
 
@@ -245,6 +240,9 @@ b.b, .b { color: var(--b); }
 .chave { display: flex; align-items: center; gap: 16px; height: 168px; padding: 0 16px 0 14px; border-radius: 34px; overflow: hidden;
   border: 4px solid var(--cor); box-shadow: 0 14px 30px rgba(0,0,0,.45);
   background: linear-gradient(180deg, color-mix(in srgb, var(--cor) 60%, #0A1433), color-mix(in srgb, var(--cor) 28%, #050A1E)); }
+.digito { display: inline-block; height: .81em; vertical-align: baseline; background: currentColor;
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
+
 .chave-a { --cor: var(--a); } .chave-b { --cor: var(--b); }
 .chave-icone { flex: none; width: 132px; height: 132px; display: grid; place-items: center; border-radius: 50%;
   font: normal 100px/1 var(--texto); background: radial-gradient(circle, rgba(255,255,255,.2), rgba(255,255,255,0) 70%); }

@@ -28,7 +28,7 @@ const Painel = {
       <fieldset><legend>Modo seguro TikTok</legend>
         <p class="dica">Sempre ligado neste jogo: a tela fala em votos, não mostra moedas e não pede presente. O TikTok restringe live por "solicitação artificial de presentes".</p>
         <label class="linha cheia"><input type="checkbox" checked disabled>Modo seguro ligado</label>
-        <label class="linha cheia"><input type="checkbox" name="ultraSeguro" ${config.ultraSeguro !== false ? "checked" : ""}>Ultra seguro: sem nome dos candidatos na tela e sem a voz deles</label>
+        <label class="linha cheia"><input type="checkbox" name="ultraSeguro" ${config.ultraSeguro !== false ? "checked" : ""}>Ultra seguro: candidatos em silhueta só com o número, sem nome e sem a voz deles</label>
       </fieldset>
       <div class="botoes">
         <button type="submit" class="principal">Salvar e recarregar</button>

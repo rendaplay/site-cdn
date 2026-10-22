@@ -41,20 +41,20 @@ const Tela = {
         <div class="pct"><b>50</b><small>%</small></div>
         <ol class="top"></ol>`;
       cartao.querySelector(".arte").src = this.artes[i];
-      cartao.querySelector(".numero").textContent = c.numero;
+      cartao.querySelector(".numero").innerHTML = numeroHtml(c.numero);
       cartao.querySelector(".nome").textContent = c.nome.toUpperCase();
     });
-    p.querySelector(".cabo-a b").textContent = candidatos[0].numero;
-    p.querySelector(".cabo-b b").textContent = candidatos[1].numero;
+    p.querySelector(".cabo-a b").innerHTML = numeroHtml(candidatos[0].numero);
+    p.querySelector(".cabo-b b").innerHTML = numeroHtml(candidatos[1].numero);
 
     /* Cada chave fica em cima da urna do seu lado: quem chega na live vê
        qual presente e qual comentário votam em quem sem procurar. */
     p.querySelector(".chaves").innerHTML = candidatos.map((c, i) => `
       <div class="chave chave-${"ab"[i]}">
         <i class="chave-icone">${iconeDoPresente(c.presente)}</i>
-        <span class="chave-texto"><span>apoie o <b>${c.numero}</b></span></span>
+        <span class="chave-texto"><span><b>${numeroHtml(c.numero)}</b></span></span>
       </div>`).join("")
-      + `<div class="chave-comente">ou comente <b class="a">${candidatos[0].numero}</b> ou <b class="b">${candidatos[1].numero}</b> no chat para participar</div>`;
+      + `<div class="chave-comente">ou comente <b class="a">VERMELHO</b> ou <b class="b">VERDE</b> no chat para participar</div>`;
 
     this.mesa = p.querySelector(".mesa");
     Urnas.montar(document.getElementById("urnas"), candidatos, this.artes);
@@ -136,14 +136,14 @@ const Tela = {
     const frente = p.querySelector(".frente");
     const dif = Math.abs(urna.votos[0] - urna.votos[1]);
     if (lider >= 0) {
-      frente.innerHTML = `<b class="${"ab"[lider]}">${cand[lider].numero}</b> NA FRENTE`;
+      frente.innerHTML = `<b class="${"ab"[lider]}">${numeroHtml(cand[lider].numero)}</b> NA FRENTE`;
       p.querySelector(".diferenca").textContent = `+${fmt(dif)} de vantagem`;
     } else {
       frente.innerHTML = total ? "EMPATE" : "VOTAÇÃO ABERTA";
       p.querySelector(".diferenca").textContent = "";
     }
     p.dataset.lider = lider;
-    p.querySelector(".serie").innerHTML = `<small>VITÓRIAS</small><span><b class="a">${cand[0].numero}</b><em>${urna.serie[0]}</em><i>×</i><em>${urna.serie[1]}</em><b class="b">${cand[1].numero}</b></span>`;
+    p.querySelector(".serie").innerHTML = `<small>VITÓRIAS</small><span><b class="a">${numeroHtml(cand[0].numero)}</b><em>${urna.serie[0]}</em><i>×</i><em>${urna.serie[1]}</em><b class="b">${numeroHtml(cand[1].numero)}</b></span>`;
   },
 
   /* ───────────── acontecimentos ───────────── */
@@ -153,8 +153,8 @@ const Tela = {
     for (const a of lista) {
       if (a.tipo === "voto") this.voto(a);
       else if (a.tipo === "virada") this.emSeguida(() => this.virada(a), 2300);
-      else if (a.tipo === "pendente") this.aviso(`<b>${escapar(a.quem.nick)}</b>, comente <b class="a">${this.candidatos[0].numero}</b> ou <b class="b">${this.candidatos[1].numero}</b>`);
-      else if (a.tipo === "comentouPresente") this.aviso(`<b>${escapar(a.quem.nick)}</b> escolheu o <b class="${"ab"[a.lado]}">${this.candidatos[a.lado].numero}</b>`);
+      else if (a.tipo === "pendente") this.aviso(`<b>${escapar(a.quem.nick)}</b>, comente <b class="a">${numeroHtml(this.candidatos[0].numero)}</b> ou <b class="b">${numeroHtml(this.candidatos[1].numero)}</b>`);
+      else if (a.tipo === "comentouPresente") this.aviso(`<b>${escapar(a.quem.nick)}</b> escolheu o <b class="${"ab"[a.lado]}">${numeroHtml(this.candidatos[a.lado].numero)}</b>`);
     }
     this.placar(urna);
   },
@@ -169,7 +169,7 @@ const Tela = {
     if (presente || a.fonte === "seguiu") this.bolha(a);
     const v = Math.round(a.votos);
     const c = this.candidatos[a.lado];
-    this.ultimo(`${avatar(a.quem)}<span class="nick">${escapar(a.quem.nick)}</span><span class="mais">+${fmt(v)} ${v === 1 ? "ponto" : "pontos"} para</span><b>${c.numero}</b>`,
+    this.ultimo(`${avatar(a.quem)}<span class="nick">${escapar(a.quem.nick)}</span><span class="mais">+${fmt(v)} ${v === 1 ? "ponto" : "pontos"} para</span><b>${numeroHtml(c.numero)}</b>`,
       `lado-${"ab"[a.lado]}${a.massa ? " em-massa" : ""}`);
     if (a.massa) this.emSeguida(() => this.massa(a), 2300);
   },
@@ -238,9 +238,9 @@ const Tela = {
       <div class="massa-fundo"></div>
       <img class="massa-arte" src="${this.artes[a.lado]}" alt="">
       <div class="massa-texto">
-        <span class="massa-titulo">SUPER APOIO!</span>
+        <span class="massa-titulo">SUPER APOI0!</span>
         <span class="massa-quem">${avatar(a.quem)}<b>${escapar(a.quem.nick)}</b></span>
-        <span class="massa-votos">+${fmt(v)} pontos para <b>${c.numero}</b></span>
+        <span class="massa-votos">+${fmt(v)} pontos para <b>${numeroHtml(c.numero)}</b></span>
       </div>`;
     void el.offsetWidth;
     el.classList.add("ativa");
@@ -255,7 +255,7 @@ const Tela = {
     const el = this.palco.querySelector(".virada");
     const c = this.candidatos[a.lado];
     el.className = `virada lado-${"ab"[a.lado]}`;
-    el.innerHTML = `<div class="virada-flash"></div><div class="virada-faixa"><span class="virada-titulo">VIROU!</span><span class="virada-sub"><b>${c.numero}</b> ${escapar(c.nome.toUpperCase())} PASSOU NA FRENTE</span></div>`;
+    el.innerHTML = `<div class="virada-flash"></div><div class="virada-faixa"><span class="virada-titulo">VIROU!</span><span class="virada-sub"><b>${numeroHtml(c.numero)}</b> ${escapar(c.nome.toUpperCase())} PASSOU NA FRENTE</span></div>`;
     void el.offsetWidth;
     el.classList.add("ativa");
     clearTimeout(this.timerVirada);
@@ -300,7 +300,7 @@ const Tela = {
         <div class="apu-linha apu-${"ab"[i]}">
           <div class="apu-foto"><img src="${this.artes[i]}" alt=""></div>
           <div class="apu-corpo">
-            <div class="apu-nome"><b>${c.numero}</b><span>${escapar(c.nome.toUpperCase())}</span><em class="apu-pct">0,00%</em></div>
+            <div class="apu-nome"><b>${numeroHtml(c.numero)}</b><span>${escapar(c.nome.toUpperCase())}</span><em class="apu-pct">0,00%</em></div>
             <div class="apu-barra"><i></i></div>
             <div class="apu-votos">0 pontos</div>
           </div>
@@ -357,7 +357,7 @@ const Tela = {
         <div class="eleito-palco"><img class="eleito-arte" src="${this.artes[r.vencedor]}" alt=""></div>
         <div class="eleito-texto">
           <div class="eleito-titulo">VENCEU!</div>
-          <div class="eleito-nome"><b>${c.numero}</b><span>${escapar(c.nome.toUpperCase())}</span></div>
+          <div class="eleito-nome"><b>${numeroHtml(c.numero)}</b><span>${escapar(c.nome.toUpperCase())}</span></div>
           <div class="eleito-dados"><b>${r.porcentagens[r.vencedor]}%</b> dos pontos · ${fmt(r.votos[r.vencedor])} pontos</div>
           ${r.mvp ? `<div class="eleito-mvp"><span class="mvp-selo">DESTAQUE</span>${avatar(r.mvp)}<b>${escapar(r.mvp.nick)}</b><em>${fmt(r.mvp.votos)} pontos</em></div>` : ""}
           <div class="eleito-proxima"></div>
@@ -374,7 +374,7 @@ const Tela = {
         <div class="empate-artes">${cand.map((c, i) => `<img class="empate-arte empate-${"ab"[i]}" src="${this.artes[i]}" alt="">`).join("")}</div>
         <div class="eleito-texto">
           <div class="eleito-titulo">EMPATE TÉCNICO</div>
-          <div class="eleito-nome"><b class="a">${cand[0].numero}</b><span>${fmt(r.votos[0])} × ${fmt(r.votos[1])}</span><b class="b">${cand[1].numero}</b></div>
+          <div class="eleito-nome"><b class="a">${numeroHtml(cand[0].numero)}</b><span>${fmt(r.votos[0])} × ${fmt(r.votos[1])}</span><b class="b">${numeroHtml(cand[1].numero)}</b></div>
           <div class="eleito-dados">A rodada terminou empatada</div>
           <div class="eleito-proxima"></div>
         </div>`;
@@ -442,6 +442,15 @@ const Tela = {
     requestAnimationFrame(x => this.quadro(x));
   },
 };
+
+/* O último dígito do número vai como imagem pintada com a cor do texto:
+   na tela continua lendo 13 e 22. */
+const LARGURA_DIGITO = { 0: .5075, 1: .275, 2: .49, 3: .5025, 4: .51, 5: .515, 6: .4975, 7: .485, 8: .5, 9: .5 };
+function numeroHtml(numero) {
+  const ultimo = numero.slice(-1);
+  const imagem = `url(arte/digitos/${ultimo}.png)`;
+  return `${numero.slice(0, -1)}<var class="digito" style="-webkit-mask-image:${imagem};mask-image:${imagem};width:${LARGURA_DIGITO[ultimo]}em"></var>`;
+}
 
 function fmt(n) { return Math.round(n).toLocaleString("pt-BR"); }
 
