@@ -16,6 +16,40 @@
    junto do feeder sem roubar evento de ninguém. */
 "use strict";
 
+/* ?leve=1 (modo leve do app do celular): pra celular de pouca memória que o
+   Android mata com a live do TikTok aberta. Vale pra todo jogo sem mexer em
+   cada um: sem som (os jogos já tratam navegador sem Web Audio), 30 quadros
+   por segundo e resolução 1x. */
+(function (raiz) {
+  if (!raiz || new URLSearchParams(raiz.location.search).get("leve") !== "1") return;
+  raiz.AudioContext = raiz.webkitAudioContext = undefined;
+  HTMLMediaElement.prototype.play = function () { return Promise.resolve(); };
+  Object.defineProperty(raiz, "devicePixelRatio", { get: () => 1 });
+  const QUADRO_MS = 1000 / 30;
+  const pedirQuadro = raiz.requestAnimationFrame.bind(raiz);
+  const cancelarQuadro = raiz.cancelAnimationFrame.bind(raiz);
+  // Quadro pulado ganha outro id do navegador: o jogo cancela pelo nosso.
+  const pendentes = new Map();
+  let proximoId = 0;
+  let ultimo = 0;
+  raiz.requestAnimationFrame = function (fn) {
+    const id = ++proximoId;
+    const quadro = agora => {
+      // Todo laço do mesmo quadro recebe o mesmo `agora`: os laços do jogo passam juntos.
+      if (agora !== ultimo && agora - ultimo < QUADRO_MS - 2) return pendentes.set(id, pedirQuadro(quadro));
+      pendentes.delete(id);
+      ultimo = agora;
+      fn(agora);
+    };
+    pendentes.set(id, pedirQuadro(quadro));
+    return id;
+  };
+  raiz.cancelAnimationFrame = function (id) {
+    if (pendentes.has(id)) cancelarQuadro(pendentes.get(id));
+    pendentes.delete(id);
+  };
+})(typeof window !== "undefined" ? window : null);
+
 (function (raiz) {
   const WS_PADRAO = "ws://127.0.0.1:8765";
   const RELAY_PADRAO = "https://relay.rendaplay.com.br";

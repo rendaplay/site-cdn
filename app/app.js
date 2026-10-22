@@ -209,7 +209,7 @@ function retomarLive() {
   if (!salva || Date.now() - salva.em > RETOMAR_ATE_MS) { guardado.gravar("ao-vivo", null); return; }
   if (!app.conta.ativo || !app.conta.canal || !jogavel(salva.jogo)) return;
   app.aoVivo = { simular: salva.simular, jogo: salva.jogo };
-  app.registro = [];
+  app.registro = registroGuardado(salva.id_live);
   anotar(`live de ${salva.jogo} retomada · @${arroba()} · ${navigator.userAgent}`);
   // O jogo recarregado conta do zero: o que já tinha somado vira a base.
   if (salva.id_live) {
@@ -408,10 +408,17 @@ async function vigiarConector() {
    as imagens seguem por trás. */
 const preparos = {};
 
+/* Pra celular de pouca memória que o Android mata com a live do TikTok aberta
+   (o jogo faz a parte dele com ?leve=1, em jogos_web/comum/live.js). */
+function modoLeve() {
+  return guardado.ler("leve") === "1";
+}
+
 function prepararJogo(jogo) {
   if (preparos[jogo]) return preparos[jogo].essenciais;
   const sw = navigator.serviceWorker && navigator.serviceWorker.controller;
-  if (!CONFIG.assets || !sw) return Promise.resolve();
+  // No modo leve nada de baixar o jogo inteiro em paralelo: cada arquivo vem quando o jogo pede.
+  if (!CONFIG.assets || !sw || modoLeve()) return Promise.resolve();
   const preparo = { prontos: 0, total: 0 };
   preparo.essenciais = new Promise(resolve => { preparo.liberar = resolve; });
   preparos[jogo] = preparo;
@@ -449,6 +456,7 @@ async function abrirJogo() {
   $("folha-como").hidden = true;
   const quadro = $("quadro-jogo");
   const parametros = new URLSearchParams({ canal: app.conta.canal, relay: RELAY });
+  if (modoLeve()) parametros.set("leve", "1");
   const jogo = app.aoVivo.jogo;
   app.abertoEm = Date.now();
   $("carregando-jogo").hidden = false;
@@ -460,6 +468,7 @@ async function abrirJogo() {
     $("carregando-jogo").hidden = true;
     clearInterval(app.relogioCarregando);
     anotar(`jogo carregou em ${Math.round((Date.now() - app.abertoEm) / 1000)} s`);
+    mandarRegistro();
     // O iOS às vezes mostra o quadro ainda com 0×0 na primeira pintura e não avisa o jogo quando cresce.
     reajustarAosPoucos();
   };
@@ -483,7 +492,8 @@ async function abrirJogo() {
     mandarTelemetria([resumoDaLive(false)]);
     mandarRegistro();
   }, RESUMO_A_CADA_MS);
-  anotar(`jogo aberto · tela ${innerWidth}×${innerHeight}`);
+  anotar(`jogo aberto · tela ${innerWidth}×${innerHeight} · memória ${navigator.deviceMemory || "?"} GB${modoLeve() ? " · modo leve" : ""}`);
+  mandarRegistro();
   lembrarLive();
   clearInterval(app.vigia);
   app.vigia = setInterval(vigiarConector, 4000);
@@ -577,6 +587,18 @@ function anotar(linha) {
   if (app.registro.length > REGISTRO_LINHAS) app.registro.splice(0, app.registro.length - REGISTRO_LINHAS);
 }
 
+/* A API troca o registro da live pelo envio novo: a live retomada depois do
+   crash continua o registro de antes, senão o que levou ao crash some. */
+function guardarRegistro() {
+  guardado.gravar("registro-live", app.aoVivo.id_live || null);
+  guardado.gravar("registro", app.registro.join("\n"));
+}
+
+function registroGuardado(idLive) {
+  if (!idLive || idLive !== guardado.ler("registro-live")) return [];
+  return (guardado.ler("registro") || "").split("\n").filter(Boolean);
+}
+
 function mandarRegistro() {
   const sessao = guardado.ler("sessao");
   if (!sessao || !app.aoVivo || !app.aoVivo.id_live || !app.registro || !app.registro.length) return;
@@ -630,6 +652,8 @@ for (const link of document.querySelectorAll("[data-guia]")) link.href = CONFIG.
 $("form-entrar").addEventListener("submit", entrar);
 $("trocar-modo").addEventListener("click", () => modoEntrar(!ativando));
 $("campo-tiktok").addEventListener("input", atualizarAcoes);
+$("campo-leve").checked = modoLeve();
+$("campo-leve").addEventListener("change", () => guardado.gravar("leve", $("campo-leve").checked ? "1" : null));
 $("botao-testar").addEventListener("click", () => comecar(true));
 $("botao-iniciar").addEventListener("click", () => comecar(false));
 $("botao-abrir-jogo").addEventListener("click", abrirJogo);
@@ -699,13 +723,20 @@ function reajustarAosPoucos() {
 }
 
 function aoVoltar() {
+  if (app.aoVivo) anotar("app voltou pra frente");
   reajustarAosPoucos();
   if (app.aoVivo && !app.trava) manterTelaAcesa();
   setTimeout(pedirTelaCheia, 300);
 }
 
+/* No Android o sistema mata a página parada atrás do TikTok sem aviso: o que
+   foi anotado até aqui precisa sair antes, senão o crash não deixa rastro. */
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible") aoVoltar();
+  if (document.visibilityState === "visible") return aoVoltar();
+  if (!app.aoVivo) return;
+  anotar("app foi pro segundo plano");
+  guardarRegistro();
+  mandarRegistro();
 });
 addEventListener("pageshow", aoVoltar);
 addEventListener("resize", () => setTimeout(reajustarJogo, 250));
