@@ -1,26 +1,8 @@
 /* As duas urnas no canvas da mesa: o desenho da urna brasileira e a mão que
-   digita o número do lado (1-3 / 2-2) e aperta CONFIRMA a cada voto. A urna
+   aperta CONFIRMA a cada voto (sem digitar número, que derruba a live). A urna
    é desenhada em unidades próprias (corpo 1000×760) e escalada pro espaço
    do formato. */
 "use strict";
-
-/* Mesmo esquema da tela: o último dígito do número é imagem, pintada na cor do lado. */
-function pintarDigito(digito, cor) {
-  const tela = document.createElement("canvas");
-  tela.width = 0;
-  const img = new Image();
-  img.onload = () => {
-    tela.width = img.width;
-    tela.height = img.height;
-    const c = tela.getContext("2d");
-    c.drawImage(img, 0, 0);
-    c.globalCompositeOperation = "source-in";
-    c.fillStyle = cor;
-    c.fillRect(0, 0, tela.width, tela.height);
-  };
-  img.src = `arte/digitos/${digito}.png`;
-  return tela;
-}
 
 const TECLA_MOVE = 150;
 const TECLA_APERTA = 120;
@@ -127,7 +109,7 @@ const Urnas = {
       const img = new Image();
       img.src = (artes && artes[lado]) || cand.arte;
       return {
-        lado, cand, img, digitos: cand.numero.split(""), digitoFinal: pintarDigito(cand.numero.slice(-1), cand.cor),
+        lado, cand, img,
         fila: [], atual: null, tela: "pronta", digitado: 0, fimAte: 0, fimVotos: 0,
         treme: 0, brilho: 0, acesas: {}, mao: { x: 810, y: 2000, escala: 1.08, aperto: 0 },
       };
@@ -198,7 +180,7 @@ const Urnas = {
   animar(e, t) {
     if (!e.atual && e.fila.length) {
       const rapido = e.fila.length > 1 ? 0.72 : 1;
-      e.atual = { ...e.fila.shift(), inicio: t, r: rapido, alvos: [...e.digitos, "CONFIRMA"], tocou: {}, deX: e.mao.x, deY: e.mao.y };
+      e.atual = { ...e.fila.shift(), inicio: t, r: rapido, alvos: ["CONFIRMA"], tocou: {}, deX: e.mao.x, deY: e.mao.y };
       e.tela = "digitando";
       e.digitado = 0;
     }
@@ -388,48 +370,25 @@ const Urnas = {
     c.font = "900 92px 'Big Shoulders Display', Impact, sans-serif";
     c.fillText("PARTICIPANTE", X + 20, Y + 142);
 
-    const pronto = e.tela === "pronta" || e.digitado >= e.digitos.length;
     c.fillStyle = "#3A3A3A";
     c.font = "800 40px Figtree, sans-serif";
-    c.fillText("Número:", X + 22, Y + 260);
-    for (let i = 0; i < e.digitos.length; i++) {
-      const bx = X + 196 + i * 132, by = Y + 168;
-      arred(c, bx, by, 118, 146, 8);
-      c.fillStyle = "#FFFFFF";
-      c.fill();
-      c.lineWidth = 5;
-      c.strokeStyle = "#1E1E1E";
-      c.stroke();
-      const visivel = e.tela === "pronta" || i < e.digitado;
-      if (visivel) {
-        const final = e.digitoFinal;
-        if (i === e.digitos.length - 1 && final.width) {
-          const h = 138 * 0.81, w = h * final.width / final.height;
-          c.drawImage(final, bx + 59 - w / 2, by + 124 - h, w, h);
-        } else {
-          c.fillStyle = cor;
-          c.textAlign = "center";
-          c.font = "900 138px 'Big Shoulders Display', Impact, sans-serif";
-          c.fillText(e.digitos[i], bx + 59, by + 124);
-          c.textAlign = "left";
-        }
-      } else if (i === e.digitado && Math.floor(t / 260) % 2 === 0) {
-        c.fillStyle = "#1E1E1E";
-        c.fillRect(bx + 30, by + 120, 58, 8);
-      }
-    }
+    c.fillText("Lado:", X + 22, Y + 260);
+    const lado = COR_DO_LADO[e.lado];
+    c.fillStyle = cor;
+    c.font = "900 120px 'Big Shoulders Display', Impact, sans-serif";
+    const cabe = Math.min(1, (W - 162) / c.measureText(lado).width);
+    c.font = `900 ${Math.floor(120 * cabe)}px 'Big Shoulders Display', Impact, sans-serif`;
+    c.fillText(lado, X + 140, Y + 286);
 
-    if (pronto) {
-      if (e.cand.nome) {
-        c.fillStyle = "#3A3A3A";
-        c.font = "800 40px Figtree, sans-serif";
-        c.fillText("Nome:", X + 22, Y + 420);
-        c.fillStyle = "#111";
-        c.font = "900 84px 'Big Shoulders Display', Impact, sans-serif";
-        c.fillText(e.cand.nome.toUpperCase(), X + 22, Y + 498);
-      }
-      this.desenharRetrato(c, e, X + 446, Y + 420, 88);
+    if (e.cand.nome) {
+      c.fillStyle = "#3A3A3A";
+      c.font = "800 40px Figtree, sans-serif";
+      c.fillText("Nome:", X + 22, Y + 420);
+      c.fillStyle = "#111";
+      c.font = "900 84px 'Big Shoulders Display', Impact, sans-serif";
+      c.fillText(e.cand.nome.toUpperCase(), X + 22, Y + 498);
     }
+    this.desenharRetrato(c, e, X + 446, Y + 420, 88);
 
     c.fillStyle = "#CFD2CB";
     c.fillRect(X + 18, Y + 532, W - 36, 4);
