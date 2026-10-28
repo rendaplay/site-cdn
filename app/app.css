@@ -294,6 +294,9 @@ input:focus { border-color: var(--rp-verde); outline: none; }
 .passos { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 10px; }
 .passos b { color: var(--rp-verde-luz); }
 
+.regras-aceite { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+.regras-aceite input { width: 22px; height: 22px; accent-color: var(--rp-verde); }
+
 .folha-rolagem { max-height: 92dvh; overflow-y: auto; overscroll-behavior: contain; }
 .passos-com-foto { gap: 22px; }
 .passos-com-foto img {

@@ -327,10 +327,30 @@ async function canalLivre(simular) {
   return confirm(`Já tem ${aberto} aberto nesta conta em outro celular, computador ou aba. ${efeito}\n\nContinuar mesmo assim?`);
 }
 
+/* Subir a versão quando as regras mudarem: todo mundo lê de novo. */
+const VERSAO_REGRAS = "1";
+
+function aceitarRegras() {
+  if (guardado.ler("regras") === VERSAO_REGRAS) return Promise.resolve(true);
+  $("campo-regras").checked = false;
+  $("botao-regras").disabled = true;
+  $("folha-regras").hidden = false;
+  return new Promise(resolver => { app.respostaRegras = resolver; });
+}
+
+function responderRegras(aceitou) {
+  $("folha-regras").hidden = true;
+  if (aceitou) guardado.gravar("regras", VERSAO_REGRAS);
+  anotar(`regras ${aceitou ? "aceitas" : "recusadas"}`);
+  if (app.respostaRegras) app.respostaRegras(aceitou);
+  app.respostaRegras = null;
+}
+
 async function comecar(simular) {
   const botao = simular ? $("botao-testar") : $("botao-iniciar");
   botao.disabled = true;
   try {
+    if (!simular && !(await aceitarRegras())) return;
     if (!(await canalLivre(simular))) return;
     if (!simular) guardado.gravar("tiktok", arroba());
     await ligarConector(simular);
@@ -658,6 +678,9 @@ $("botao-testar").addEventListener("click", () => comecar(true));
 $("botao-iniciar").addEventListener("click", () => comecar(false));
 $("botao-abrir-jogo").addEventListener("click", abrirJogo);
 $("botao-cancelar").addEventListener("click", () => { $("folha-como").hidden = true; pararLive(); });
+$("campo-regras").addEventListener("change", () => { $("botao-regras").disabled = !$("campo-regras").checked; });
+$("botao-regras").addEventListener("click", () => responderRegras(true));
+$("botao-regras-cancelar").addEventListener("click", () => responderRegras(false));
 $("botao-conta").addEventListener("click", () => { $("folha-conta").hidden = false; });
 $("botao-instalar").addEventListener("click", instalar);
 $("botao-instalar-fechar").addEventListener("click", () => {
