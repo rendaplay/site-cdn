@@ -234,6 +234,7 @@ function montarInicio() {
   $("conta-email").textContent = conta.email || "";
   $("conta-plano").textContent = conta.ativo ? `Plano ${conta.plano || "ativo"}` : "Assinatura inativa";
   $("campo-tiktok").value = guardado.ler("tiktok") || "";
+  aoDigitarArroba();
 
   const aviso = $("aviso-conta");
   const algumLiberado = JOGOS.some(j => liberado(j.id));
@@ -288,13 +289,40 @@ function escolherJogo(id) {
 }
 
 function arroba() {
-  return $("campo-tiktok").value.trim().replace(/^@+/, "");
+  return lerArroba($("campo-tiktok").value).usuario || "";
+}
+
+/** Aceita "@fulano", "fulano" ou o link do perfil, que muito cliente cola no lugar do @. */
+function lerArroba(texto) {
+  const limpo = texto.replace(/\s+/g, "");
+  if (!limpo) return {};
+  const doLink = limpo.match(/tiktok\.com\/@([^/?#&]+)/i);
+  if (doLink) return validarArroba(doLink[1]);
+  if (/^(https?:|www\.)|tiktok\.com/i.test(limpo)) {
+    return { erro: "Esse link não mostra o seu @. Abra seu perfil no TikTok e escreva só o nome que vem depois do @ (ex.: fulano)." };
+  }
+  return validarArroba(limpo.replace(/^@+/, ""));
+}
+
+function validarArroba(usuario) {
+  if (/^[A-Za-z0-9._]{2,24}$/.test(usuario)) return { usuario };
+  return { erro: "Escreva só o @ do TikTok, sem espaço nem acento: letras, números, ponto e _ (ex.: fulano)." };
+}
+
+/** Link colado vira o @ na hora; o que não der pra usar diz o porquê, em vez de só travar o botão. */
+function aoDigitarArroba() {
+  const campo = $("campo-tiktok");
+  const { usuario, erro } = lerArroba(campo.value);
+  if (usuario && usuario !== campo.value) campo.value = usuario;
+  $("aviso-tiktok").textContent = erro || "";
+  $("aviso-tiktok").hidden = !erro;
+  atualizarAcoes();
 }
 
 function atualizarAcoes() {
   const pode = !!(app.conta && app.conta.ativo && app.conta.canal && app.jogo && jogavel(app.jogo));
   $("botao-testar").disabled = !pode;
-  $("botao-iniciar").disabled = !pode || !/^[A-Za-z0-9._]{2,24}$/.test(arroba());
+  $("botao-iniciar").disabled = !pode || !arroba();
 }
 
 /* ───────────── live ───────────── */
@@ -394,8 +422,8 @@ function mostrarSelo(estado) {
 
 async function trocarArroba(evento) {
   evento.preventDefault();
-  const novo = $("campo-arroba-jogo").value.trim().replace(/^@+/, "");
-  if (!/^[A-Za-z0-9._]{2,24}$/.test(novo)) return alert("Esse @ não parece certo. Use só letras, números, ponto e _.");
+  const { usuario: novo, erro } = lerArroba($("campo-arroba-jogo").value);
+  if (!novo) return alert(erro || "Digite o @ do seu TikTok.");
   $("campo-tiktok").value = novo;
   guardado.gravar("tiktok", novo);
   try {
@@ -671,7 +699,7 @@ for (const link of document.querySelectorAll("[data-guia]")) link.href = CONFIG.
 
 $("form-entrar").addEventListener("submit", entrar);
 $("trocar-modo").addEventListener("click", () => modoEntrar(!ativando));
-$("campo-tiktok").addEventListener("input", atualizarAcoes);
+$("campo-tiktok").addEventListener("input", aoDigitarArroba);
 $("campo-leve").checked = modoLeve();
 $("campo-leve").addEventListener("change", () => guardado.gravar("leve", $("campo-leve").checked ? "1" : null));
 $("botao-testar").addEventListener("click", () => comecar(true));
