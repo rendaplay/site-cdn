@@ -30,10 +30,10 @@
   <img class="logo" src="marca/logo-horizontal.svg" alt="Renda Play">
   <form id="form-entrar" class="cartao form" novalidate>
     <h1 id="entrar-titulo">Entrar</h1>
-    <p id="entrar-sub" class="apagado">Use o e-mail e a senha da sua conta Renda Play.</p>
+    <p id="entrar-sub" class="apagado">Use o e-mail da compra e a sua senha. Primeira vez? Pode usar o código do pedido que veio no e-mail da Kiwify.</p>
     <label>E-mail<input id="campo-email" type="email" autocomplete="email" inputmode="email" required></label>
     <label id="rotulo-pedido" hidden>Código do pedido<input id="campo-pedido" autocomplete="off" placeholder="está no e-mail da compra"></label>
-    <label>Senha<input id="campo-senha" type="password" autocomplete="current-password" required minlength="6"></label>
+    <label><span id="rotulo-senha">Senha ou código do pedido</span><input id="campo-senha" type="password" autocomplete="current-password" required minlength="6"></label>
     <p id="entrar-erro" class="erro" role="alert" hidden></p>
     <button id="botao-entrar" class="rp-botao largo" type="submit">Entrar</button>
     <button id="trocar-modo" class="link" type="button">Primeira vez? Ativar com o código da compra</button>

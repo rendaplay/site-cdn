@@ -125,7 +125,8 @@ function modoEntrar(ativar) {
   $("entrar-titulo").textContent = ativar ? "Ativar conta" : "Entrar";
   $("entrar-sub").textContent = ativar
     ? "Use o e-mail da compra, o código do pedido e crie uma senha."
-    : "Use o e-mail e a senha da sua conta Renda Play.";
+    : "Use o e-mail da compra e a sua senha. Primeira vez? Pode usar o código do pedido que veio no e-mail da Kiwify.";
+  $("rotulo-senha").textContent = ativar ? "Crie uma senha" : "Senha ou código do pedido";
   $("rotulo-pedido").hidden = !ativar;
   $("campo-senha").autocomplete = ativar ? "new-password" : "current-password";
   $("botao-entrar").textContent = ativar ? "Ativar e entrar" : "Entrar";
