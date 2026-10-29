@@ -20,7 +20,8 @@ const Config = {
     const num = k => (url.has(k) && Number.isFinite(Number(url.get(k))) ? Number(url.get(k)) : null);
     if (["auto", "misto", "streamer"].includes(url.get("controle"))) config.controle = url.get("controle");
     if (url.has("som")) config.som = url.get("som") !== "0";
-    if (url.has("seguro")) config.modoSeguro = url.get("seguro") !== "0";
+    /* O modo seguro é fixo: nada na tela pede presente nem mostra moedas. */
+    config.modoSeguro = true;
     if (url.has("surpresa")) config.surpresa.ligada = url.get("surpresa") !== "0";
     if (num("semente") !== null) config.demo.semente = num("semente");
 

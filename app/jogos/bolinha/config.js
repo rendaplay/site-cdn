@@ -15,7 +15,8 @@ const Config = {
 
     const num = k => (url.has(k) && Number.isFinite(Number(url.get(k))) ? Number(url.get(k)) : null);
     if (url.has("som")) config.som = url.get("som") !== "0";
-    if (url.has("seguro")) config.modoSeguro = url.get("seguro") !== "0";
+    /* O modo seguro é fixo: nada na tela pede presente nem mostra moedas. */
+    config.modoSeguro = true;
     if (url.has("surpresa")) config.surpresa.ligada = url.get("surpresa") !== "0";
     if (num("rodada") !== null) config.rodada.duracao = Math.max(10, num("rodada"));
     if (num("semente") !== null) config.demo.semente = num("semente");

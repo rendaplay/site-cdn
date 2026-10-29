@@ -16,6 +16,8 @@ const Config = {
        fábrica, não foi escolha do streamer. */
     if (!("volume" in salvo)) delete salvo.som;
     const config = mesclar(clonar(presets[chave]), salvo);
+    /* O modo seguro é fixo: nada na tela pede presente nem mostra moedas. */
+    config.modoSeguro = true;
 
     const num = k => (url.has(k) && Number.isFinite(Number(url.get(k))) ? Number(url.get(k)) : null);
     if (num("max")) config.maxPipas = num("max");

@@ -235,9 +235,9 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
   font: 900 30px/1 var(--display); text-transform: uppercase; letter-spacing: .06em; color: var(--amarelo); white-space: nowrap;
 }
 .horizontal .quiosque::before { display: none; }
-.seguro .quiosque::before { content: "Efeitos"; font-size: 24px; top: -36px; }
+/* Modo seguro: sem o cardápio, ficam o comente 1 ou 2 e as barras do chat. */
+.seguro .quiosque::before, .seguro .quiosque .faixas { display: none; }
 .seguro .quiosque .cabeca .faixa { visibility: hidden; }
-.seguro .quiosque .valor { font-size: 26px; }
 .titulo-jogo { font: 900 34px/1 var(--display); text-transform: uppercase; letter-spacing: .06em; text-align: center; color: var(--amarelo); }
 .titulo-jogo { display: none; }
 .quiosque .cabeca, .quiosque .faixas li { display: grid; grid-template-columns: 92px 1fr 1fr; gap: 10px; align-items: center; }
@@ -283,7 +283,6 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .vertical .quiosque .barra b { font: 900 38px/1 var(--display); color: rgba(255, 255, 255, .9); }
 .vertical .quiosque .faixas li { height: 50px; padding: 0; }
 .vertical .quiosque .valor { font-size: 44px; gap: 6px; }
-.vertical.seguro .quiosque .valor { font-size: 40px; }
 .vertical .quiosque .valor svg { font-size: 32px; }
 .vertical .quiosque .ef { grid-template-columns: 42px 1fr; column-gap: 10px; }
 .vertical .quiosque .ef .ic { grid-row: auto; font-size: 40px; }

@@ -48,11 +48,13 @@ const Tela = {
 
     /* Cada chave fica em cima da urna do seu lado: quem chega na live vê
        qual presente e qual comentário votam em quem sem procurar. */
+    const seguro = config.modoSeguro !== false;
+    p.classList.toggle("seguro", seguro);
     p.querySelector(".chaves").innerHTML = candidatos.map((c, i) => `
       <div class="chave chave-${"ab"[i]}">
         <i class="chave-icone">${iconeDoPresente(c.presente)}</i>
       </div>`).join("")
-      + `<div class="chave-comente">ou comente <b class="a">VERMELHO</b> ou <b class="b">VERDE</b> no chat para participar</div>`;
+      + `<div class="chave-comente">${seguro ? "comente" : "ou comente"} <b class="a">VERMELHO</b> ou <b class="b">VERDE</b> no chat para participar</div>`;
 
     this.mesa = p.querySelector(".mesa");
     Urnas.montar(document.getElementById("urnas"), candidatos, this.artes);

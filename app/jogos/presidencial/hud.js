@@ -14,6 +14,8 @@ const Hud = {
     this.candidatos = candidatos;
     this.config = config;
     this.$ = s => palco.querySelector(s);
+    this.seguro = config.modoSeguro !== false;
+    palco.classList.toggle("seguro", this.seguro);
     this.trilho = this.$(".trilho");
     this.raias = [this.$(".raia-a"), this.$(".raia-b")].map(r => ({ cheio: r.querySelector(".cheio"), rosto: r.querySelector(".rosto") }));
     this.falta = this.$(".falta");
@@ -32,7 +34,7 @@ const Hud = {
         <i class="chave-icone">${iconeDoPresente(c.presente)}</i>
         <span class="chave-texto"><span>apoie o <b>${c.numero}</b></span></span>
       </div>`).join("")
-      + `<div class="chave-comente">ou comente <b class="ca">${a.numero}</b> ou <b class="cb">${b.numero}</b> no chat para participar</div>`;
+      + `<div class="chave-comente">${this.seguro ? "comente" : "ou comente"} <b class="ca">${a.numero}</b> ou <b class="cb">${b.numero}</b> no chat para participar</div>`;
     this.medir();
   },
 

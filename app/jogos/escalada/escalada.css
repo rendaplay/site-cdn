@@ -676,4 +676,5 @@ body { font-family: var(--fonte); color: var(--texto); }
 
 /* ───────── modo seguro TikTok ───────── */
 .seguro .placar .moedas,
-.seguro .pendente .moedas::before { display: none; }
+.seguro .pendente .moedas::before,
+.seguro .cardapio { display: none; }

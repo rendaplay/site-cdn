@@ -25,9 +25,7 @@ const Painel = {
         ${Vozes.campoLocutor(config.locutor)}
         ${campo("Volume da música (0 a 100)", "musica", config.musica, "number")}
       </fieldset>
-      <fieldset><legend>Modo seguro TikTok</legend>
-        <p class="dica">Sempre ligado neste jogo: a tela fala em votos, não mostra moedas e não pede presente. O TikTok restringe live por "solicitação artificial de presentes".</p>
-        <label class="linha cheia"><input type="checkbox" checked disabled>Modo seguro ligado</label>
+      <fieldset><legend>Candidatos</legend>
         <label class="linha cheia"><input type="checkbox" name="ultraSeguro" ${config.ultraSeguro !== false ? "checked" : ""}>Ultra seguro: candidatos em silhueta só com o número, sem nome e sem a voz deles</label>
       </fieldset>
       <div class="botoes">

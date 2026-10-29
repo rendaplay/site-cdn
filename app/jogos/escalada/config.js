@@ -14,6 +14,8 @@ const Config = {
        fábrica, não foi escolha do streamer. */
     if (!("volume" in salvo)) delete salvo.som;
     const config = mesclar(clonar(presets[chave]), salvo);
+    /* O modo seguro é fixo: nada na tela pede presente nem mostra moedas. */
+    config.modoSeguro = true;
     if (url.has("som")) config.som = url.get("som") !== "0";
 
     const formato = url.get("formato");

@@ -50,6 +50,24 @@
   };
 })(typeof window !== "undefined" ? window : null);
 
+/* Respiro da tela: a página toda passeia devagar, menos de 1% pra cada lado,
+   pra imagem da live nunca ficar parada nem quando o jogo espera alguém. O
+   zoom de 2% cobre o passeio: a borda nunca aparece. ?respiro=0 desliga. */
+(function (raiz) {
+  if (!raiz || new URLSearchParams(raiz.location.search).get("respiro") === "0") return;
+  const estilo = raiz.document.createElement("style");
+  estilo.textContent = `
+    @keyframes rendaplay-respiro {
+      0%   { transform: scale(1.02) translate(0, 0); }
+      23%  { transform: scale(1.02) translate(-0.7%, 0.3%); }
+      51%  { transform: scale(1.02) translate(0.4%, -0.5%); }
+      78%  { transform: scale(1.02) translate(0.6%, 0.4%); }
+      100% { transform: scale(1.02) translate(0, 0); }
+    }
+    html { overflow: hidden; animation: rendaplay-respiro 53s ease-in-out infinite; }`;
+  raiz.document.documentElement.appendChild(estilo);
+})(typeof window !== "undefined" ? window : null);
+
 (function (raiz) {
   const WS_PADRAO = "ws://127.0.0.1:8765";
   const RELAY_PADRAO = "https://relay.rendaplay.com.br";

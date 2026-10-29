@@ -31,7 +31,6 @@ const Painel = {
       <p class="sub">Preset <b>${escapar(chave)}</b>. Fica salvo neste PC; o arquivo preset.js não muda.</p>
       <fieldset><legend>Luta</legend>
         ${campo("Título", "titulo", config.titulo)}
-        <label class="linha"><input type="checkbox" name="modoSeguro" ${config.modoSeguro ? "checked" : ""}>Modo seguro TikTok (sem pedir presente)</label>
         ${campo("Dano por moeda", "danoPorMoeda", config.danoPorMoeda, "number")}
         ${campo("Vida do 1º chefão", "vida.0", config.vida[0], "number")}
         ${campo("Vida do 2º chefão", "vida.1", config.vida[1], "number")}

@@ -40,18 +40,6 @@ const Painel = {
         <label class="linha cheia"><input type="checkbox" name="rodada.automatica" ${config.rodada.automatica ? "checked" : ""}>Começar a próxima rodada sozinho</label>
         ${campo("Crédito das fotos", "creditos", config.creditos, "text", "cheia")}
       </fieldset>
-      <fieldset><legend>Modo seguro TikTok</legend>
-        <p class="dica">A tela não pede presente, não mostra moedas e o 2× fica desligado. Recomendado: o TikTok restringe live por "solicitação artificial de presentes".</p>
-        <label class="linha cheia"><input type="checkbox" name="modoSeguro" ${config.modoSeguro !== false ? "checked" : ""} ${chave === "lula-flavio" ? "disabled" : ""}>Modo seguro ligado</label>
-        <label class="linha cheia"><input type="checkbox" name="ultraSeguro" ${config.ultraSeguro ? "checked" : ""}>Ultra seguro: tira também os presentes e os golpes da legenda (o presente continua contando)</label>
-      </fieldset>
-      ${chave === "lula-flavio" ? "" : `<fieldset><legend>Presente vale 2×</legend>
-        <p class="dica">Quando um lado fica muito pra trás, o próximo presente dele vale o dobro por alguns segundos. Não funciona com o modo seguro ligado.</p>
-        ${campo("Duração (segundos, 0 desliga)", "dobro.segundos", config.dobro.segundos, "number")}
-        ${campo("Lado com até (% da altura do outro)", "dobro.atras", config.dobro.atras, "number")}
-        ${campo("Só com a rodada em (metros)", "dobro.minimo", config.dobro.minimo, "number")}
-        ${campo("Espera até o próximo 2× (segundos)", "dobro.intervalo", config.dobro.intervalo, "number")}
-      </fieldset>`}
       <fieldset><legend>Comentário empilha</legend>
         <p class="dica">Comentar o comando do lado (ou o nome do presente) empilha um tijolinho. Uma rosa vale 1 metro.</p>
         ${campo("Metros por comentário (0 desliga)", "comentario.metros", config.comentario.metros, "number")}

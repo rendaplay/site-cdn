@@ -34,7 +34,6 @@ const Painel = {
         ${campo("Anúncio grande a partir de (moedas)", "destaqueMoedas", config.destaqueMoedas, "number")}
         ${campo("Curtidas pra 1 gás", "gas.curtidas", config.gas.curtidas, "number")}
         ${campo("Gás acumulado (máximo)", "gas.max", config.gas.max, "number")}
-        <label class="linha"><input type="checkbox" name="modoSeguro" ${config.modoSeguro ? "checked" : ""}>Modo seguro TikTok (sem pedir presente)</label>
         <label class="linha"><input type="checkbox" name="som" ${config.som ? "checked" : ""}>Som do jogo</label>
         ${campo("Volume do som (0 a 100)", "volume", config.volume, "number")}
         ${campo("Volume da música (0 a 100)", "musica", config.musica, "number")}

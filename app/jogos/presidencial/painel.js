@@ -32,10 +32,6 @@ const Painel = {
         ${Vozes.campoLocutor(config.locutor)}
         ${campo("Volume da música (0 a 100)", "musica", config.musica, "number")}
       </fieldset>
-      <fieldset><legend>Modo seguro TikTok</legend>
-        <p class="dica">Sempre ligado neste jogo: a tela fala em votos, não mostra moedas e não pede presente. O TikTok restringe live por "solicitação artificial de presentes".</p>
-        <label class="linha cheia"><input type="checkbox" checked disabled>Modo seguro ligado</label>
-      </fieldset>
       <div class="botoes">
         <button type="submit" class="principal">Salvar e recarregar</button>
         <button type="button" data-acao="restaurar">Voltar ao preset</button>

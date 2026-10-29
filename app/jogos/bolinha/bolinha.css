@@ -143,7 +143,8 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .legenda .ico-faixa .raio { fill: none; stroke: currentColor; stroke-width: 3; }
 .legenda .faixas .nome { color: var(--cor); }
 .legenda .moedas { font: 900 22px/1 var(--display); color: var(--ouro); }
-.seguro .legenda .moedas { display: none; }
+.seguro .legenda .moedas,
+.seguro .legenda .faixas { display: none; }
 
 .horizontal .legenda h3 { font-size: 38px; }
 .horizontal .legenda ol { gap: 12px; }

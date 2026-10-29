@@ -12,7 +12,7 @@ const Config = {
     const presets = window.PRESIDENCIAL_PRESETS;
     const chave = presets[url.get("preset")] ? url.get("preset") : window.PRESIDENCIAL_PRESET_PADRAO;
     const config = mesclar(clonar(presets[chave]), this.lerSalvo(chave));
-    /* Não tem 2× nem pedido de presente pra desligar: o modo seguro é fixo. */
+    /* O modo seguro é fixo: nada na tela pede presente nem mostra moedas. */
     config.modoSeguro = true;
 
     const num = (k) => (url.has(k) && Number.isFinite(Number(url.get(k))) ? Number(url.get(k)) : null);

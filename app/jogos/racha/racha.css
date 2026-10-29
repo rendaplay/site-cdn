@@ -750,3 +750,6 @@ body { font-family: var(--fonte); color: var(--texto); }
 .painel button.principal { background: var(--ouro); color: #1a1200; border: 0; box-shadow: 0 5px 0 #D9920B; }
 .painel .atalhos { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; color: var(--apagado); font-size: 17px; }
 .painel kbd { padding: 2px 8px; border-radius: 6px; background: #22264A; color: #fff; font-family: var(--fonte); }
+
+/* Modo seguro TikTok: sem lista de presentes e sem chamada pedindo comentário ou curtida. */
+.seguro .cardapio, .seguro .chamada { display: none; }

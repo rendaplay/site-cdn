@@ -69,7 +69,7 @@ const Hud = {
       col.innerHTML = `
         <div class="cab">
           <h2>${escapar(time.nome)}</h2>
-          <p class="comando">comente <b>${escapar(time.comandos[0])}</b><span>${this.seguro ? "ou " : "ou mande "}${escapar(time.presente.nome)}</span></p>
+          <p class="comando">comente <b>${escapar(time.comandos[0])}</b>${this.seguro ? "" : `<span>ou mande ${escapar(time.presente.nome)}</span>`}</p>
           <p class="torcida">0 na torcida</p>
         </div>
         <ol class="cardapio"></ol>

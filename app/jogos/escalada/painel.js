@@ -29,7 +29,6 @@ const Painel = {
       <p class="sub-painel">Preset <b>${escapar(chave)}</b>. Fica salvo neste PC; o arquivo preset.js não muda.</p>
       ${config.times.map(time).join("")}
       <fieldset><legend>TikTok</legend>
-        ${campo("Modo seguro TikTok (sem pedir presente)", "modoSeguro", "checkbox", "cheia")}
       </fieldset>
       <fieldset><legend>Subida</legend>
         ${campo("Metros por moeda", "regras.metrosPorMoeda", "number")}

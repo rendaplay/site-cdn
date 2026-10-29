@@ -38,7 +38,6 @@ const Painel = {
         ${campo("Piloto volta depois de (s parado)", "devolver", config.devolver, "number")}
         ${campo("Erro do piloto (px, maior = cai mais)", "piloto.erro", config.piloto.erro, "number")}
         ${campo("Título", "titulo", config.titulo, "text", "cheia")}
-        <label class="linha"><input type="checkbox" name="modoSeguro" ${config.modoSeguro ? "checked" : ""}>Modo seguro TikTok (sem pedir presente)</label>
         <label class="linha"><input type="checkbox" name="som" ${config.som ? "checked" : ""}>Som do jogo</label>
         ${campo("Volume do som (0 a 100)", "volume", config.volume, "number")}
         ${campo("Volume da música (0 a 100)", "musica", config.musica, "number")}

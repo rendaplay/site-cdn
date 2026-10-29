@@ -25,7 +25,6 @@ const Painel = {
       <p class="sub">Preset <b>${escapar(chave)}</b>. Fica salvo neste PC; o arquivo preset.js não muda.</p>
       <fieldset><legend>Geral</legend>
         ${campo("Título", "titulo", config.titulo, "text", "cheia")}
-        <label class="linha"><input type="checkbox" name="modoSeguro" ${config.modoSeguro ? "checked" : ""}>Modo seguro TikTok (sem mostrar moedas)</label>
         <label class="linha"><input type="checkbox" name="som" ${config.som ? "checked" : ""}>Som do jogo</label>
         ${campo("Volume do som (0 a 100)", "volume", config.volume, "number")}
         ${campo("Volume da música (0 a 100)", "musica", config.musica, "number")}

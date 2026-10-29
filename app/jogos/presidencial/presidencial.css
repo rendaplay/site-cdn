@@ -423,3 +423,6 @@ body { font-family: var(--fonte); color: var(--texto); -webkit-font-smoothing: a
 .horizontal .podio .dados { left: auto; right: 90px; bottom: 470px; transform: none; }
 .horizontal .podio .mvp { left: auto; right: 90px; bottom: 270px; transform: none; }
 .horizontal .podio .proxima { left: auto; right: 90px; bottom: 170px; text-align: right; }
+
+/* Modo seguro TikTok: sem a rosa de cada lado e sem a lista de efeitos por presente. */
+.seguro .chave, .seguro .legenda { display: none; }

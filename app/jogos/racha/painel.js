@@ -23,7 +23,6 @@ const Painel = {
       <h2>Ajustes do racha</h2>
       <p class="sub-painel">Preset <b>${escapar(chave)}</b>. Fica salvo neste PC; o arquivo preset.js não muda.</p>
       <fieldset><legend>Corrida</legend>
-        ${campo("Modo seguro TikTok (sem pedir presente)", "modoSeguro", "checkbox")}
         ${campo("Tamanho da pista (m)", "pista")}
         ${campo("Velocidade base (m/s)", "velocidade")}
         ${campo("Espera entre rodadas (s)", "fases.espera")}
@@ -52,8 +51,6 @@ const Painel = {
         ${campo("Ligado", "surpresa.ligada", "checkbox")}
         ${campo("Dispara com quantos s sem presente", "surpresa.frio")}
         ${campo("Intervalo mínimo entre eventos (s)", "surpresa.intervalo")}
-        ${campo("Nitro em dobro dura (s, fora do modo seguro)", "surpresa.dobro")}
-        ${campo("Temporada de míssil: a partir de (moedas, fora do modo seguro)", "surpresa.missil.moedas")}
       </fieldset>
       <fieldset><legend>Som</legend>
         ${campo("Som do jogo", "som", "checkbox")}

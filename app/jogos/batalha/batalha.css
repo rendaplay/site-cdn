@@ -773,3 +773,6 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 .seguro.horizontal .top { width: 420px; }
 .seguro.horizontal .top-a { left: 130px; }
 .seguro.horizontal .top-b { right: 130px; }
+
+/* Sem a tabela do que cada faixa de moedas empilha. */
+.seguro .cardapio { display: none; }

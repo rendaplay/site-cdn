@@ -419,14 +419,6 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .vertical .painel { grid-template-columns: 1fr; }
 .vertical .painel .atalhos { grid-template-columns: 1fr; }
 
-/* Modo seguro TikTok: sem placar de moedas e cardápio discreto. */
+/* Modo seguro TikTok: sem placar de moedas e sem lista de presentes (fica só o comentário e a curtida). */
 .seguro .moedas { visibility: hidden; }
-.seguro .cardapio { opacity: .8; }
-.seguro .cardapio .icone { width: 52px; height: 52px; }
-.seguro .cardapio .valor { font-size: 20px; }
-.seguro .cardapio .nome { font-size: 18px; }
-/* No vertical a tela vira ~0,36 no celular: discreto, mas ainda legível. */
-.vertical.seguro .cardapio { opacity: .92; }
-.vertical.seguro .cardapio .icone { width: 100px; height: 100px; }
-.vertical.seguro .cardapio .valor { font-size: 44px; }
-.vertical.seguro .cardapio .nome { font-size: 36px; }
+.seguro .cardapio ol { display: none; }

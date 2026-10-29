@@ -14,7 +14,7 @@ const Config = {
     dobro: { atras: 50, minimo: 150, segundos: 10, intervalo: 45 },
     comentario: { metros: 0.2, intervalo: 5, teto: 6 },
     modoSeguro: true,
-    ultraSeguro: false,
+    ultraSeguro: true,
     /* Fala gravada de cada lado (`falas` do lado): uma a cada `intervalo` s no máximo. */
     fala: { intervalo: 15 },
     curtida: { cada: 25, metros: 0.5, intervalo: 5, teto: 6 },
@@ -32,11 +32,10 @@ const Config = {
     if (num("rodada")) config.rodada.segundos = num("rodada");
     if (num("meta") !== null) config.meta.moedas = num("meta");
     if (url.has("som")) config.som = url.get("som") !== "0";
-    /* O preset eleitoral nunca pode reativar urgência de presente via ajustes salvos. */
-    if (chave === "lula-flavio") {
-      config.modoSeguro = true;
-      config.dobro = { ...config.dobro, segundos: 0 };
-    } else if (config.ultraSeguro) config.modoSeguro = true;
+    /* O modo seguro é fixo: nada na tela pede presente nem mostra moedas. */
+    config.modoSeguro = true;
+    config.ultraSeguro = true;
+    if (chave === "lula-flavio") config.dobro = { ...config.dobro, segundos: 0 };
 
     const formato = url.get("formato");
     return {

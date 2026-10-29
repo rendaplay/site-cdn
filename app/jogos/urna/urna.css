@@ -499,3 +499,6 @@ b.b, .b { color: var(--b); }
 .horizontal .empate-artes { margin-bottom: -20px; }
 .horizontal .empate-arte { height: 500px; }
 .horizontal .eleito.empate .eleito-titulo { font-size: 130px; }
+
+/* Modo seguro TikTok: sem a rosa de cada lado em cima das urnas. */
+.seguro .chave { display: none; }
