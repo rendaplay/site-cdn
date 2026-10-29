@@ -7,6 +7,10 @@ const BOLHAS_MAX = 7;
 const TEXTO_EFEITO = { impulso: "IMPULSO!", nitro: "NITRO!", banana: "CASCA!", jato: "JATO!" };
 const ICONE_EFEITO = { impulso: "⚡", nitro: "🔥", banana: "🍌", jato: "🚀" };
 const NOME_EFEITO = { impulso: "impulso", nitro: "nitro", banana: "casca no rival", jato: "jato" };
+/* Lado com dois na chapa ("Trump e Bolsonaro") conjuga no plural. */
+const verbo = (candidato, um, dois) => (candidato.plural ? dois : um);
+/* O que a tela pede pra comentar: a cor do lado no preset, senão o número. */
+const comando = candidato => (candidato.comando || candidato.numero).toUpperCase();
 
 const Hud = {
   montar(palco, candidatos, config) {
@@ -27,14 +31,16 @@ const Hud = {
     this.ultimoTexto = { falta: "", relogio: "" };
 
     const [a, b] = candidatos;
-    this.$(".time-a .num").textContent = a.numero;
-    this.$(".time-b .num").textContent = b.numero;
+    this.$(".time-a .num").textContent = comando(a);
+    this.$(".time-b .num").textContent = comando(b);
+    /* Palavra no lugar do número não cabe ao lado do "comente": fica só ela. */
+    this.$(".placar").classList.toggle("palavra", [a, b].some(c => c.comando));
     this.$(".chaves").innerHTML = candidatos.map((c, i) => `
       <div class="chave chave-${"ab"[i]}">
         <i class="chave-icone">${iconeDoPresente(c.presente)}</i>
-        <span class="chave-texto"><span>apoie o <b>${c.numero}</b></span></span>
+        <span class="chave-texto"><span>apoie o <b>${comando(c)}</b></span></span>
       </div>`).join("")
-      + `<div class="chave-comente">${this.seguro ? "comente" : "ou comente"} <b class="ca">${a.numero}</b> ou <b class="cb">${b.numero}</b> no chat para participar</div>`;
+      + `<div class="chave-comente">${this.seguro ? "comente" : "ou comente"} <b class="ca">${comando(a)}</b> ou <b class="cb">${comando(b)}</b> no chat para participar</div>`;
     this.medir();
   },
 
@@ -46,16 +52,23 @@ const Hud = {
     this.topoBolhas = chaves.offsetTop + chaves.offsetHeight + 110;
   },
 
+  /* Com parceiro de chapa, as duas cabeças lado a lado: o parceiro atrás,
+     à esquerda, e o titular na frente. */
   cabecas() {
     for (let l = 0; l < 2; l++) {
       const cr = Cena.corredores[l];
       const cv = this.raias[l].rosto;
       const c = cv.getContext("2d");
       c.clearRect(0, 0, cv.width, cv.height);
-      if (!cr || !cr.cabeca) continue;
-      const img = cr.cabeca.canvas;
-      const k = Math.min(cv.width / img.width, cv.height / img.height);
-      c.drawImage(img, (cv.width - img.width * k) / 2, cv.height - img.height * k, img.width * k, img.height * k);
+      if (!cr) continue;
+      const rostos = [cr.parceiro, cr].filter(x => x && x.cabeca);
+      const largura = rostos.length > 1 ? 0.68 : 1;
+      rostos.forEach((r, i) => {
+        const img = r.cabeca.canvas;
+        const k = Math.min((cv.width * largura) / img.width, cv.height / img.height);
+        const x = rostos.length > 1 ? i * (cv.width - img.width * k) : (cv.width - img.width * k) / 2;
+        c.drawImage(img, x, cv.height - img.height * k, img.width * k, img.height * k);
+      });
     }
   },
 
@@ -104,11 +117,11 @@ const Hud = {
         this.bolha(a.lado, a.quem, TEXTO_EFEITO[a.efeito] || "!", a.efeito !== "impulso");
         if (a.efeito === "banana") this.emSeguida(() => this.faixa("🍌 Casca!", `${a.quem.nick} derrubou ${this.candidatos[a.alvo].nome}`, a.lado), 2200);
         if (a.efeito === "jato") this.emSeguida(() => this.faixa("🚀 Jato!", `${a.quem.nick} ligou o jato de ${this.candidatos[a.lado].nome}`, a.lado), 2200);
-      } else if (a.tipo === "ultrapassagem") this.emSeguida(() => this.faixa("Passou!", `${this.candidatos[a.lado].nome} assumiu a ponta`, a.lado), 2200);
+      } else if (a.tipo === "ultrapassagem") this.emSeguida(() => this.faixa("Passou!", `${this.candidatos[a.lado].nome} ${verbo(this.candidatos[a.lado], "assumiu", "assumiram")} a ponta`, a.lado), 2200);
       else if (a.tipo === "retaFinal") this.emSeguida(() => this.faixa("Reta final", `faltam ${Math.ceil(corrida.config.pista * (1 - corrida.config.retaFinal))} m`, -1), 2200);
-      else if (a.tipo === "encostou") this.aviso(`<b>${escapar(this.candidatos[a.lado].nome)}</b> encostou!`);
-      else if (a.tipo === "pendente") this.aviso(`<b>${escapar(a.quem.nick)}</b>, comente <b class="ca">${this.candidatos[0].numero}</b> ou <b class="cb">${this.candidatos[1].numero}</b>`);
-      else if (a.tipo === "comentouPresente") this.aviso(`<b>${escapar(a.quem.nick)}</b> corre com o <b>${this.candidatos[a.lado].numero}</b>`);
+      else if (a.tipo === "encostou") this.aviso(`<b>${escapar(this.candidatos[a.lado].nome)}</b> ${verbo(this.candidatos[a.lado], "encostou", "encostaram")}!`);
+      else if (a.tipo === "pendente") this.aviso(`<b>${escapar(a.quem.nick)}</b>, comente <b class="ca">${comando(this.candidatos[0])}</b> ou <b class="cb">${comando(this.candidatos[1])}</b>`);
+      else if (a.tipo === "comentouPresente") this.aviso(`<b>${escapar(a.quem.nick)}</b> corre com o <b>${comando(this.candidatos[a.lado])}</b>`);
     }
   },
 
@@ -210,11 +223,13 @@ const Hud = {
     el.style.setProperty("--cor", v.cor);
     el.style.setProperty("--cor-escura", v.corEscura || "#000");
     el.querySelector(".rotulo").textContent = `Corrida ${corrida.numero}`;
-    el.querySelector(".titulo").innerHTML = `${escapar(v.nome)} <b>venceu!</b>`;
+    const titulo = el.querySelector(".titulo");
+    titulo.innerHTML = `${escapar(v.nome)} <b>${verbo(v, "venceu", "venceram")}!</b>`;
+    titulo.classList.toggle("longo", v.nome.length > 12);
     const arte = this.config.arte || [];
     const d1 = el.querySelector(".d1"), d2 = el.querySelector(".d2");
-    d1.querySelector(".arte").src = arte[vencedor] || v.arte;
-    d2.querySelector(".arte").src = arte[1 - vencedor] || o.arte;
+    d1.querySelector(".arte").src = v.podio || arte[vencedor] || v.arte;
+    d2.querySelector(".arte").src = o.podio || arte[1 - vencedor] || o.arte;
     d1.querySelector(".quem").textContent = v.nome;
     d2.querySelector(".quem").textContent = o.nome;
     d1.querySelector(".bloco").style.background = `linear-gradient(180deg, ${v.cor}, ${v.corEscura || v.cor})`;
@@ -228,6 +243,7 @@ const Hud = {
     if (mvp) mvpEl.innerHTML = `${avatar(mvp)}<div><small>Maior torcedor de ${escapar(v.nome)}</small><strong>${escapar(mvp.nick)}</strong></div>`;
     this.proxima(segundos);
     el.hidden = false;
+    for (const quem of el.querySelectorAll(".degrau .quem")) caberNaLinha(quem, 20);
     this.confete.iniciar(el.querySelector(".confete"), v);
   },
 
@@ -300,6 +316,16 @@ const Hud = {
     },
   },
 };
+
+/* Diminui a fonte até o texto caber na largura (precisa estar visível pra medir). */
+function caberNaLinha(e, minimo) {
+  e.style.fontSize = "";
+  let tam = parseFloat(getComputedStyle(e).fontSize);
+  while (e.scrollWidth > e.clientWidth + 1 && tam > minimo) {
+    tam = Math.max(minimo, tam * 0.92);
+    e.style.fontSize = tam + "px";
+  }
+}
 
 function escapar(s) {
   return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));

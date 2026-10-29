@@ -673,7 +673,7 @@ const Torres = {
     /* Na tela de vitória o canvas fica por cima só pelo confete. */
     if (this.soEfeitos) { this.efeitos(dt); return; }
 
-    this.regua();
+    if (!this.cfg.hudLimpo) this.regua();
     this.chao();
     this.torres.forEach((torre, i) => {
       const pos = this.posicoes(torre, i);
@@ -695,7 +695,7 @@ const Torres = {
         this.peca(p, L.xs[i] + p.x + S * k, yIni + (yFim - yIni) * k * k, giro * (1 - k), hp);
       }
     });
-    this.marcaFalta();
+    if (!this.cfg.hudLimpo) this.marcaFalta();
     const sumindo = (q, vida) => Math.max(0, Math.min(1, (vida - q.vida) / 0.5));
     for (const q of this.lascas) {
       c.globalAlpha = sumindo(q, 2.4);

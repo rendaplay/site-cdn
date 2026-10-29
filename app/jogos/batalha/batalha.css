@@ -48,12 +48,12 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 }
 .palco.horizontal { width: 1920px; height: 1080px; }
 
-.aviso-ficticio { position: absolute; left: 50%; top: calc(var(--y0) + 10px); transform: translateX(-50%); z-index: 11;
+.aviso-ficticio { position: absolute; left: 50%; top: calc(var(--y0) + 230px); transform: translateX(-50%); z-index: 11;
   padding: 6px 15px 5px; border-radius: 999px; background: rgba(6,16,42,.82); border: 1px solid rgba(255,255,255,.25);
   color: #E5ECFF; font: 800 19px/1 var(--texto); letter-spacing: .04em; white-space: nowrap; pointer-events: none; }
-.horizontal .aviso-ficticio { top: 10px; }
+.horizontal .aviso-ficticio { top: auto; bottom: 10px; }
 
-/* Aplicado apenas no preset eleitoral (Lula x Flávio). */
+/* Aplicado apenas no preset eleitoral (Lula x Trump e Bolsonaro). */
 .palco.tema-politico::before { content: ""; position: absolute; inset: 0;
   z-index: 10; pointer-events: none; background: #00873F; opacity: .014; }
 
@@ -776,3 +776,15 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 
 /* Sem a tabela do que cada faixa de moedas empilha. */
 .seguro .cardapio { display: none; }
+
+/* HUD limpo: só o tempo, a altura de cada lado e o "comente X ou Y". */
+.hud-limpo .lado .info, .hud-limpo .meta, .hud-limpo .top, .hud-limpo .maior,
+.hud-limpo .legenda, .hud-limpo .cardapio, .hud-limpo .golpes, .hud-limpo .regras,
+.hud-limpo .linha-ajuda, .hud-limpo .falta, .hud-limpo .empate, .hud-limpo .creditos,
+.hud-limpo .rodada, .hud-limpo .serie, .hud-limpo .bolhas, .hud-limpo .destaque,
+.hud-limpo .ataque, .hud-limpo .virada { display: none !important; }
+.hud-limpo .relogio { border: 4px solid var(--branco); border-radius: 18px; }
+.hud-limpo .so-presente { font-size: 40px; letter-spacing: .04em; padding: 8px 28px 6px; }
+/* Sem a rodada o relógio é mais baixo: cabe entre ele (mesmo 1.3× nos
+   últimos 10 s) e a placa da torre que está no teto. */
+.hud-limpo.horizontal .so-presente { top: 158px; }

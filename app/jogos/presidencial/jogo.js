@@ -4,7 +4,7 @@
 "use strict";
 
 const { chave, config, opcoes } = Config.carregar();
-const candidatos = window[config.candidatos] || window.CANDIDATOS;
+const candidatos = candidatosDoPreset(window[config.candidatos] || window.CANDIDATOS, config.lados);
 const FILA_LEVE_MAX = 300;
 
 /* A plateia de demonstração do live.js entrega o evento já normalizado;

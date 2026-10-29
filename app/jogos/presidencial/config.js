@@ -32,9 +32,16 @@ const Config = {
     };
   },
 
+  /* Candidatos, lados e artes são do preset: o painel não edita, e o que
+     foi salvo esconderia a troca (Trump entrou de parceiro no 22). */
   lerSalvo(chave) {
-    try { return JSON.parse(localStorage.getItem(this.PREFIXO + chave) || "null") || {}; }
+    let salvo;
+    try { salvo = JSON.parse(localStorage.getItem(this.PREFIXO + chave) || "null") || {}; }
     catch (e) { return {}; }
+    delete salvo.candidatos;
+    delete salvo.lados;
+    delete salvo.arte;
+    return salvo;
   },
 
   salvar(chave, config) {

@@ -40,7 +40,7 @@ body { font-family: var(--fonte); color: var(--texto); -webkit-font-smoothing: a
 .palco.vertical { width: 1080px; height: 1920px; }
 .palco.horizontal { width: 1920px; height: 1080px; }
 
-.aviso-ficticio { position: absolute; left: 50%; top: calc(286px + var(--sobra, 0px) * .75); transform: translateX(-50%); z-index: 10;
+.aviso-ficticio { position: absolute; left: 50%; top: calc(422px + var(--sobra, 0px) * .75); transform: translateX(-50%); z-index: 10;
   padding: 7px 16px 6px; border-radius: 999px; background: rgba(5,6,15,.8); border: 1px solid rgba(255,255,255,.2);
   color: #E3E8F7; font: 800 20px/1 var(--fonte); letter-spacing: .04em; white-space: nowrap; pointer-events: none; }
 .horizontal .aviso-ficticio { top: 288px; }
@@ -73,6 +73,9 @@ body { font-family: var(--fonte); color: var(--texto); -webkit-font-smoothing: a
 .time-b .num { color: var(--ouro); }
 .time .nome { font: 900 34px/1 var(--fonte); text-transform: uppercase; letter-spacing: .5px; flex: 1; text-align: right; opacity: .92; }
 .time-b .nome { text-align: left; }
+.placar.palavra .time .nome { display: none; }
+.placar.palavra .time .num { flex: 1; font-size: 68px; }
+.placar.palavra .time-b .num { text-align: right; }
 .time .vitorias {
   min-width: 74px; height: 80px; display: grid; place-items: center; padding: 0 10px;
   font: 900 70px/1 var(--numero); color: var(--tinta); background: #fff; border-radius: 16px;
@@ -290,7 +293,8 @@ body { font-family: var(--fonte); color: var(--texto); -webkit-font-smoothing: a
   box-shadow: inset 0 14px 0 rgba(255, 255, 255, .18);
 }
 .degrau .bloco b { font: 900 96px/1 var(--numero); }
-.degrau .bloco .quem { font: 900 40px/1 var(--fonte); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+/* Uma linha só: quebrado, o nome da dupla passava do degrau e o horizontal cortava embaixo. */
+.degrau .bloco .quem { align-self: stretch; padding: 0 12px; text-align: center; white-space: nowrap; overflow: hidden; font: 900 40px/1 var(--fonte); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
 .degrau .bloco .marca {
   display: flex; align-items: baseline; gap: 12px; margin-top: 26px; padding: 8px 26px 10px;
   border-radius: 999px; background: rgba(0, 0, 0, .32); font: 900 64px/1 var(--numero); color: var(--ouro);
@@ -328,6 +332,8 @@ body { font-family: var(--fonte); color: var(--texto); -webkit-font-smoothing: a
    cobrem, com o maior torcedor logo abaixo do título. */
 .vertical .podio .rotulo { top: calc(110px + var(--sobra, 0px) * .75); }
 .vertical .podio .titulo { top: calc(160px + var(--sobra, 0px) * .75); font-size: 140px; }
+/* Nome de dupla ("Trump e Bolsonaro"): título numa linha só, acima do aviso de jogo ficcional. */
+.vertical .podio .titulo.longo { font-size: 66px; }
 .vertical .podio .mvp { top: calc(320px + var(--sobra, 0px) * .75); bottom: auto; }
 .vertical .podio .degraus { top: calc(490px + var(--sobra, 0px) * .75); bottom: auto; transform: translateX(-50%) scale(.86); transform-origin: top center; }
 .vertical .podio .dados { top: calc(1290px + var(--sobra, 0px) * .75); bottom: auto; }
@@ -384,6 +390,7 @@ body { font-family: var(--fonte); color: var(--texto); -webkit-font-smoothing: a
 .horizontal .placar { left: 50%; right: auto; width: 860px; transform: translateX(-50%); top: 18px; height: 100px; }
 .horizontal .time .num { font-size: 78px; }
 .horizontal .time .nome { font-size: 32px; }
+.horizontal .placar.palavra .time .num { font-size: 58px; }
 .horizontal .time .vitorias { height: 68px; min-width: 64px; font-size: 60px; }
 .horizontal .meio .relogio { font-size: 50px; }
 .horizontal .progresso { top: 132px; left: 50%; right: auto; width: 1060px; transform: translateX(-50%); height: 86px; padding: 8px 96px 8px 22px; }
@@ -419,6 +426,7 @@ body { font-family: var(--fonte); color: var(--texto); -webkit-font-smoothing: a
 
 .horizontal .podio .rotulo { top: 40px; }
 .horizontal .podio .titulo { top: 84px; font-size: 120px; left: 40px; right: 40px; }
+.horizontal .podio .titulo.longo { font-size: 84px; }
 .horizontal .podio .degraus { bottom: 0; left: 33%; width: 900px; height: 820px; transform: translateX(-50%) scale(.82); transform-origin: bottom center; }
 .horizontal .podio .dados { left: auto; right: 90px; bottom: 470px; transform: none; }
 .horizontal .podio .mvp { left: auto; right: 90px; bottom: 270px; transform: none; }

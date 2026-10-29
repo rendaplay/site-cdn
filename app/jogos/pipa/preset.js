@@ -25,7 +25,7 @@ window.PIPA_PRESETS = {
     gas: { max: 5, forca: 0.35, decai: 8, espera: 1.5, curtidas: 30 },
     relo: { primeiro: 4, intervaloMin: 3, intervaloMax: 6, duracao: 1.8, simultaneos: 2, minimoNoCeu: 4, confortavel: 14, carencia: 3 },
     ataque: { duracao: 1.2, fogo: 0.55, fogoSegundos: 12, simultaneos: 4, esperaMaxima: 20 },
-    rei: { minimo: 15, firme: 5, anuncio: 20 },
+    rei: { minimo: 15, firme: 5 },
     surpresa: {
       ligada: true,
       semPresente: 45,
@@ -35,7 +35,6 @@ window.PIPA_PRESETS = {
       ventaniaLeva: 8,
       aparar: { escudo: 30, cortes: 2 },
     },
-    destaqueMoedas: 100,
     som: true,
     volume: 60,
     musica: 25,

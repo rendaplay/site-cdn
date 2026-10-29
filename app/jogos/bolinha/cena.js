@@ -59,10 +59,12 @@ const Cena = {
     this.c = canvas.getContext("2d");
   },
 
-  aplicarFormato(W, H, mesa, potes, zoom = 1) {
+  /* `desce`: em celular mais comprido que 9:16 a mesa desce junto com o HUD. */
+  aplicarFormato(W, H, mesa, potes, zoom = 1, desce = 0) {
     this.W = W;
     this.H = H;
     this.zoom = zoom;
+    this.desce = desce;
     this.canvas.width = W;
     this.canvas.height = H;
     this.mesa = mesa;
@@ -106,7 +108,7 @@ const Cena = {
 
     /* Daqui pra baixo, tudo em px da mesa. */
     const z = this.zoom;
-    c.scale(z, z);
+    c.setTransform(z, 0, 0, z, 0, this.desce);
     const f = this.moldura();
     const vertical = H > W;
 
@@ -116,7 +118,7 @@ const Cena = {
       base.addColorStop(0, "#1B0B45");
       base.addColorStop(1, "#0B0424");
       c.fillStyle = base;
-      arredondado(c, f.x - 6, f.y + f.h - 30, f.w + 12, H / z - f.y - f.h + 80, 34);
+      arredondado(c, f.x - 6, f.y + f.h - 30, f.w + 12, (H - this.desce) / z - f.y - f.h + 80, 34);
       c.fill();
       c.strokeStyle = "rgba(255,61,154,.35)";
       c.lineWidth = 3;
@@ -321,9 +323,9 @@ const Cena = {
     c.setTransform(1, 0, 0, 1, 0, 0);
     c.drawImage(this.fundo, 0, 0);
     const z = this.zoom;
-    c.setTransform(z, 0, 0, z, 0, 0);
+    c.setTransform(z, 0, 0, z, 0, this.desce);
     this.respirar(agora);
-    c.setTransform(z, 0, 0, z, tx, ty);
+    c.setTransform(z, 0, 0, z, tx, ty + this.desce);
 
     this.desenharBocal(m, agora);
     this.desenharPinos(m, agora, partida);

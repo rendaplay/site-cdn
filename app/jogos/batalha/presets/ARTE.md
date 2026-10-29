@@ -62,3 +62,10 @@ Nos outros presets é igual: `cenario` no preset e `arte` em cada lado. Sem `cen
 desenhado é a arena (ou o Congresso com `desenho: "congresso"`).
 
 Na tela não aparece nome de ninguém, só "Vermelho" e "Verde". Não ponha nome escrito na arte.
+
+## Trump e Bolsonaro no verde
+
+`presets/arte/trump.png` saiu do GPT Image (Codex) com o `flavio.png` anexado como referência de
+estilo e o mesmo pedido da seção 1 (gravata verde, fundo branco tirado depois).
+`trump-flavio.webp` junta as duas caricaturas num quadro só (Trump atrás, à direita) e serve de
+`arte` e de `foto` do lado verde. A Corrida usa as mesmas cópias em `../presidencial/arte/`.

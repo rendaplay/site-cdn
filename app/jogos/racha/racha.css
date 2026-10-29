@@ -572,7 +572,8 @@ body { font-family: var(--fonte); color: var(--texto); }
    e ~1.250. O feed tem faixa própria (794–914), entre a barra e a pista, pra
    não embolar com as etiquetas; a pista desce por baixo dos comentários. */
 
-.vertical .topo { top: 116px; left: 28px; right: 28px; height: 72px; }
+/* Marca e rodada coladas no ranking (placar, espera e pódio em 470). */
+.vertical .topo { top: 388px; left: 28px; right: 28px; height: 72px; }
 .vertical .rodada { font-size: 42px; gap: 10px; }
 .vertical .rodada .pilula { padding: 2px 16px; }
 

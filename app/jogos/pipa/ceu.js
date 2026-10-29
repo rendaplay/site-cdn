@@ -22,7 +22,7 @@ const FORMATOS = {
   horizontal: {
     W: 1920, H: 1080, horizonte: 900,
     ceu: { x0: 470, x1: 1450, y0: 270, y1: 700 },
-    evitar: [[0, 120, 440, 760], [1480, 120, 1920, 1000]],
+    evitar: [[1480, 120, 1920, 1000]],
     chat: null,
     tamanho: 66,
     letra: 1,
@@ -553,7 +553,7 @@ const Ceu = {
       const { W, ceu } = this.dims;
       const k = Math.min(1, (t - ouro.inicio) / ouro.dur);
       const c = ouro.corpo;
-      /* Desce pela faixa do meio, abaixo do feed e do cardápio. */
+      /* Desce pela faixa do meio, abaixo do ranking e do cardápio. */
       const y0 = ceu.y0 + (ceu.y1 - ceu.y0) * 0.5;
       c.passo(dt, t, -90 + (W + 180) * k, y0 + (ceu.y1 - y0) * k + Math.sin(t * 0.9) * 40, { mola: 2, freio: 2 });
       c.rot = Math.sin(t * 1.3) * 0.45;

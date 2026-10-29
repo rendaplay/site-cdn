@@ -153,6 +153,13 @@
     }
   }
 
+  /* `lados` do preset troca campos de cada candidato da lista comum (nome,
+     comandos, parceiro de chapa) sem mexer na lista que a Urna também usa. */
+  function candidatosDoPreset(lista, lados = []) {
+    return lista.map((c, i) => ({ ...c, ...(lados[i] || {}) }));
+  }
+
   raiz.Corrida = Corrida;
-  if (typeof module !== "undefined") module.exports = { Corrida };
+  raiz.candidatosDoPreset = candidatosDoPreset;
+  if (typeof module !== "undefined") module.exports = { Corrida, candidatosDoPreset };
 })(typeof window !== "undefined" ? window : globalThis);

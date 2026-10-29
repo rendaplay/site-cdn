@@ -16,7 +16,6 @@ const Jogo = {
   agora: 0,
   pausado: false,
   ultimoHud: 0,
-  ultimoCobrou: -Infinity,
   info: { rei: null, top: new Set() },
 
   iniciar() {
@@ -110,7 +109,7 @@ const Jogo = {
       } else if (a.tipo === "rei") {
         if (a.id) Som.coroa();
       } else if (a.tipo === "presente") {
-        this.presente(a, j);
+        this.presente(a);
       } else if (a.tipo === "relo") {
         Som.relo();
         if (a.duelo.cobranca) {
@@ -124,12 +123,8 @@ const Jogo = {
       } else if (a.tipo === "escudo") {
         const p = Ceu.pipas.get(a.id);
         if (p) Ceu.texto("ESCUDO", p.corpo.x, p.corpo.y - 80, 0.55, "#BFF3FF");
-      } else if (a.tipo === "seguiu") {
+      } else if (a.tipo === "seguiu" || a.tipo === "compartilhou") {
         Som.seguiu();
-        Hud.aviso(`<b>${escapar(j.nome)}</b> seguiu e soltou a pipa`);
-      } else if (a.tipo === "compartilhou") {
-        Som.seguiu();
-        Hud.aviso(`<b>${escapar(j.nome)}</b> compartilhou: escudo ${config.escudoCompartilhar} s`);
       } else if (a.tipo === "evento") {
         this.evento(a);
       } else if (a.tipo === "fimEvento") {
@@ -140,22 +135,10 @@ const Jogo = {
     }
   },
 
-  presente(a, j) {
+  /* Presente não vira aviso na tela, só efeito na pipa de quem mandou. */
+  presente(a) {
     const f = config.faixas[a.faixa];
     Som.presente(a.faixa);
-    if (a.faixa >= 2) {
-      Hud.aviso(`<b>${escapar(j.nome)}</b> mandou ${escapar(f.nome)}`, "presente");
-    }
-    if (a.moedas >= config.destaqueMoedas || f.fogo) {
-      Hud.anunciar({
-        fita: a.dourado ? `${f.nome} (dourado)` : f.nome,
-        nome: j.nome,
-        texto: `${a.quantidade > 1 ? a.quantidade + "× " : ""}${a.nome || "presente"} · ${f.efeito}`,
-        cor: f.fogo ? "#FF6A1A" : a.faixa >= 3 ? "#FFD23F" : "#8FE3FF",
-        jogador: j,
-        ms: f.fogo ? 3600 : 2600,
-      });
-    }
     const p = Ceu.pipas.get(a.id);
     if (p) {
       p.flash = 1;
@@ -165,30 +148,13 @@ const Jogo = {
   },
 
   corte(a) {
-    const autor = combate.jogadores.get(a.autor);
-    const vitima = combate.jogadores.get(a.vitima);
     const grande = a.eraRei || a.cobrou || a.fogo;
     Ceu.cortar(a.autor, a.vitima, { grande, fogo: a.fogo });
-    Hud.corte(autor, vitima, a);
     Som.corte(grande);
-    /* Anúncio grande só pra coroa que durou: no começo da live a coroa
-       troca toda hora e o anúncio perderia a graça. */
-    if (a.eraRei && a.reiPor >= config.rei.anuncio * 1000) {
-      Hud.anunciar({ fita: "Derrubou o rei", nome: autor.nome,
-        texto: `cortou ${vitima.nome} depois de ${tempoNoAr(a.tempoNoAr)} no ar`, cor: "#FFD23F", jogador: autor });
-    } else if (a.cobrou && a.duelo && a.duelo.tipo === "ataque" && this.agora - this.ultimoCobrou > 20000) {
-      /* Cobrança do relo natural fica no céu e no feed. Anúncio é pra quem
-         pagou pra cobrar, e no máximo um a cada 20 s: com presente
-         frequente (ou dois rivais pagando em loop) virava enxurrada. */
-      this.ultimoCobrou = this.agora;
-      Hud.anunciar({ fita: "Cobrou!", nome: autor.nome, texto: `devolveu o corte em ${vitima.nome}`, cor: "#FF8FB1", jogador: autor });
-    }
   },
 
   evento(a) {
     Som.evento();
-    const info = EVENTOS[a.evento];
-    Hud.anunciar({ fita: "Surpresa", nome: info.titulo, texto: info.texto, cor: "#FFD23F", ms: 3000 });
     if (a.evento === "ventania") {
       Vento.forca = 2.6;
       Ceu.tingir = { ...Ceu.tingir, cor: "#24164A", alvo: 0.28 };
@@ -203,18 +169,7 @@ const Jogo = {
     Som.fanfarra();
     Vento.forca = 1;
     Ceu.tingir = { ...Ceu.tingir, alvo: 0 };
-    if (a.evento === "ventania") {
-      const n = a.levou.length;
-      Hud.anunciar(n
-        ? { fita: "Ventania", nome: `${n} ${n === 1 ? "pipa foi" : "pipas foram"} embora`, texto: "quem comentou segurou a linha", cor: "#B9A8FF" }
-        : { fita: "Ventania", nome: "Todo mundo segurou!", texto: "o chat salvou as pipas", cor: "#B9A8FF" });
-    } else if (a.evento === "avoada") {
-      if (a.dono) {
-        const j = combate.jogadores.get(a.dono);
-        const como = a.naLinha ? "a dourada enroscou na linha" : "pegou a pipa dourada";
-        Hud.anunciar({ fita: "Aparou!", nome: j.nome, texto: `${como}: escudo e 2 cortes`, cor: "#FFD23F", jogador: j });
-      } else Ceu.largarDourada();
-    }
+    if (a.evento === "avoada" && !a.dono) Ceu.largarDourada();
   },
 
   quadro(dt) {
@@ -292,8 +247,6 @@ const Jogo = {
     Ceu.largarDourada();
     Vento.forca = 1;
     Ceu.tingir = { ...Ceu.tingir, alvo: 0 };
-    Hud.$.feed.replaceChildren();
-    this.ultimoCobrou = -Infinity;
   },
 };
 

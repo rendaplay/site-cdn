@@ -23,7 +23,17 @@
       queixo: [545, 508],
       pele: "#EBA67F", peleSombra: "#B97553",
     },
+    trump: {
+      pontos: [[295, 0], [790, 0], [790, 300], [745, 345], [712, 370], [695, 412], [670, 460], [640, 500], [605, 530], [565, 550],
+        [520, 553], [478, 538], [440, 512], [405, 478], [378, 440], [355, 398], [335, 368], [295, 345]],
+      queixo: [530, 548],
+      pele: "#F59A6E", peleSombra: "#C2683F",
+    },
   };
+
+  /* Parceiro de chapa: corre colado, um pouco atrás e mais longe da câmera,
+     com a cabeça inteira fora da do titular. */
+  const PARCEIRO = { dx: -150, dy: -34, escala: 0.94 };
 
   const ALTURA_CABECA = 360;
   const CONTORNO = 9;
@@ -166,20 +176,30 @@
       this.camisaSombra = escurecer(candidato.cor, 0.62);
       this.numeroCor = candidato.acento && candidato.acento !== "#FFFFFF" ? candidato.acento : "#FFFFFF";
       this.peleLonge = escurecer(this.r.pele, 0.8);
+      this.parceiro = null;
+      this.recuo = 0;
     }
 
     static criar(candidato, src) {
-      return new Promise(ok => {
+      const um = (cand, arte) => new Promise(ok => {
         const img = new Image();
-        img.onload = () => ok(new Corredor(candidato, img));
-        img.onerror = () => ok(new Corredor(candidato, null));
-        img.src = src;
+        img.onload = () => ok(new Corredor(cand, img));
+        img.onerror = () => ok(new Corredor(cand, null));
+        img.src = arte;
+      });
+      const p = candidato.parceiro;
+      return Promise.all([um(candidato, src), p ? um({ ...candidato, id: p.id }, p.arte) : null]).then(([titular, parceiro]) => {
+        titular.parceiro = parceiro;
+        titular.recuo = parceiro ? -PARCEIRO.dx : 0;
+        return titular;
       });
     }
 
     /* Anda o relógio do corredor. Devolve true no quadro em que um pé bate
        no chão (a cena solta poeira). */
-    atualizar(dt, { vel = 0, caido = false, voando = false, pose = "correndo" }) {
+    atualizar(dt, estado) {
+      if (this.parceiro) this.parceiro.atualizar(dt, estado);
+      const { vel = 0, caido = false, voando = false, pose = "correndo" } = estado;
       this.tempo += dt;
       this.queda += ((caido ? 1 : 0) - this.queda) * Math.min(1, dt * (caido ? 14 : 5));
       this.voo += ((voando ? 1 : 0) - this.voo) * Math.min(1, dt * 3.2);
@@ -245,6 +265,12 @@
     /* x, y: chão. o: { escala, vel, pose, boost: "nitro"|"jato"|null, rastro } */
     desenhar(c, x, y, o) {
       const escala = o.escala || 1;
+      if (this.parceiro) {
+        const op = this._oParceiro || (this._oParceiro = {});
+        Object.assign(op, o);
+        op.escala = escala * PARCEIRO.escala;
+        this.parceiro.desenhar(c, x + PARCEIRO.dx * escala, y + PARCEIRO.dy * escala, op);
+      }
       const pose = this.queda > 0.02 && o.pose !== "largada" ? "correndo" : o.pose || "correndo";
       this.montarPose(pose, o.vel || 0);
       const p = this.pose;

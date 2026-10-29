@@ -13,7 +13,7 @@
 
 window.BATALHA_PRESETS = {
   "lula-flavio": {
-    titulo: "Lula x Flávio",
+    titulo: "Lula x Trump e Bolsonaro",
     desenho: "congresso",
     cenario: "presets/arte/congresso.jpg",
     /* Na tela só aparecem as cores ("Vermelho" e "Verde"), nunca os nomes;
@@ -24,11 +24,12 @@ window.BATALHA_PRESETS = {
         cor: "#D8141F",
         corEscura: "#5C0710",
         acento: "#FFFFFF",
-        foto: "fotos/lula.webp",
+        foto: "presets/arte/lula.webp",
         arte: "presets/arte/lula.webp",
         presente: { nome: "Rosa", icone: "🌹", aceitos: ["Rose", "Rosa"], palavras: ["rosas", "rosinha"] },
-        /* 13 e 22: o número do partido de cada um, que o público já conhece. */
-        comandos: ["13", "lula", "vermelho"],
+        /* O primeiro comando é o que a tela pede; 13 e 22 (o número que o
+           público já conhece) e os nomes continuam valendo no chat. */
+        comandos: ["vermelho", "13", "lula"],
         falas: [],
       },
       {
@@ -36,8 +37,9 @@ window.BATALHA_PRESETS = {
         cor: "#00873F",
         corEscura: "#00351A",
         acento: "#FFD400",
-        foto: "fotos/flavio.webp",
-        arte: "presets/arte/flavio.webp",
+        /* Trump e Bolsonaro no mesmo lado: as duas caricaturas numa arte só. */
+        foto: "presets/arte/trump-flavio.webp",
+        arte: "presets/arte/trump-flavio.webp",
         /* A live manda "White Rose" (1 moeda). "GG" continua valendo pra
            quem já mandava GG pro verde. */
         presente: {
@@ -45,7 +47,7 @@ window.BATALHA_PRESETS = {
           aceitos: ["White Rose", "Rosa branca", "Rosa Branca", "GG"],
           palavras: ["branca", "rosa branca", "gg"],
         },
-        comandos: ["22", "flavio", "verde"],
+        comandos: ["verde", "22", "flavio", "bolsonaro", "trump"],
         falas: [],
       },
     ],
@@ -78,9 +80,12 @@ window.BATALHA_PRESETS = {
     /* Presente de 10+ moedas também derruba a torre rival (vento, raio,
        bola de demolição, terremoto), nunca mais que `maxPct`% dela. */
     ataque: { maxPct: 40 },
+    /* Na tela só o relógio com a altura de cada lado e o "comente vermelho
+       ou verde": sem torcida, top 3, meta, régua, legenda e avisos. */
+    hudLimpo: true,
     som: true,
     volume: 50,
-    creditos: "Fotos: Ricardo Stuckert/PR (CC BY 2.0) e Agência Senado (CC BY 2.0)",
+    creditos: "",
   },
 };
 

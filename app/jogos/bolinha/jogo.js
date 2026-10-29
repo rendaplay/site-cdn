@@ -75,15 +75,26 @@ const Jogo = {
     requestAnimationFrame(quadro);
   },
 
+  /* Celular mais comprido que 9:16 (até 9:21): o palco cresce pra baixo em
+     vez de sobrar faixa preta, e HUD e mesa descem um quarto da sobra, pra
+     sair de baixo do topo do TikTok sem entrar nos comentários. */
   aplicarFormato(primeira = false) {
     const f = this.forcado || "vertical";
-    const { W, H, zoom } = FORMATOS[f];
-    if (f !== this.formato || primeira) {
+    const { W, zoom } = FORMATOS[f];
+    const H = f === "vertical" && innerWidth && innerHeight
+      ? Math.min(2520, Math.max(1920, Math.round(1080 * innerHeight / innerWidth)))
+      : FORMATOS[f].H;
+    if (f !== this.formato || H !== this.altura || primeira) {
+      const trocou = f !== this.formato && !primeira;
       this.formato = f;
+      this.altura = H;
       this.palco.classList.toggle("vertical", f === "vertical");
       this.palco.classList.toggle("horizontal", f === "horizontal");
-      if (!primeira) this.partida.trocarFormato(f);
-      Cena.aplicarFormato(W, H, this.partida.mesa, config.potes, zoom);
+      this.palco.style.height = f === "vertical" ? `${H}px` : "";
+      const desce = (H - FORMATOS[f].H) / 4;
+      this.palco.style.setProperty("--desce", `${desce}px`);
+      if (trocou) this.partida.trocarFormato(f);
+      Cena.aplicarFormato(W, H, this.partida.mesa, config.potes, zoom, desce);
       Hud.chaveTop = "";
     }
     const s = Math.min(innerWidth / W, innerHeight / H);

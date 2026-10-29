@@ -6,10 +6,11 @@
 const { chave, config, opcoes } = Config.carregar();
 const batalha = new Batalha(config);
 
-/* Só Lula x Flávio tem bordão. O narrador das eleições também fala da
-   corrida, que não é este jogo: essas falas ficam de fora. */
+/* Só o preset das eleições (Lula x Trump e Bolsonaro) tem bordão. O
+   narrador também fala da corrida, que não é este jogo, e pede "13 ou 22",
+   que a tela não mostra: essas falas ficam de fora. */
 const PRESET_COM_VOZES = "lula-flavio";
-const VOZES_FORA = ["narr-entrada-1", "narr-vitoria-2"];
+const VOZES_FORA = ["narr-entrada-1", "narr-entrada-3", "narr-vitoria-2"];
 
 const Jogo = {
   fase: "rodada",

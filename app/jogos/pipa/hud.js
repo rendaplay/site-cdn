@@ -1,12 +1,11 @@
-/* O que fica por cima do céu, em DOM: rei do céu, moedas da live, feed de
-   cortes, ranking, cardápio de presentes, anúncios e eventos-surpresa. */
+/* O que fica por cima do céu, em DOM: rei do céu, moedas da live, ranking,
+   cardápio de presentes e eventos-surpresa. */
 "use strict";
 
 const fmt = new Intl.NumberFormat("pt-BR");
 const CORES_AVATAR = ["#3B4C7A", "#6B3F7A", "#2F6E73", "#7A5A2F", "#4F6B2F", "#7A2F4A", "#2F4F7A", "#5E5E6E"];
 
 const ICONES = {
-  tesoura: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.1 8.1 20 20M8.1 15.9 20 4M14.5 12l1.5 1.5"/></svg>`,
   coroa: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18l-1.5-10-4.5 4-3-7-3 7-4.5-4z"/></svg>`,
   moeda: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4"/></svg>`,
   balao: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>`,
@@ -58,16 +57,14 @@ const EVENTOS = {
 
 const Hud = {
   palco: null,
-  filaAnuncio: [],
-  anunciando: false,
 
   montar(palco, cfg) {
     this.palco = palco;
     this.cfg = cfg;
     const q = s => palco.querySelector(s);
     this.$ = {
-      rei: q(".rei"), moedas: q(".moedas"), feed: q(".feed ol"), ranking: q(".ranking ol"),
-      cardapio: q(".cardapio ol"), anuncio: q(".anuncio"), chamada: q(".chamada"), evento: q(".evento"),
+      rei: q(".rei"), moedas: q(".moedas"), ranking: q(".ranking ol"),
+      cardapio: q(".cardapio ol"), chamada: q(".chamada"), evento: q(".evento"),
       sinal: q(".sem-sinal"),
     };
     q(".titulo-jogo").textContent = cfg.titulo;
@@ -149,72 +146,6 @@ const Hud = {
     }
   },
 
-  /* ───────── feed de cortes ───────── */
-
-  corte(autor, vitima, { cobrou, eraRei, fogo }) {
-    const li = el("li");
-    if (cobrou || eraRei || fogo) li.classList.add("forte");
-    li.append(criarAvatar(autor), el("b", "autor", autor.nome));
-    const t = el("span", "tesoura");
-    t.innerHTML = ICONES.tesoura;
-    li.append(t, el("span", "vitima", vitima.nome));
-    if (cobrou) li.append(el("em", "tag tag-cobrou", "cobrou"));
-    else if (eraRei) li.append(el("em", "tag tag-rei", "era o rei"));
-    else if (fogo) li.append(el("em", "tag tag-fogo", "fogo"));
-    this.noFeed(li);
-  },
-
-  aviso(texto, cls = "") {
-    const li = el("li", "aviso " + cls);
-    li.innerHTML = texto;
-    this.noFeed(li);
-  },
-
-  noFeed(li) {
-    const ol = this.$.feed;
-    ol.prepend(li);
-    li.animate([{ transform: "translateX(-40px)", opacity: 0 }, { transform: "none", opacity: 1 }],
-      { duration: 280, easing: "cubic-bezier(.2,.8,.3,1.2)" });
-    while (ol.children.length > 5) ol.lastChild.remove();
-  },
-
-  /* ───────── anúncios grandes ───────── */
-
-  anunciar({ fita, nome, texto, cor = "#FFD23F", jogador = null, ms = 2600 }) {
-    this.filaAnuncio.push({ fita, nome, texto, cor, jogador, ms });
-    if (this.filaAnuncio.length > 4) this.filaAnuncio.splice(1, 1);
-    if (!this.anunciando) this.proximoAnuncio();
-  },
-
-  proximoAnuncio() {
-    const a = this.filaAnuncio.shift();
-    const caixa = this.$.anuncio;
-    if (!a) { this.anunciando = false; this.palco.classList.remove("anunciando"); return; }
-    this.anunciando = true;
-    this.palco.classList.add("anunciando");
-    const cartao = el("div", "cartao");
-    cartao.style.setProperty("--cor", a.cor);
-    const fita = el("div", "fita", a.fita);
-    const corpo = el("div", "corpo");
-    if (a.jogador) corpo.append(criarAvatar(a.jogador));
-    const linhas = el("div", "linhas");
-    if (a.nome) linhas.append(el("div", "nome", a.nome));
-    if (a.texto) linhas.append(el("div", "texto", a.texto));
-    corpo.append(linhas);
-    cartao.append(fita, corpo);
-    caixa.replaceChildren(cartao);
-    cartao.animate([
-      { transform: "scale(.6) rotate(-4deg)", opacity: 0 },
-      { transform: "scale(1.06) rotate(1deg)", opacity: 1, offset: 0.1 },
-      { transform: "scale(1) rotate(0)", opacity: 1, offset: 0.16 },
-      { transform: "scale(1) rotate(0)", opacity: 1, offset: 0.88 },
-      { transform: "scale(.94) translateY(-40px)", opacity: 0 },
-    ], { duration: a.ms, easing: "ease-out" }).onfinish = () => {
-      cartao.remove();
-      this.proximoAnuncio();
-    };
-  },
-
   /* ───────── evento-surpresa ───────── */
 
   evento(ev, agora) {
@@ -237,18 +168,10 @@ const Hud = {
     caixa.querySelector("u").style.width = (resta * 100).toFixed(1) + "%";
   },
 
-  /* Onde os painéis estão (px do palco), pro céu não pôr pipa atrás deles.
-     O feed vazio é só o título, mas reserva o espaço de cheio: pipa que
-     mora ali fica tapada quando os cortes começam. */
+  /* Onde os painéis estão (px do palco), pro céu não pôr pipa atrás deles. */
   areas() {
-    const caixa = (sec, largura = sec.offsetWidth, altura = sec.offsetHeight) =>
-      [sec.offsetLeft, sec.offsetTop, sec.offsetLeft + largura, sec.offsetTop + altura];
-    const feed = this.$.feed.parentElement;
-    const largura = Math.max(400, ...[...this.$.feed.children].map(li => li.offsetWidth));
-    const linhas = Number(getComputedStyle(this.palco).getPropertyValue("--linhas-feed")) || 5;
-    const alturaLinha = (this.$.ranking.firstElementChild?.offsetHeight || 54) + 8;
-    const altura = Math.max(feed.offsetHeight, feed.querySelector("h3").offsetHeight + 10 + linhas * alturaLinha);
-    return [caixa(feed, largura, altura), caixa(this.$.ranking.parentElement), caixa(this.$.cardapio.parentElement)];
+    const caixa = sec => [sec.offsetLeft, sec.offsetTop, sec.offsetLeft + sec.offsetWidth, sec.offsetTop + sec.offsetHeight];
+    return [caixa(this.$.ranking.parentElement), caixa(this.$.cardapio.parentElement)];
   },
 
   sinal(estado) {

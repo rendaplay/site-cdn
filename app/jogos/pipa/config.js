@@ -16,6 +16,9 @@ const Config = {
        fábrica, não foi escolha do streamer. */
     if (!("volume" in salvo)) delete salvo.som;
     const config = mesclar(clonar(presets[chave]), salvo);
+    /* O painel salva a config inteira: ajuste antigo ainda traz campos que saíram. */
+    delete config.destaqueMoedas;
+    if (config.rei) delete config.rei.anuncio;
     /* O modo seguro é fixo: nada na tela pede presente nem mostra moedas. */
     config.modoSeguro = true;
 

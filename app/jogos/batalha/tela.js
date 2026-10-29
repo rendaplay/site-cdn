@@ -134,12 +134,13 @@ const Tela = {
        o presente continua contando, só não aparece o que ele faz. */
     this.ultra = !!cfg.ultraSeguro;
     p.classList.toggle("seguro", this.seguro);
+    p.classList.toggle("hud-limpo", !!cfg.hudLimpo);
     const [a, b] = cfg.lados;
     const curte = this.curtidaLigada(cfg);
     p.querySelector(".so-presente").innerHTML =
       `Comente <span class="n n-a">${escapar(a.comandos[0])}</span> ou ` +
       `<span class="n n-b">${escapar(b.comandos[0])}</span>` +
-      (curte ? ` · curtidas também empilham` : ` pra empilhar`);
+      (cfg.hudLimpo ? "" : curte ? ` · curtidas também empilham` : ` pra empilhar`);
     p.querySelector(".creditos").textContent = cfg.creditos || "";
     Cenario.montar(p, cfg);
     this.montarLegenda(cfg);
@@ -606,7 +607,7 @@ const Tela = {
     item.mostrar(() => this.proximoGrande());
   },
 
-  /* Faixa "fulano DERRUBOU 12 m do Flávio!" no impacto, não no envio. */
+  /* Faixa "fulano DERRUBOU 12 m do Verde!" no impacto, não no envio. */
   ataque(a) {
     if (this.emVitoria) return;
     Torres.atacar(a);

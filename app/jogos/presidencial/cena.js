@@ -1002,7 +1002,7 @@
       const esc = L.escala[raia];
       /* cabeça e braço pra frente, mochila e fogo do jato pra trás: o corpo
          inteiro fica a L.margem px da borda */
-      const xMin = L.margem + 160 * esc, xMax = L.W - L.margem - 130 * esc;
+      const xMin = L.margem + (160 + cr.recuo) * esc, xMax = L.W - L.margem - 130 * esc;
       const alvo = L.W / 2 + (this.vis[l] - this.cam) * this.ppm * k + (l ? -1 : 1) * this.frente * L.afasta / 2;
       const x = lim(alvo, xMin, xMax);
       const longe = x !== alvo;

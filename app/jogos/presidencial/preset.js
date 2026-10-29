@@ -1,7 +1,8 @@
 /* Preset da Corrida Presidencial. `candidatos` é o nome da lista global
-   (comum/eleicao/candidatos.js); `arte` troca a caricatura pela cópia leve
-   desta pasta. Escolha com ?preset=<chave>; o painel (tecla P) salva
-   ajustes por cima neste PC.
+   (comum/eleicao/candidatos.js); `lados` troca campos de cada candidato só
+   neste jogo; `arte` troca a caricatura pela cópia leve desta pasta.
+   Escolha com ?preset=<chave>; o painel (tecla P) salva ajustes por cima
+   neste PC.
 
    Velocidade em m/s e metros por voto: com a plateia de demonstração a
    corrida de 1000 m dura de 2 a 4 min (média ~3 min). Sem nenhum apoio
@@ -12,6 +13,21 @@ window.PRESIDENCIAL_PRESETS = {
   "lula-flavio": {
     titulo: "Corrida Presidencial",
     candidatos: "CANDIDATOS",
+    /* Trump e Bolsonaro correm juntos no 22: o Trump é o parceiro de chapa,
+       desenhado colado no Flávio, e o pódio usa a arte dos dois.
+       `comando` é o que a tela pede, igual à Batalha; 13, 22 e os nomes
+       continuam valendo no chat. */
+    lados: [
+      { comando: "vermelho" },
+      {
+        nome: "Trump e Bolsonaro",
+        plural: true,
+        comando: "verde",
+        comandos: ["22", "flavio", "verde", "bolsonaro", "trump"],
+        parceiro: { id: "trump", arte: "arte/trump.webp" },
+        podio: "arte/trump-flavio.webp",
+      },
+    ],
     arte: ["arte/lula.webp", "arte/flavio.webp"],
     pista: 1000,
     base: 2.5,

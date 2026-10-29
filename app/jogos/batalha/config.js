@@ -62,13 +62,18 @@ const Config = {
     if (Array.isArray(salvo.lados)) {
       salvo.lados.forEach((l, i) => {
         if (!l) return;
-        /* As falas são arquivos do preset: o painel não edita, e a lista salva
-           esconderia a fala nova. */
+        /* Falas e arte são arquivos do preset: o painel não edita, e o que
+           foi salvo esconderia o arquivo novo. */
         delete l.falas;
-        /* Lula x Flávio trocou 1/2 por 13/22: quem salvou sem mexer no comando segue o preset. */
-        if (chave === "lula-flavio" && Array.isArray(l.comandos) && l.comandos[0] === String(i + 1)) delete l.comandos;
+        delete l.arte;
+        if (chave !== "lula-flavio") return;
+        /* Os comandos já foram 1/2 e 13/22, e a foto era a do Flávio sozinho: quem
+           salvou sem mexer nisso segue o preset (vermelho/verde, Trump e Bolsonaro). */
+        if (Array.isArray(l.comandos) && [String(i + 1), ["13", "22"][i]].includes(l.comandos[0])) delete l.comandos;
+        if (l.foto === ["fotos/lula.webp", "fotos/flavio.webp"][i]) delete l.foto;
       });
     }
+    if (chave === "lula-flavio" && /Stuckert/.test(salvo.creditos || "")) delete salvo.creditos;
     return salvo;
   },
 

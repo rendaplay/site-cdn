@@ -31,7 +31,6 @@ const Painel = {
         ${campo("Relo natural a cada (s, máximo)", "relo.intervaloMax", config.relo.intervaloMax, "number")}
         ${campo("Rei do céu a partir de (s no ar)", "rei.minimo", config.rei.minimo, "number")}
         ${campo("Escudo de quem compartilha (s)", "escudoCompartilhar", config.escudoCompartilhar, "number")}
-        ${campo("Anúncio grande a partir de (moedas)", "destaqueMoedas", config.destaqueMoedas, "number")}
         ${campo("Curtidas pra 1 gás", "gas.curtidas", config.gas.curtidas, "number")}
         ${campo("Gás acumulado (máximo)", "gas.max", config.gas.max, "number")}
         <label class="linha"><input type="checkbox" name="som" ${config.som ? "checked" : ""}>Som do jogo</label>
