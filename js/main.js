@@ -34,6 +34,32 @@ function aplicarLinks() {
 
 aplicarLinks();
 
+// ───────── checkout ativo ─────────
+
+// A API diz se as compras saem pela Kiwify ou pelo checkout próprio (/pay). Sem resposta em 1,5 s
+// a página fica como está, em Kiwify, que é o que o HTML já traz.
+const API = 'https://api.rendaplay.com.br';
+
+async function seguirCheckoutAtivo() {
+  const controle = new AbortController();
+  const limite = setTimeout(() => controle.abort(), 1500);
+  try {
+    const resposta = await fetch(`${API}/checkout/provedor`, { signal: controle.signal });
+    if (!resposta.ok) return;
+    const { provedor, links, cartao } = await resposta.json();
+    if (provedor !== 'asaas' || !links) return;
+    for (const botao of $$('[data-checkout]')) {
+      const caminho = links[botao.dataset.checkout];
+      if (typeof caminho === 'string' && caminho.startsWith('/pay/')) apontar(botao, new URL(caminho, location.origin).href);
+    }
+    for (const el of $$('[data-texto-asaas]')) el.textContent = cartao === false && el.dataset.textoAsaasPix ? el.dataset.textoAsaasPix : el.dataset.textoAsaas;
+  } catch (e) { /* API fora do ar: fica na Kiwify */ } finally {
+    clearTimeout(limite);
+  }
+}
+
+seguirCheckoutAtivo();
+
 // ───────── WhatsApp: origem ─────────
 
 // O wa.me só leva o texto: sem isto as UTMs do anúncio morrem no clique e a venda
