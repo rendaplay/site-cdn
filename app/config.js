@@ -9,6 +9,7 @@ const CONFIG = {
   // Capas, marca e arquivos dos jogos: o montar.py --cdn aponta pro jsDelivr.
   assets: "",
   guia: "https://rendaplay.com.br/guia-restricoes.pdf",
+  grupo: "https://chat.whatsapp.com/LXwhUQe2uVOKTo7YhKmYmh",
   suporte: "https://wa.me/5511941867789?text=" + encodeURIComponent("Oi! Preciso de ajuda com o app da Renda Play no celular."),
 };
 

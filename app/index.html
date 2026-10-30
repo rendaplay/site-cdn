@@ -54,6 +54,25 @@
 
   <section id="aviso-conta" class="cartao aviso" hidden></section>
 
+  <button id="cartao-curso" class="cartao curso" type="button" hidden>
+    <span id="curso-capa" class="curso-capa" hidden><img id="curso-capa-img" alt=""><span class="curso-play" aria-hidden="true"></span><small id="curso-duracao"></small></span>
+    <span class="curso-corpo">
+      <span id="curso-selo" class="curso-selo"></span>
+      <b id="curso-titulo" class="curso-titulo"></b>
+      <small id="curso-texto" class="apagado"></small>
+      <span id="curso-trilho" class="curso-trilho"><i id="curso-barra"></i></span>
+      <span class="curso-rodape"><span id="curso-contagem" class="apagado"></span><span id="curso-abrir" class="curso-abrir"></span></span>
+    </span>
+  </button>
+
+  <section id="grupo" class="cartao instalar" hidden>
+    <p><b>Entre no grupo do WhatsApp</b></p>
+    <p class="apagado pequeno">É no grupo de clientes da Renda Play que saem os avisos, as novidades dos jogos e as dicas pra sua live. Não fique de fora.</p>
+    <div class="instalar-acoes">
+      <a id="botao-grupo" class="rp-botao" data-grupo target="_blank" rel="noopener">Entrar no grupo</a>
+    </div>
+  </section>
+
   <a class="cartao guia" data-guia target="_blank" rel="noopener">
     <span><b>Guia de restrições</b><small class="apagado">Como reduzir o risco de a sua live ser limitada ou encerrada</small></span>
     <span class="guia-abrir">Abrir</span>
@@ -87,6 +106,28 @@
     <button id="botao-testar" class="botao-secundario" type="button">Testar sem live</button>
     <button id="botao-iniciar" class="rp-botao" type="button">Iniciar live</button>
   </footer>
+</main>
+
+<!-- Aulas: o curso de boas-vindas (launcher/src/aulas.js) -->
+<main id="tela-aulas" class="tela tela-aulas" hidden>
+  <header class="aulas-topo">
+    <button id="aulas-voltar" class="aulas-voltar" type="button">‹ Voltar</button>
+    <span id="aulas-contagem" class="apagado pequeno"></span>
+  </header>
+  <div class="curso-trilho"><i id="aulas-barra"></i></div>
+
+  <article class="aula">
+    <div id="aula-player" class="aula-player"></div>
+    <p id="aula-modulo" class="aula-modulo"></p>
+    <h1 id="aula-titulo" class="aula-titulo"></h1>
+    <div id="aula-texto" class="aula-texto"></div>
+    <a id="aula-guia" class="botao-secundario largo aula-guia" data-guia target="_blank" rel="noopener" hidden>Abrir o guia completo</a>
+    <button id="aula-concluir" class="rp-botao largo" type="button"></button>
+    <p id="aula-seguinte" class="apagado pequeno aula-seguinte"></p>
+  </article>
+
+  <h2 class="titulo-secao">Todas as aulas</h2>
+  <div id="aulas-modulos" class="aulas-modulos"></div>
 </main>
 
 <!-- Como entrar ao vivo -->
@@ -174,6 +215,7 @@
       </details>
     </div>
 
+    <button id="botao-ajuda-aulas" class="botao-secundario largo" type="button">Ver as aulas</button>
     <button id="botao-ajuda-instalar" class="botao-secundario largo" type="button">Instalar na tela de início</button>
     <a class="botao-secundario largo botao-suporte" data-suporte target="_blank" rel="noopener">
       <svg class="icone-zap" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.2A12.7 12.7 0 0 0 5.1 22.4L3.3 28.8l6.6-1.7A12.7 12.7 0 1 0 16 3.2Zm0 23.2a10.5 10.5 0 0 1-5.4-1.5l-.4-.2-3.9 1 1-3.8-.2-.4A10.5 10.5 0 1 1 16 26.4Zm5.8-7.9c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1a8.6 8.6 0 0 1-2.5-1.6 9.6 9.6 0 0 1-1.8-2.2c-.2-.3 0-.5.1-.7l.5-.6.3-.5a.6.6 0 0 0 0-.5l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.7 3.7 0 0 0-1.1 2.7 6.5 6.5 0 0 0 1.3 3.4 14.6 14.6 0 0 0 5.7 5c2.1.9 2.9 1 4 .8a3.4 3.4 0 0 0 2.2-1.6 2.8 2.8 0 0 0 .2-1.6c-.1-.1-.3-.2-.6-.4Z"/></svg>
@@ -260,6 +302,7 @@
 </div>
 
 <script src="config.js"></script>
+<script src="aulas.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

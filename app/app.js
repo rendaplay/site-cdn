@@ -113,7 +113,7 @@ async function instalar() {
 }
 
 function mostrar(tela) {
-  for (const id of ["tela-carregando", "tela-entrar", "tela-inicio"]) $(id).hidden = id !== tela;
+  for (const id of ["tela-carregando", "tela-entrar", "tela-inicio", "tela-aulas"]) $(id).hidden = id !== tela;
 }
 
 /* ───────────── entrar ───────────── */
@@ -255,6 +255,7 @@ function montarInicio() {
     }
   }
   aviso.hidden = conta.ativo && conta.canal && algumLiberado;
+  montarCartaoCurso();
 
   if (!jogavel(app.jogo)) app.jogo = (JOGOS.find(j => jogavel(j.id)) || {}).id || null;
   if (app.jogo) prepararJogo(app.jogo);
@@ -324,6 +325,142 @@ function atualizarAcoes() {
   const pode = !!(app.conta && app.conta.ativo && app.conta.canal && app.jogo && jogavel(app.jogo));
   $("botao-testar").disabled = !pode;
   $("botao-iniciar").disabled = !pode || !arroba();
+}
+
+/* ───────────── aulas ───────────── */
+
+function numeroDoModulo(modulo) {
+  const principais = modulosDaPlataforma("celular").filter(m => !m.extra);
+  return modulo.extra ? "Extra" : `Módulo ${principais.findIndex(m => m.id === modulo.id) + 1}`;
+}
+
+/* Quem nunca viu uma aula vê o convite no topo, com a capa da 1ª aula; depois,
+   a próxima aula (ou a que o app sugeriu pelo que a pessoa acabou de fazer);
+   curso visto vira só um atalho. */
+function montarCartaoCurso() {
+  const passo = proximoPassoDoCurso("celular");
+  const { aula } = passo;
+  const cartao = $("cartao-curso");
+  cartao.classList.toggle("concluido", !aula);
+  $("curso-trilho").hidden = !aula;
+  $("curso-barra").style.width = `${(100 * passo.vistas) / passo.total}%`;
+  $("curso-contagem").textContent = aula ? `${passo.vistas} de ${passo.total} aulas` : "";
+  $("curso-capa").hidden = !aula?.capa;
+  if (aula?.capa) {
+    $("curso-capa-img").src = aula.capa;
+    $("curso-duracao").textContent = aula.duracao;
+  }
+  if (!passo.comecou && !passo.motivo) {
+    const { minutos } = resumoDoCurso("celular");
+    $("curso-selo").textContent = "Comece por aqui";
+    $("curso-titulo").textContent = "Assista antes da sua primeira live";
+    $("curso-texto").textContent = `${passo.total} aulas curtas (${minutos} min de vídeo) mostrando na tela como abrir a live, trazer gente e evitar restrição.`;
+    $("curso-abrir").textContent = "Assistir a aula 1";
+    $("curso-trilho").hidden = true;
+    $("curso-contagem").textContent = "";
+  } else if (aula) {
+    $("curso-selo").textContent = passo.motivo ? "Próximo passo" : "Continue o curso";
+    $("curso-titulo").textContent = aula.titulo;
+    $("curso-texto").textContent = passo.motivo || `${numeroDoModulo(aula.modulo)} · ${aula.modulo.titulo}`;
+    $("curso-abrir").textContent = aula.video ? "Assistir" : "Ler";
+  } else {
+    $("curso-selo").textContent = "Curso concluído";
+    $("curso-titulo").textContent = "Rever as aulas";
+    $("curso-texto").textContent = `Você terminou as ${passo.total} aulas. Pode rever quando quiser.`;
+    $("curso-abrir").textContent = "Abrir";
+  }
+  cartao.hidden = false;
+}
+
+function abrirAulas(id) {
+  const aulas = aulasDaPlataforma("celular");
+  const aula = aulas.find(a => a.id === id) || proximoPassoDoCurso("celular").aula || aulas[0];
+  if ($("tela-aulas").hidden) history.pushState({ aulas: true }, "");
+  mostrar("tela-aulas");
+  desenharAula(aula);
+  scrollTo(0, 0);
+}
+
+function fecharAulas() {
+  $("aula-player").replaceChildren();
+  montarCartaoCurso();
+  mostrar("tela-inicio");
+}
+
+function desenharAula(aula) {
+  const seguinte = aulaSeguinte("celular", aula.id);
+  app.aula = aula.id;
+  const player = montarPlayer(aula, () => videoTerminou(aula));
+  $("aula-player").replaceChildren(...player);
+  $("aula-player").hidden = !player.length;
+  $("aula-concluir").classList.remove("pronto");
+  $("aula-player").classList.toggle("em-pe", aula.emPe);
+  $("aula-modulo").textContent = `${numeroDoModulo(aula.modulo)} · ${aula.modulo.titulo}`;
+  $("aula-titulo").textContent = aula.titulo;
+  $("aula-texto").innerHTML = aula.texto;
+  $("aula-guia").hidden = !aula.guia;
+  $("aula-concluir").textContent = seguinte ? "Concluí, próxima aula" : aula.modulo.extra ? "Concluí" : "Concluí o curso 🎉";
+  $("aula-seguinte").textContent = aula.modulo.extra && !seguinte ? "" : textoDaSeguinte(seguinte);
+  $("aula-concluir").dataset.seguinte = seguinte ? seguinte.id : "";
+
+  desenharListaDeAulas(aula);
+}
+
+/** Progresso e a lista de módulos, com a aula aberta marcada. */
+function desenharListaDeAulas(aula) {
+  const vistas = aulasVistas.ler();
+  const passo = proximoPassoDoCurso("celular");
+  $("aulas-contagem").textContent = `${passo.vistas} de ${passo.total} aulas`;
+  $("aulas-barra").style.width = `${(100 * passo.vistas) / passo.total}%`;
+
+  $("aulas-modulos").replaceChildren(...modulosDaPlataforma("celular").map(modulo => {
+    const bloco = document.createElement("section");
+    bloco.className = "aulas-modulo";
+    const feitas = modulo.aulas.filter(a => vistas.has(a.id)).length;
+    bloco.innerHTML = `<h3><span></span><small class="apagado"></small></h3><ol></ol>`;
+    bloco.querySelector("span").textContent = `${numeroDoModulo(modulo)} · ${modulo.titulo}`;
+    bloco.querySelector("small").textContent = `${feitas}/${modulo.aulas.length}`;
+    bloco.querySelector("ol").append(...modulo.aulas.map(item => {
+      const linha = document.createElement("li");
+      const botao = document.createElement("button");
+      botao.type = "button";
+      botao.className = "aulas-item";
+      botao.classList.toggle("vista", vistas.has(item.id));
+      if (item.id === aula.id) botao.setAttribute("aria-current", "true");
+      botao.innerHTML = `<span class="aulas-capa" aria-hidden="true"></span><span class="aulas-nome"><b></b><small class="apagado"></small></span><span class="aulas-marca" aria-hidden="true"></span>`;
+      if (item.capa) {
+        const capa = document.createElement("img");
+        Object.assign(capa, { src: item.capa, alt: "", loading: "lazy" });
+        botao.querySelector(".aulas-capa").append(capa);
+      } else {
+        botao.querySelector(".aulas-capa").classList.add("leitura");
+      }
+      botao.querySelector("b").textContent = item.titulo;
+      botao.querySelector("small").textContent = rotuloDaAula(item);
+      botao.addEventListener("click", () => { desenharAula(item); scrollTo(0, 0); });
+      linha.append(botao);
+      return linha;
+    }));
+    return bloco;
+  }));
+}
+
+/* Viu o vídeo até o fim: já conta como vista e o botão da próxima chama
+   atenção (em tela cheia o celular sai sozinho ao terminar). */
+function videoTerminou(aula) {
+  if (app.aula !== aula.id) return;
+  aulasVistas.marcar(aula.id);
+  desenharListaDeAulas(aula);
+  $("aula-concluir").classList.add("pronto");
+  $("aula-concluir").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function concluirAula() {
+  aulasVistas.marcar(app.aula);
+  const seguinte = $("aula-concluir").dataset.seguinte;
+  if (!seguinte) return history.back();
+  desenharAula(aulasDaPlataforma("celular").find(a => a.id === seguinte));
+  scrollTo(0, 0);
 }
 
 /* ───────────── live ───────────── */
@@ -568,6 +705,11 @@ async function pararLive() {
   clearInterval(app.vigia);
   app.vigia = null;
   fecharTelemetria();
+  if (app.aoVivo) {
+    if (app.aoVivo.simular) aulaSugerida.sugerirUmaVez("abrir-live", "primeiro_teste");
+    else aulaSugerida.sugerirUmaVez("horario", "primeira_live");
+    montarCartaoCurso();
+  }
   app.aoVivo = null;
   lembrarLive();
   $("quadro-jogo").src = "about:blank";
@@ -697,6 +839,12 @@ addEventListener("message", evento => {
 
 for (const link of document.querySelectorAll("[data-suporte]")) link.href = CONFIG.suporte;
 for (const link of document.querySelectorAll("[data-guia]")) link.href = CONFIG.guia;
+for (const link of document.querySelectorAll("[data-grupo]")) link.href = CONFIG.grupo;
+$("grupo").hidden = Boolean(guardado.ler("grupo-entrou"));
+$("botao-grupo").addEventListener("click", () => {
+  guardado.gravar("grupo-entrou", "1");
+  $("grupo").hidden = true;
+});
 
 $("form-entrar").addEventListener("submit", entrar);
 $("trocar-modo").addEventListener("click", () => modoEntrar(!ativando));
@@ -719,6 +867,14 @@ $("botao-instalar-fechar").addEventListener("click", () => {
 $("botao-passo-a-passo").addEventListener("click", abrirPassoAPasso);
 $("botao-ajuda").addEventListener("click", () => { $("folha-ajuda").hidden = false; });
 $("botao-fechar-ajuda").addEventListener("click", () => { $("folha-ajuda").hidden = true; });
+$("cartao-curso").addEventListener("click", () => abrirAulas());
+$("aulas-voltar").addEventListener("click", () => history.back());
+$("aula-concluir").addEventListener("click", concluirAula);
+$("botao-ajuda-aulas").addEventListener("click", () => {
+  $("folha-ajuda").hidden = true;
+  abrirAulas();
+});
+addEventListener("popstate", () => { if (!$("tela-aulas").hidden) fecharAulas(); });
 $("botao-ajuda-instalar").hidden = INSTALADO;
 $("botao-ajuda-instalar").addEventListener("click", () => {
   $("folha-ajuda").hidden = true;

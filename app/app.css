@@ -163,7 +163,7 @@ input:focus { border-color: var(--rp-verde); outline: none; }
 
 .instalar { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
 .instalar-acoes { display: flex; align-items: center; gap: 4px; margin-top: 6px; }
-.instalar-acoes .rp-botao { padding: 0.6em 1.4em; }
+.instalar-acoes .rp-botao { padding: 0.6em 1.4em; text-decoration: none; }
 
 .tiktok label { color: var(--texto); font-weight: 700; font-size: 15px; margin-bottom: 8px; }
 
@@ -265,6 +265,110 @@ input:focus { border-color: var(--rp-verde); outline: none; }
 }
 
 .acoes > * { max-width: 100%; white-space: nowrap; padding-left: 0.8em; padding-right: 0.8em; }
+
+/* ───────── aulas ───────── */
+
+.curso {
+  width: 100%;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+  border: 2px solid var(--rp-verde);
+  background: linear-gradient(135deg, var(--rp-verde-fundo), var(--cartao) 70%);
+  box-shadow: 0 0 24px rgba(23, 248, 100, 0.18);
+  text-align: left;
+}
+.curso-corpo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.curso small { font-size: 13px; line-height: 1.35; }
+.curso-selo { color: var(--rp-verde); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.curso-titulo { font-size: 18px; line-height: 1.25; }
+.curso-rodape { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; font-size: 13px; }
+.curso-abrir { margin-left: auto; padding: 8px 14px; border-radius: 999px; background: var(--rp-verde); color: var(--rp-breu); font-weight: 800; font-size: 14px; white-space: nowrap; }
+.curso-capa { position: relative; flex: none; width: 96px; aspect-ratio: 9 / 16; overflow: hidden; border-radius: 12px; background: var(--rp-breu); }
+.curso-capa img { width: 100%; height: 100%; object-fit: cover; }
+.curso-play {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 40px;
+  height: 40px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: var(--rp-verde) center / 18px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 4.5v15l13-7.5z' fill='%23031610'/%3E%3C/svg%3E");
+  box-shadow: 0 0 0 4px rgba(3, 22, 16, 0.45);
+}
+.curso-capa small { position: absolute; right: 5px; bottom: 5px; padding: 1px 6px; border-radius: 6px; background: rgba(0, 0, 0, 0.75); font-size: 11px; font-weight: 700; }
+.curso.concluido { align-items: center; flex-wrap: wrap; border: 1px solid var(--linha); background: var(--cartao); box-shadow: none; }
+.curso.concluido .curso-selo { color: var(--texto-2); }
+.curso.concluido .curso-abrir { padding: 0; background: none; color: var(--rp-verde); }
+
+.curso-trilho { display: block; height: 6px; margin: 4px 0 2px; overflow: hidden; border-radius: 999px; background: var(--linha); }
+.curso-trilho i { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--rp-verde); transition: width 0.4s ease-out; }
+
+.aulas-topo { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.aulas-voltar { margin-left: -10px; padding: 10px; border: 0; background: none; color: var(--texto); font-weight: 700; }
+.tela-aulas > .curso-trilho { margin-bottom: 18px; }
+
+.aula { display: flex; flex-direction: column; gap: 10px; }
+.aula-player { position: relative; overflow: hidden; aspect-ratio: 16 / 9; border-radius: var(--rp-raio-card); background: var(--rp-breu); }
+/* Vídeo em pé: ocupa a altura que cabe e deixa o título da aula à vista. */
+.aula-player.em-pe { aspect-ratio: 9 / 16; width: min(100%, calc(68vh * 9 / 16)); margin: 0 auto; }
+.aula-player iframe, .aula-player video { display: block; width: 100%; height: 100%; border: 0; }
+/* Play grande por cima do vídeo até começar a tocar. */
+.aula-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  border: 0;
+  background: rgba(3, 22, 16, 0.3);
+  color: var(--texto);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.aula-play i {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: var(--rp-verde) center / 36px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 4.5v15l13-7.5z' fill='%23031610'/%3E%3C/svg%3E");
+  box-shadow: 0 0 0 8px rgba(23, 248, 100, 0.22), 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: transform 0.15s;
+}
+.aula-play:hover i, .aula-play:focus-visible i { transform: scale(1.07); }
+.aula-play span { padding: 5px 14px; border-radius: 999px; background: rgba(0, 0, 0, 0.65); }
+/* Terminou o vídeo: o botão da próxima aula chama o olho. */
+.aula-seguinte { margin: -2px 0 0; text-align: center; }
+.aula-concluir.pronto, #aula-concluir.pronto { outline: 3px solid rgba(23, 248, 100, 0.6); outline-offset: 3px; animation: aula-pronta 1.4s ease-in-out infinite; }
+@keyframes aula-pronta { 50% { outline-color: rgba(23, 248, 100, 0); outline-offset: 7px; } }
+@media (prefers-reduced-motion: reduce) { .aula-concluir.pronto, #aula-concluir.pronto { animation: none; } }
+.aula-modulo { margin-top: 6px; color: var(--rp-verde); font-size: 13px; font-weight: 700; }
+.aula-titulo { font-size: 22px; line-height: 1.25; }
+.aula-texto { display: flex; flex-direction: column; gap: 10px; color: var(--texto-2); }
+.aula-texto ol, .aula-texto ul { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
+.aula-texto b { color: var(--texto); }
+.aula-guia { color: var(--texto); text-align: center; text-decoration: none; }
+.aula .rp-botao { margin-top: 8px; }
+
+.aulas-modulos { display: flex; flex-direction: column; gap: 14px; }
+.aulas-modulo h3 { display: flex; justify-content: space-between; gap: 12px; margin: 0 0 6px; font-size: 15px; }
+.aulas-modulo ol { margin: 0; padding: 0; list-style: none; border: 1px solid var(--linha); border-radius: var(--rp-raio-card); overflow: hidden; }
+.aulas-modulo li + li { border-top: 1px solid var(--linha); }
+.aulas-item { width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 14px 10px 10px; border: 0; background: var(--cartao); text-align: left; }
+.aulas-capa { flex: none; width: 44px; aspect-ratio: 9 / 16; overflow: hidden; border-radius: 8px; background: var(--rp-breu); }
+.aulas-capa img { width: 100%; height: 100%; object-fit: cover; }
+.aulas-capa.leitura { display: grid; place-items: center; background: var(--linha) center / 20px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239fb5a8' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M5 4h11l3 3v13H5z'/%3E%3Cpath d='M8 10h8M8 14h8M8 18h5'/%3E%3C/svg%3E"); }
+.aulas-item[aria-current] { background: var(--rp-verde-fundo); }
+.aulas-nome { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.aulas-nome b { font-size: 15px; font-weight: 600; line-height: 1.3; }
+.aulas-nome small { font-size: 12px; font-weight: 600; }
+.aulas-nome small:empty { display: none; }
+.aulas-marca { flex: none; width: 22px; height: 22px; border: 2px solid var(--linha); border-radius: 50%; }
+.aulas-item.vista .aulas-marca { border-color: var(--rp-verde); background: var(--rp-verde) center / 14px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23031610' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E"); }
 
 /* ───────── folhas ───────── */
 
