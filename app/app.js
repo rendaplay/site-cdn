@@ -643,6 +643,7 @@ async function abrirJogo() {
   const quadro = $("quadro-jogo");
   const parametros = new URLSearchParams({ canal: app.conta.canal, relay: RELAY });
   if (modoLeve()) parametros.set("leve", "1");
+  if (arroba()) parametros.set("arroba", arroba());
   const jogo = app.aoVivo.jogo;
   app.abertoEm = Date.now();
   $("carregando-jogo").hidden = false;

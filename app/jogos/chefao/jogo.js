@@ -103,7 +103,7 @@ const Jogo = {
             const f = config.faixas[a.faixa];
             /* O Chinelo da Mãe tem a própria entrada: o cartão vem depois da pancada. */
             if (a.faixa >= 4) Hud.esconderFala();
-            const texto = `${a.quantidade > 1 ? a.quantidade + "× " : ""}${a.nome || "presente"} · ${fmt.format(Math.round(a.moedas * config.danoPorMoeda * raid.multiplicador(this.agora, "presente")))} de dano`;
+            const texto = `${a.quantidade > 1 ? a.quantidade + "× " : ""}${simboloDoPresente(a.nome)} · ${fmt.format(Math.round(a.moedas * config.danoPorMoeda * raid.multiplicador(this.agora, "presente")))} de dano`;
             const anunciar = () => Hud.anunciar({
               fita: f.nome,
               nome: j.nome,
@@ -171,8 +171,7 @@ const Jogo = {
         case "evento": {
           Som.evento();
           const info = EVENTOS[a.evento];
-          const texto = a.evento === "mutirao" ? `${config.surpresa.mutirao.pessoas} ${info.texto}` : info.texto;
-          Hud.anunciar({ fita: "Surpresa", nome: info.titulo, texto, cor: info.cor, ms: 3000 });
+          Hud.anunciar({ fita: "Surpresa", nome: info.titulo, texto: info.texto, cor: info.cor, ms: 3000 });
           break;
         }
         case "mutirao":
@@ -261,9 +260,9 @@ const Jogo = {
 
   testeId: 0,
   teste(tipo, extra = {}) {
-    const nomes = ["teste.ana", "teste.beto", "teste.cida", "teste.dudu", "teste.edu", "teste.fefe"];
-    const nome = extra.nome || nomes[this.testeId++ % nomes.length];
-    this.live.simular({ tipo, usuario: { id: nome, nome }, ...extra });
+    const ids = ["teste.ana", "teste.beto", "teste.cida", "teste.dudu", "teste.edu", "teste.fefe"];
+    const id = extra.nome || ids[this.testeId++ % ids.length];
+    this.live.simular({ tipo, usuario: { id, nome: nomeDeTeste() }, ...extra });
   },
 
   tecla(e) {

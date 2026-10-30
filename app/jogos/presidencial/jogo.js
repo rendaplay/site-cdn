@@ -159,7 +159,6 @@ const Jogo = {
     Hud.fecharPodio();
     Hud.fecharFoto();
     Hud.placar(this.corrida);
-    Hud.legenda(config.faixas, (nome, moedas) => this.configurar.faixa(nome, moedas));
     this.ritmoDaMusica(1);
     Vozes.falar("largada", "narrador");
   },
@@ -301,7 +300,7 @@ const Jogo = {
       lado = dono >= 0 ? dono : (this.ladoTeste = 1 - (this.ladoTeste || 0));
     }
     const id = `teste${lado}${Math.floor(Math.random() * 3)}`;
-    const user = { id, nickname: id, avatar: null };
+    const user = { id, nickname: nomeDeTeste(), avatar: null };
     this.receber({ type: "chat", user, data: { text: String(candidatos[lado].numero) } });
     this.receber({ type: "gift", user, data });
   },

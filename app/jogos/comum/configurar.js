@@ -16,6 +16,10 @@
 
 (function (raiz) {
   const SOME_EM = 4000;
+  /* O painel aparece na transmissão do celular: nada de nome de presente nem
+     de faixa na tela, só símbolo (o nome fica no title). */
+  const PELO_VALOR = "🪙";
+  const SIMBOLOS_FAIXA = ["✨", "🎉", "🔥", "💥", "👑", "🌟", "🚀", "💎"];
 
   const CSS = `
 .rp-cfg-botao { position: fixed; right: 16px; bottom: 16px; z-index: 2147483000; width: 56px; height: 56px;
@@ -31,17 +35,16 @@
 .rp-cfg h2 { flex: 1; margin: 0; font-size: 19px; font-weight: 800; }
 .rp-cfg .rp-cfg-sub { margin: 0 16px 10px; color: #B9B2CC; font-size: 13px; }
 .rp-cfg ul { flex: 1; overflow-y: auto; margin: 0; padding: 0 16px 8px; list-style: none; scrollbar-width: thin; }
-.rp-cfg li { display: grid; grid-template-columns: 32px 1fr auto; grid-template-areas: "ic nome testar" "ic faixa faixa";
-  align-items: center; gap: 6px 10px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
-.rp-cfg .rp-cfg-icone { grid-area: ic; font-size: 26px; text-align: center; }
-.rp-cfg .rp-cfg-nome { grid-area: nome; min-width: 0; }
-.rp-cfg .rp-cfg-nome small { display: block; color: #B9B2CC; font-size: 12px; }
-.rp-cfg select { grid-area: faixa; width: 100%; min-height: 40px; padding: 0 10px; border-radius: 10px;
-  border: 1px solid rgba(255,255,255,.18); background: #221E33; color: inherit; font: inherit; }
+.rp-cfg li { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+.rp-cfg .rp-cfg-icone { font-size: 30px; text-align: center; }
+.rp-cfg .rp-cfg-faixas { display: flex; flex-wrap: wrap; gap: 6px; }
+.rp-cfg .rp-cfg-faixas button { min-width: 40px; padding: 0 8px; font-size: 20px; border: 2px solid transparent; }
+.rp-cfg .rp-cfg-faixas button[aria-pressed="true"] { border-color: #6C4BFF; background: rgba(108,75,255,.35); }
 .rp-cfg button { min-height: 40px; padding: 0 14px; border: 0; border-radius: 10px; background: rgba(255,255,255,.12);
   color: inherit; font: inherit; font-weight: 700; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .rp-cfg button:active { background: rgba(255,255,255,.22); }
-.rp-cfg .rp-cfg-testar { grid-area: testar; background: #6C4BFF; }
+.rp-cfg .rp-cfg-testar { width: 48px; padding: 0; font-size: 20px; background: #6C4BFF; }
 .rp-cfg .rp-cfg-fechar { width: 40px; padding: 0; font-size: 20px; }
 .rp-cfg footer { display: flex; gap: 10px; align-items: center; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,255,255,.08); }
 .rp-cfg .rp-cfg-status { flex: 1; color: #B9B2CC; font-size: 13px; }
@@ -77,8 +80,8 @@
     folha.className = "rp-cfg";
     folha.hidden = true;
     folha.innerHTML = `
-      <header><h2>O que cada presente faz</h2><button type="button" class="rp-cfg-fechar" aria-label="Fechar">✕</button></header>
-      <p class="rp-cfg-sub">Fica salvo neste aparelho. Presente fora da lista vale pelo valor.</p>
+      <header><h2>⚙ 🎁</h2><button type="button" class="rp-cfg-fechar" aria-label="Fechar">✕</button></header>
+      <p class="rp-cfg-sub">${PELO_VALOR} = pelo valor · ${SIMBOLOS_FAIXA.slice(0, 5).join(" ")} = efeito do mais fraco ao mais forte</p>
       <ul></ul>
       <footer><span class="rp-cfg-status"></span>${avancado ? '<button type="button" class="rp-cfg-avancado">Ajustes avançados</button>' : ""}</footer>`;
     const lista = folha.querySelector("ul");
@@ -104,25 +107,34 @@
       const nomes = opcoes();
       lista.replaceChildren(...PRESENTES_TIKTOK.map(p => {
         const li = document.createElement("li");
-        li.innerHTML = `<span class="rp-cfg-icone"></span><span class="rp-cfg-nome"><b></b><small></small></span>
-          <select></select><button type="button" class="rp-cfg-testar">Testar</button>`;
-        li.querySelector(".rp-cfg-icone").textContent = p.icone;
-        li.querySelector("b").textContent = p.nome;
-        li.querySelector("small").textContent = `${p.moedas.toLocaleString("pt-BR")} ${p.moedas === 1 ? "moeda" : "moedas"}`;
-        const select = li.querySelector("select");
-        select.setAttribute("aria-label", `Faixa de ${p.nome}`);
-        select.add(new Option("Pelo valor (padrão)", ""));
-        nomes.forEach((nome, i) => select.add(new Option(nome, String(i))));
+        li.innerHTML = `<span class="rp-cfg-icone"></span><span class="rp-cfg-faixas"></span>
+          <button type="button" class="rp-cfg-testar" aria-label="Testar">▶</button>`;
+        const icone = li.querySelector(".rp-cfg-icone");
+        icone.textContent = p.icone;
+        icone.title = `${p.nome} · ${p.moedas.toLocaleString("pt-BR")} ${p.moedas === 1 ? "moeda" : "moedas"}`;
+        const faixas = li.querySelector(".rp-cfg-faixas");
         const atual = escolhas[p.chave];
-        select.value = Number.isInteger(atual) && atual < nomes.length ? String(atual) : "";
-        select.addEventListener("change", () => {
-          if (select.value === "") delete escolhas[p.chave];
-          else escolhas[p.chave] = Number(select.value);
-          status.textContent = gravar() ? "Salvo." : "Não deu pra salvar neste aparelho.";
-        });
+        const escolhida = Number.isInteger(atual) && atual < nomes.length ? atual : null;
+        const chip = (simbolo, titulo, valor) => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.textContent = simbolo;
+          b.title = titulo;
+          b.setAttribute("aria-label", titulo);
+          b.setAttribute("aria-pressed", String(valor === escolhida));
+          b.addEventListener("click", () => {
+            if (valor === null) delete escolhas[p.chave];
+            else escolhas[p.chave] = valor;
+            for (const outro of faixas.children) outro.setAttribute("aria-pressed", String(outro === b));
+            status.textContent = gravar() ? "✓" : "Não deu pra salvar neste aparelho.";
+          });
+          return b;
+        };
+        faixas.append(chip(PELO_VALOR, "Pelo valor (padrão)", null),
+          ...nomes.map((nome, i) => chip(SIMBOLOS_FAIXA[i] || String(i + 1), nome, i)));
         li.querySelector(".rp-cfg-testar").addEventListener("click", () => {
           testar({ nome: p.api, moedas: p.moedas, quantidade: 1, total: p.moedas });
-          status.textContent = `${p.nome} enviado.`;
+          status.textContent = `${p.icone} ✓`;
         });
         return li;
       }));

@@ -101,7 +101,7 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .top li .nome { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .top li .txt { display: contents; }
 .top li .pts { font: 900 26px/1 var(--display); color: var(--ciano); font-variant-numeric: tabular-nums; }
-.top .vazio { font: 600 19px/1.25 var(--texto); color: rgba(246, 242, 255, .6); text-align: center; }
+.top:empty { visibility: hidden; }
 .top li.subiu { animation: subiu .6s ease; }
 @keyframes subiu { 30% { transform: translateX(-6px); color: var(--ouro); } }
 .top h3 { display: none; }
@@ -125,63 +125,12 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .vertical .top li .txt { display: grid; gap: 4px; min-width: 0; }
 .vertical .top li .nome { font: 700 38px/1.05 var(--texto); }
 .vertical .top li .pts { font-size: 44px; line-height: .9; }
-.vertical .top .vazio { font-size: 36px; }
 .horizontal .top { padding: 16px 20px; gap: 10px; }
 .horizontal .top h3 { display: block; font: 800 18px/1 var(--texto); letter-spacing: .12em; text-transform: uppercase; color: rgba(246, 242, 255, .7); margin-bottom: 4px; }
 .horizontal .top li { grid-template-columns: 26px 44px 1fr auto; font-size: 24px; }
 .horizontal .top li .avatar { width: 40px; height: 40px; }
 .horizontal .rei .nome { font-size: 44px; }
 .horizontal .relogio .tempo { font-size: 80px; }
-
-/* ───────── legenda ───────── */
-
-.legenda { position: absolute; padding: 18px 14px; pointer-events: none; }
-.horizontal .legenda { left: 1370px; top: 150px; width: 500px; padding: 22px 26px; }
-.legenda h3 { font: 900 34px/1 var(--display); text-transform: uppercase; letter-spacing: .04em; color: var(--ciano); margin-bottom: 12px; }
-.legenda ol { list-style: none; display: grid; gap: 14px; }
-.legenda li { display: grid; gap: 3px; }
-.legenda .acao { display: flex; align-items: center; gap: 8px; font: 800 23px/1.05 var(--texto); }
-.legenda .acao svg { font-size: 30px; color: var(--cor, var(--ciano)); filter: drop-shadow(0 0 6px var(--cor, var(--ciano))); }
-.legenda .faz { font: 600 21px/1.15 var(--texto); color: rgba(246, 242, 255, .8); }
-.legenda .faz b { color: var(--cor, var(--ciano)); font-weight: 800; }
-.legenda .ico-faixa { color: var(--cor); fill: currentColor; stroke: none; filter: drop-shadow(0 0 8px var(--cor)); }
-.legenda .ico-faixa .luz { fill: #fff; opacity: .7; }
-.legenda .ico-faixa .raio { fill: none; stroke: currentColor; stroke-width: 3; }
-.legenda .faixas .nome { color: var(--cor); }
-.legenda .moedas { font: 900 22px/1 var(--display); color: var(--ouro); }
-.seguro .legenda .moedas,
-.seguro .legenda .faixas { display: none; }
-
-.horizontal .legenda h3 { font-size: 38px; }
-.horizontal .legenda ol { gap: 12px; }
-.horizontal .legenda .acoes li { grid-template-columns: 250px 1fr; align-items: center; }
-.horizontal .legenda .faz { font-size: 20px; }
-.horizontal .legenda .faixas { margin-top: 12px; padding-top: 14px; border-top: 2px solid var(--linha); }
-.horizontal .legenda .faixas li { grid-template-columns: 44px 206px 1fr auto; align-items: center; column-gap: 0; }
-.horizontal .legenda .ico-faixa { font-size: 34px; }
-.horizontal .legenda .faixas .nome { font: 800 23px/1.05 var(--texto); padding-left: 4px; }
-
-/* Na vertical a legenda vira o cardápio, de ponta a ponta logo abaixo do
-   placar: é o que o espectador mais precisa ler, e ali o app do TikTok não
-   tampa. Medidas pensadas pra escala ~0,36 do celular (36 px ≈ 13 px). */
-.vertical .legenda { left: 20px; right: 20px; top: calc(374px + var(--desce, 0px)); padding: 10px 14px; display: grid; gap: 14px; }
-.vertical .legenda h3, .vertical .legenda .mais { display: none; }
-.vertical .legenda .acoes { grid-template-columns: auto auto; justify-content: space-between; gap: 6px 18px; padding: 0 6px; }
-.vertical .legenda .acoes li { display: flex; align-items: center; gap: 14px; white-space: nowrap; min-width: 0; }
-.vertical .legenda .acao { font: 900 42px/1 var(--display); text-transform: uppercase; letter-spacing: .01em; gap: 10px; }
-.vertical .legenda .acao svg { font-size: 42px; }
-.vertical .legenda .acoes .faz { font: 700 38px/1 var(--texto); color: rgba(246, 242, 255, .9); overflow: hidden; text-overflow: ellipsis; }
-.vertical .legenda .faixas { grid-template-columns: repeat(5, 1fr); gap: 10px; }
-.vertical .legenda .faixas li {
-  position: relative; justify-items: center; align-content: start; text-align: center; gap: 6px;
-  padding: 12px 6px 14px; border-radius: 18px;
-  background: color-mix(in srgb, var(--cor) 13%, rgba(10, 3, 32, .6));
-  border: 2px solid color-mix(in srgb, var(--cor) 55%, transparent);
-}
-.vertical .legenda .ico-faixa { font-size: 64px; }
-.vertical .legenda .faixas .nome { display: none; }
-.vertical .legenda .faixas .faz { font: 900 44px/.95 var(--display); text-transform: uppercase; color: var(--branco); text-wrap: balance; }
-.vertical .legenda .moedas { position: absolute; top: 8px; right: 10px; font-size: 34px; }
 
 /* ───────── fila, anúncio e destaque ───────── */
 

@@ -5,11 +5,9 @@
 
 const BOLHAS_MAX = 7;
 const TEXTO_EFEITO = { impulso: "IMPULSO!", nitro: "NITRO!", banana: "CASCA!", jato: "JATO!" };
-const ICONE_EFEITO = { impulso: "⚡", nitro: "🔥", banana: "🍌", jato: "🚀" };
-const NOME_EFEITO = { impulso: "impulso", nitro: "nitro", banana: "casca no rival", jato: "jato" };
 /* Lado com dois na chapa ("Trump e Bolsonaro") conjuga no plural. */
 const verbo = (candidato, um, dois) => (candidato.plural ? dois : um);
-/* O que a tela pede pra comentar: a cor do lado no preset, senão o número. */
+/* A chave de cada lado: a cor do lado no preset, senão o número. */
 const comando = candidato => (candidato.comando || candidato.numero).toUpperCase();
 
 const Hud = {
@@ -33,14 +31,14 @@ const Hud = {
     const [a, b] = candidatos;
     this.$(".time-a .num").textContent = comando(a);
     this.$(".time-b .num").textContent = comando(b);
-    /* Palavra no lugar do número não cabe ao lado do "comente": fica só ela. */
+    /* Palavra no lugar do número é mais larga: ocupa o time inteiro. */
     this.$(".placar").classList.toggle("palavra", [a, b].some(c => c.comando));
     this.$(".chaves").innerHTML = candidatos.map((c, i) => `
       <div class="chave chave-${"ab"[i]}">
         <i class="chave-icone">${iconeDoPresente(c.presente)}</i>
-        <span class="chave-texto"><span>apoie o <b>${comando(c)}</b></span></span>
+        <span class="chave-texto"><span><b>${comando(c)}</b></span></span>
       </div>`).join("")
-      + `<div class="chave-comente">${this.seguro ? "comente" : "ou comente"} <b class="ca">${comando(a)}</b> ou <b class="cb">${comando(b)}</b> no chat para participar</div>`;
+      + `<div class="chave-comente"><b class="ca">${comando(a)}</b> · <b class="cb">${comando(b)}</b></div>`;
     this.medir();
   },
 
@@ -120,7 +118,7 @@ const Hud = {
       } else if (a.tipo === "ultrapassagem") this.emSeguida(() => this.faixa("Passou!", `${this.candidatos[a.lado].nome} ${verbo(this.candidatos[a.lado], "assumiu", "assumiram")} a ponta`, a.lado), 2200);
       else if (a.tipo === "retaFinal") this.emSeguida(() => this.faixa("Reta final", `faltam ${Math.ceil(corrida.config.pista * (1 - corrida.config.retaFinal))} m`, -1), 2200);
       else if (a.tipo === "encostou") this.aviso(`<b>${escapar(this.candidatos[a.lado].nome)}</b> ${verbo(this.candidatos[a.lado], "encostou", "encostaram")}!`);
-      else if (a.tipo === "pendente") this.aviso(`<b>${escapar(a.quem.nick)}</b>, comente <b class="ca">${comando(this.candidatos[0])}</b> ou <b class="cb">${comando(this.candidatos[1])}</b>`);
+      else if (a.tipo === "pendente") this.aviso(`<b>${escapar(a.quem.nick)}</b> ainda sem lado`);
       else if (a.tipo === "comentouPresente") this.aviso(`<b>${escapar(a.quem.nick)}</b> corre com o <b>${comando(this.candidatos[a.lado])}</b>`);
     }
   },
@@ -181,23 +179,6 @@ const Hud = {
     el.classList.remove("on");
     void el.offsetWidth;
     el.classList.add("on");
-  },
-
-  /* Cada efeito com os presentes que o disparam: o que o streamer escolheu
-     no ⚙ ou, sem escolha, o preço. As rosas das chaves ficam de fora. */
-  legenda(faixas, faixaDe) {
-    const ordem = [...faixas].sort((x, y) => x.de - y.de);
-    const daChave = new Set(this.candidatos.flatMap(c => c.presente.aceitos));
-    const icones = ordem.map(() => []);
-    for (const p of PRESENTES_TIKTOK) {
-      if (daChave.has(p.api)) continue;
-      const escolhida = faixaDe(p.api, p.moedas);
-      const i = escolhida ?? Math.max(0, ordem.findLastIndex(f => p.moedas >= f.de));
-      if (icones[i] && icones[i].length < 2) icones[i].push(p.icone);
-    }
-    const html = ordem.map((f, i) => `<li><i>${ICONE_EFEITO[f.efeito]}</i><span>${NOME_EFEITO[f.efeito]}</span><em>${icones[i].join("")}</em></li>`).join("");
-    const el = this.$(".legenda");
-    if (el._html !== html) el.innerHTML = el._html = html;
   },
 
   fotoFinish(vencedor) {

@@ -670,30 +670,11 @@ const Ceu = {
        e o resto encolhe pro nome pequeno ou some naquele quadro. */
     const peso = p => (p.id === info.rei ? 50 : 0) + (p.fogo ? 40 : 0) + (p.gigante ? 30 : 0) + (p.faixa + 1) * 5 + (p.dourada ? 20 : 0);
     /* Os painéis do HUD entram como ocupados: nome que cairia atrás deles
-       some em vez de aparecer pela metade. O "COMENTE APAREI" é instrução
-       e reserva antes de qualquer nome. */
+       some em vez de aparecer pela metade. */
     const ocupado = (this.areas || []).map(a => [...a]);
-    if (this.dourada) this.etiquetaDourada(c, this.dourada, t, ocupado);
     for (const p of [...frente].sort((a, b) => peso(b) - peso(a))) this.etiqueta(c, p, info, true, ocupado);
     for (const p of fundo) this.etiqueta(c, p, info, false, ocupado);
     this.desenharTextos(c);
-  },
-
-  etiquetaDourada(c, d, t, ocupado) {
-    const y = d.corpo.y - this.dims.tamanho * 1.1 - 14;
-    c.font = `900 ${Math.round(34 * this.dims.letra)}px 'Big Shoulders Display', Impact, sans-serif`;
-    const txt = "COMENTE APAREI";
-    const meia = c.measureText(txt).width / 2 + 12;
-    const x = Math.max(meia, Math.min(this.dims.W - meia, d.corpo.x));
-    ocupado.push([x - meia, y - 44 * this.dims.letra, x + meia, y]);
-    c.textAlign = "center";
-    c.textBaseline = "bottom";
-    c.lineJoin = "round";
-    c.lineWidth = 8;
-    c.strokeStyle = "#3A2200";
-    c.strokeText(txt, x, y);
-    c.fillStyle = `rgb(255,${220 + 30 * Math.sin(t * 8)},120)`;
-    c.fillText(txt, x, y);
   },
 
   linha(c, corda, cor, largura, brilho = false) {

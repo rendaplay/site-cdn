@@ -209,9 +209,9 @@ const Jogo = {
 
   testeId: 0,
   teste(tipo, extra = {}) {
-    const nomes = ["teste.ana", "teste.beto", "teste.cida", "teste.dudu", "teste.edu", "teste.fefe"];
-    const nome = extra.nome || nomes[this.testeId++ % nomes.length];
-    this.live.simular({ tipo, usuario: { id: nome, nome }, ...extra });
+    const ids = ["teste.ana", "teste.beto", "teste.cida", "teste.dudu", "teste.edu", "teste.fefe"];
+    const id = extra.nome || ids[this.testeId++ % ids.length];
+    this.live.simular({ tipo, usuario: { id, nome: nomeDeTeste() }, ...extra });
   },
 
   tecla(e) {

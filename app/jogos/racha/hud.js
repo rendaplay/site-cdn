@@ -1,4 +1,4 @@
-/* Tudo que é texto na tela: placar, feed, cardápio, cartões de presente,
+/* Tudo que é texto na tela: placar, feed, cartões de presente,
    anúncios, contagem, barra LARGADA → CHEGADA, espera e pódio, e os textos
    que sobem dos carros. Animação guiada pelo relógio do jogo
    (Hud.quadro), não por CSS: pausa junto e grava quadro a quadro igual. */
@@ -33,9 +33,9 @@ const EFEITOS = {
   bomba: { nome: "BOMBA", cor: "cor-bomba" },
 };
 const NOMES_SURPRESA = {
-  dobro: ["Nitro em dobro", "todo presente vale 2×"],
-  chuva: ["Chuva na pista", "comentar vira turbo, a cada 3 s"],
-  missil: ["Temporada de míssil", "míssil a partir de 100 moedas"],
+  dobro: ["Nitro em dobro", ""],
+  chuva: ["Chuva na pista", ""],
+  missil: ["Temporada de míssil", ""],
 };
 
 function el(tag, cls, html) {
@@ -105,27 +105,14 @@ const Hud = {
     this.$ = $;
     this.el = {
       rodada: $(".rodada"), placar: $(".placar"), espera: $(".espera"), podio: $(".podio"),
-      feed: $(".feed"), cardapio: $(".cardapio"), chamada: $(".chamada"), surpresa: $(".surpresa"), anuncios: $(".anuncios"),
+      feed: $(".feed"), surpresa: $(".surpresa"), anuncios: $(".anuncios"),
       cartoes: $(".cartoes"), contagem: $(".contagem"), progresso: $(".progresso"), avisos: $(".avisos"),
       pista: $(".hud-pista"),
     };
     palco.classList.toggle("seguro", !!config.modoSeguro);
     this.el.placar.innerHTML = '<div class="grade"></div><div class="rodape"><span class="pilotos"></span><span class="moedas"></span></div>';
     this.grade = this.el.placar.querySelector(".grade");
-    this.montarCardapio();
     this.montarProgresso();
-  },
-
-  montarCardapio(evento = null) {
-    const promo = evento && evento.tipo === "missil" ? this.config.surpresa.missil.moedas : null;
-    const seguro = this.config.modoSeguro;
-    this.el.cardapio.innerHTML = this.config.faixas.map(f => {
-      const e = EFEITOS[f.efeito] || { nome: f.efeito, cor: "" };
-      const barato = !seguro && promo && f.efeito === "missil";
-      const valor = seguro ? fmt.format(f.moedas) : `${fmt.format(barato ? promo : f.moedas)}+`;
-      return `<div class="item${barato ? " barato" : ""}">${icone(f.efeito, e.cor)}<span class="nome ${e.cor}">${e.nome}</span>` +
-        `<span class="moedas">${icone("moeda", "cor-ouro")}<b>${valor}</b>${seguro ? "" : '<span class="un"> moedas</span>'}</span></div>`;
-    }).join("");
   },
 
   montarProgresso() {
@@ -182,11 +169,10 @@ const Hud = {
           this.feed(icone("passou"), `${arroba(a.piloto)} passou ${arroba(a.passou)} · <em>${a.posicao}º</em>`);
           break;
         case "falta":
-          this.anunciar("falta", `Faltam ${fmt.format(Math.round(a.metros))} m pro 1º`, this.config.modoSeguro ? `${arroba(a.piloto)} está na caça` : `${arroba(a.piloto)}, um <b class="cor-nitro">NITRO</b> resolve`, 1);
+          this.anunciar("falta", `Faltam ${fmt.format(Math.round(a.metros))} m pro 1º`, `${arroba(a.piloto)} está na caça`, 1);
           break;
         case "retaFinal":
-          if (this.config.modoSeguro) this.anunciar("reta", "Reta final", `${arroba(a.lider)} vê a chegada`, 2, 3);
-          else this.anunciar("reta", "Reta final", `presente vale <b>${a.multiplicador}×</b> até a chegada`, 2, 3);
+          this.anunciar("reta", "Reta final", `${arroba(a.lider)} vê a chegada`, 2, 3);
           break;
         case "largada":
           this.contagemFim = null;
@@ -203,18 +189,13 @@ const Hud = {
           break;
         case "surpresa":
           this.anunciar("surpresa", NOMES_SURPRESA[a.evento.tipo][0], NOMES_SURPRESA[a.evento.tipo][1], 2, 3);
-          if (a.evento.tipo === "missil") this.montarCardapio(a.evento);
-          break;
-        case "fimSurpresa":
-          if (a.evento.tipo === "missil") this.montarCardapio();
           break;
       }
     }
   },
 
   presente(a) {
-    const nomePresente = this.config.nomes[a.nomePresente] || a.nomePresente || "presente";
-    const qtd = a.quantidade > 1 ? ` ×${a.quantidade}` : "";
+    const qtd = a.quantidade > 1 ? `×${a.quantidade}` : "";
     if (!a.efeito) return;
     const e = EFEITOS[a.efeito];
     const para = a.para ? ` para ${arroba(a.alvo)}` : "";
@@ -231,7 +212,7 @@ const Hud = {
       quem: a.quem,
       classe: `f${a.faixa}${a.faixa >= 3 ? " grande" : ""}${a.largada ? " largada" : ""}`,
       dur: a.faixa >= 3 ? 4.4 : a.faixa >= 2 ? 3.6 : 2.8,
-      l1: this.config.modoSeguro ? `${arroba(a.quem)} · ${escapar(nomePresente)}${qtd}` : `${arroba(a.quem)} enviou ${escapar(nomePresente)}${qtd}`,
+      l1: `${arroba(a.quem)} · ${simboloDoPresente(a.nomePresente)}${qtd}`,
       l2: `<span class="seta">→</span>${icone(a.efeito)}${a.largada ? "NITRO NA LARGADA" : e.nome}${a.dobro && !a.largada ? ' <span class="dobro">2×</span>' : ""}${alvo}`,
       faixa: a.faixa,
       quando: this.tempo,
@@ -288,7 +269,7 @@ const Hud = {
       `<div class="degraus">${degrau(p2, 2)}${degrau(p1, 1)}${degrau(p3, 3)}</div>` +
       (a.mvp
         ? `<div class="mvp"><span class="av"></span><div><div class="rot">${seguro ? "MVP DA RODADA" : "MVP DOS PRESENTES"}</div><div class="nome">@${escapar(a.mvp.nome)}</div></div><span class="moedas">${fmt.format(a.mvp.moedas)}${seguro ? " pts" : ""}</span></div>`
-        : seguro ? "" : '<div class="mvp sem">Ninguém mandou presente nessa rodada. O MVP leva o pódio junto do vencedor.</div>');
+        : "");
     if (a.mvp) this.el.podio.querySelector(".av").replaceWith(criarAvatar(a.mvp));
     this.el.podio.hidden = false;
   },
@@ -301,8 +282,7 @@ const Hud = {
     const emPodio = fase === "podio";
     const naEspera = fase === "espera";
     this.el.placar.hidden = emPodio || naEspera;
-    /* Na vertical, espera e pódio ocupam também a faixa do feed; o cardápio
-       e a chamada continuam: é na espera que se entra na corrida. */
+    /* Na vertical, espera e pódio ocupam também a faixa do feed. */
     this.el.feed.hidden = this.el.progresso.hidden = (emPodio || naEspera) && this.formatoAtual !== "horizontal";
     this.el.espera.hidden = !naEspera;
     if (!emPodio) this.el.podio.hidden = true;
@@ -333,10 +313,6 @@ const Hud = {
     else status = '<span class="pilula vivo">Ao vivo</span>';
     const html = `<span class="pilula">Rodada ${racha.rodada}</span>${status}`;
     if (this.el.rodada.innerHTML !== html) this.el.rodada.innerHTML = html;
-    const chamada = racha.fase === "espera" && !racha.config.modoSeguro
-      ? "<b>Comente</b> pra entrar na corrida · presente agora vira <b>nitro na largada</b>"
-      : "<b>Comente</b> pra entrar na corrida · <b>curta</b> pra empurrar";
-    if (this.el.chamada.innerHTML !== chamada) this.el.chamada.innerHTML = chamada;
   },
 
   placar(dt, racha) {
@@ -403,7 +379,7 @@ const Hud = {
     if (vitorias.length) esquerda = `<h3>${icone("coroa", "cor-ouro")} Vitórias na live</h3>${lista(vitorias, p => p.vitorias)}`;
     else {
       const grade = racha.ordem.slice(-5).reverse();
-      esquerda = `<h3>${icone("bandeira")} Chegaram na grade</h3>${grade.length ? lista(grade, p => "#" + p.numero) : '<div class="vazio">Ninguém ainda. Seja o primeiro.</div>'}`;
+      esquerda = `<h3>${icone("bandeira")} Chegaram na grade</h3>${grade.length ? lista(grade, p => "#" + p.numero) : '<div class="vazio">Ninguém ainda.</div>'}`;
     }
     const comNumero = doadores.map(d => ({ ...d, numero: (racha.pilotos.get(d.id) || {}).numero || "–", cor: (racha.pilotos.get(d.id) || {}).cor || 0 }));
     const seguro = racha.config.modoSeguro;
@@ -411,12 +387,9 @@ const Hud = {
       ? `<h3>${icone("coroa", "cor-ouro")} Pontos da live</h3>` +
         (comNumero.length ? lista(comNumero, d => fmt.format(d.moedas)) : '<div class="vazio">Ninguém pontuou ainda.</div>')
       : `<h3>${icone("moeda", "cor-ouro")} Moedas da live</h3>` +
-        (comNumero.length ? lista(comNumero, d => fmt.format(d.moedas)) : '<div class="vazio">O primeiro presente vira nitro na largada.</div>') +
+        (comNumero.length ? lista(comNumero, d => fmt.format(d.moedas)) : '<div class="vazio">Ninguém pontuou ainda.</div>') +
         `<div class="total">Total na live: <b>${fmt.format(racha.moedasLive)}</b> moedas</div>`;
-    const cta = seguro
-      ? '<div class="cta">Comente qualquer coisa pra <b>entrar na corrida</b> · curtir empurra seu carro</div>'
-      : '<div class="cta">Comente qualquer coisa pra <b>entrar na corrida</b> · presente agora vira <b>nitro na largada</b></div>';
-    const html = `<div class="cab"><div class="t">${titulo}</div><div class="n">${n}</div></div>` + cta +
+    const html = `<div class="cab"><div class="t">${titulo}</div><div class="n">${n}</div></div>` +
       `<div class="colunas"><div>${esquerda}</div><div>${direita}</div></div>`;
     if (this._espera !== html) { this.el.espera.innerHTML = html; this._espera = html; }
   },

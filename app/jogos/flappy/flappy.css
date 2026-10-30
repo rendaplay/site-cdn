@@ -1,6 +1,6 @@
 /* Voa, Tuca!: palco fixo (1080×1920 ou 1920×1080) escalado pra caber na
    janela, pra captura sair igual em qualquer tamanho. Tudo em px do palco.
-   O cardápio é a lousa de quiosque de praia. */
+   As barras do chat ficam na lousa de quiosque de praia. */
 
 @font-face {
   font-family: "Big Shoulders Display";
@@ -214,7 +214,7 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .dica.on { opacity: 1; }
 .dica kbd { font: 800 22px var(--texto); padding: 3px 10px; border-radius: 8px; background: var(--creme); color: var(--tinta); margin: 0 3px; }
 
-/* ───────── quiosque (cardápio) ───────── */
+/* ───────── quiosque (barras do chat) ───────── */
 
 .quiosque {
   position: absolute;
@@ -228,32 +228,13 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
   pointer-events: none;
 }
 .vertical .quiosque { left: 24px; right: 24px; top: calc(var(--cima) + 222px); padding: 10px 18px 12px; border-width: 10px; isolation: isolate; }
-.horizontal .quiosque { right: 24px; top: 868px; width: 1250px; height: 202px; padding: 10px 16px 10px; display: grid; grid-template-columns: 1fr 230px; column-gap: 18px; }
-.quiosque::before {
-  content: "Cardápio do Tuca"; position: absolute; left: 50%; top: -44px; transform: translateX(-50%);
-  background: var(--madeira); border-radius: 10px 10px 0 0; padding: 8px 22px 4px;
-  font: 900 30px/1 var(--display); text-transform: uppercase; letter-spacing: .06em; color: var(--amarelo); white-space: nowrap;
-}
-.horizontal .quiosque::before { display: none; }
-/* Modo seguro: sem o cardápio, ficam o comente 1 ou 2 e as barras do chat. */
-.seguro .quiosque::before, .seguro .quiosque .faixas { display: none; }
-.seguro .quiosque .cabeca .faixa { visibility: hidden; }
+.horizontal .quiosque { right: 24px; top: 868px; width: 460px; padding: 10px 16px; display: grid; row-gap: 8px; }
 .titulo-jogo { font: 900 34px/1 var(--display); text-transform: uppercase; letter-spacing: .06em; text-align: center; color: var(--amarelo); }
 .titulo-jogo { display: none; }
-.quiosque .cabeca, .quiosque .faixas li { display: grid; grid-template-columns: 92px 1fr 1fr; gap: 10px; align-items: center; }
+.quiosque .cabeca { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: center; }
 .quiosque .cabeca { font: 800 17px/1 var(--texto); text-transform: uppercase; letter-spacing: .08em; color: rgba(244, 240, 228, .6); margin: 6px 0 4px; }
 .quiosque .cabeca .caos { color: #FF8A96; }
 .quiosque .cabeca .ajuda { color: #7FF0B6; }
-.quiosque .faixas { list-style: none; }
-.quiosque .faixas li { padding: 6px 0; border-top: 2px dashed rgba(244, 240, 228, .16); }
-.quiosque .valor { display: flex; align-items: center; gap: 6px; font: 900 34px/1 var(--display); color: var(--amarelo); }
-.quiosque .valor svg { font-size: 22px; }
-.quiosque .ef { display: grid; grid-template-columns: 30px 1fr; align-items: center; column-gap: 8px; min-width: 0; }
-.quiosque .ef .ic { grid-row: span 2; font-size: 28px; }
-.quiosque .ef.caos .ic { color: #FF8A96; }
-.quiosque .ef.ajuda .ic { color: #7FF0B6; }
-.quiosque .ef b { font: 900 26px/.92 var(--display); text-transform: uppercase; letter-spacing: .02em; }
-.quiosque .ef small { font: 600 16px/1.15 var(--texto); color: rgba(244, 240, 228, .7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .quiosque .barras { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
 .quiosque .barra { position: relative; height: 36px; border-radius: 10px; background: rgba(0, 0, 0, .28); overflow: hidden; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; }
 .quiosque .barra i { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; transform-origin: 0 0; transform: scaleX(0); transition: transform .3s; }
@@ -261,11 +242,9 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .quiosque .barra.caos i { background: linear-gradient(90deg, #B3233A, var(--caos)); }
 .quiosque .barra .rot, .quiosque .barra b { position: relative; z-index: 1; font: 800 18px/1 var(--texto); text-shadow: 0 1px 2px rgba(0, 0, 0, .5); }
 .quiosque .barra b { font-variant-numeric: tabular-nums; }
-/* Vertical: o cabeçalho "comente 1 / 2" é a própria barra do chat, que
-   enche por trás do texto; a descrição curta só cabe no horizontal. */
-.vertical .quiosque::before { display: none; }
-.vertical .quiosque .cabeca, .vertical .quiosque .faixas li { grid-template-columns: 128px 1fr 1fr; gap: 12px; }
-.vertical .quiosque .cabeca { position: relative; z-index: 1; height: 84px; margin: 0 0 6px; font-size: 30px; letter-spacing: .04em; text-align: center; }
+/* Vertical: o cabeçalho "1 / 2" é a própria barra do chat, que enche por
+   trás do texto. */
+.vertical .quiosque .cabeca { position: relative; z-index: 1; gap: 12px; height: 84px; margin: 0 0 6px; font-size: 30px; letter-spacing: .04em; text-align: center; }
 .vertical .quiosque .cabeca .caos, .vertical .quiosque .cabeca .ajuda { display: flex; align-items: center; gap: 12px; padding-left: 12px; color: #fff; text-transform: none; letter-spacing: 0; text-align: left; }
 .vertical .quiosque .cabeca kbd {
   display: grid; place-items: center; flex: none; width: 58px; height: 62px; border-radius: 12px;
@@ -275,32 +254,17 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .vertical .quiosque .cabeca .ajuda kbd { background: #7FF0B6; }
 .vertical .quiosque .cabeca kbd + span { display: grid; gap: 2px; font: 700 37px/1 var(--texto); text-shadow: 0 1px 3px rgba(0, 0, 0, .6); }
 .vertical .quiosque .cabeca kbd + span b { font: 900 44px/.95 var(--display); text-transform: uppercase; letter-spacing: .02em; }
-.vertical .quiosque .barras { position: absolute; top: 10px; left: 158px; right: 18px; height: 84px; margin: 0; gap: 12px; }
+.vertical .quiosque .barras { position: absolute; top: 10px; left: 18px; right: 18px; height: 84px; margin: 0; gap: 12px; }
 .vertical .quiosque .barra { height: 100%; border-radius: 14px; justify-content: flex-end; padding: 0 14px; background: rgba(0, 0, 0, .32); }
 .vertical .quiosque .barra.caos { order: -1; }
 .vertical .quiosque .barra i { opacity: .7; }
 .vertical .quiosque .barra .rot { display: none; }
 .vertical .quiosque .barra b { font: 900 38px/1 var(--display); color: rgba(255, 255, 255, .9); }
-.vertical .quiosque .faixas li { height: 50px; padding: 0; }
-.vertical .quiosque .valor { font-size: 44px; gap: 6px; }
-.vertical .quiosque .valor svg { font-size: 32px; }
-.vertical .quiosque .ef { grid-template-columns: 42px 1fr; column-gap: 10px; }
-.vertical .quiosque .ef .ic { grid-row: auto; font-size: 40px; }
-.vertical .quiosque .ef b { font-size: 44px; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.vertical .quiosque .ef small { display: none; }
 .horizontal .quiosque .cabeca { display: none; }
-.horizontal .quiosque .faixas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-.horizontal .quiosque .faixas li { grid-template-columns: 1fr; gap: 6px; align-content: start; border-top: 0; border-left: 2px dashed rgba(244, 240, 228, .16); padding: 0 0 0 12px; }
-.horizontal .quiosque .faixas li:first-child { border-left: 0; padding-left: 0; }
-.horizontal .quiosque .valor { font-size: 30px; }
-.horizontal .quiosque .ef { grid-template-columns: 24px 1fr; column-gap: 6px; }
-.horizontal .quiosque .ef .ic { font-size: 22px; }
-.horizontal .quiosque .ef b { font-size: 22px; }
-.horizontal .quiosque .ef small { font-size: 14px; white-space: normal; }
-.horizontal .quiosque .barras { grid-column: 2; grid-row: 1; grid-template-columns: 1fr; margin-top: 0; align-content: end; padding-bottom: 4px; }
+.horizontal .quiosque .barras { grid-template-columns: 1fr; margin-top: 0; }
 .horizontal .quiosque .barra { height: 40px; }
 .horizontal .quiosque .barra .rot, .horizontal .quiosque .barra b { font-size: 16px; }
-.horizontal .quiosque::after { content: "Comente 1 ajuda · 2 sabota"; grid-column: 2; grid-row: 1; font: 900 24px/1.05 var(--display); text-transform: uppercase; letter-spacing: .04em; color: var(--amarelo); text-align: center; align-self: start; padding-top: 6px; }
+.horizontal .quiosque::after { content: "1 ajuda · 2 sabota"; order: -1; font: 900 24px/1.05 var(--display); text-transform: uppercase; letter-spacing: .04em; color: var(--amarelo); text-align: center; align-self: start; padding-top: 6px; }
 
 /* ───────── feed e ranking ───────── */
 

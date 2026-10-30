@@ -226,8 +226,6 @@ b.b, .b { color: var(--b); }
 .ultimos .texto b.a { color: #FF5A62; } .ultimos .texto b.b { color: #2BD97C; }
 .ultimos li:nth-child(n+4) { opacity: .75; }
 .ultimos li:nth-child(n+6) { opacity: .5; }
-.ultimos:empty::before { content: "Os últimos apoi0s aparecem aqui"; display: flex; align-items: center; justify-content: center; height: 64px;
-  border-radius: 32px; border: 2px dashed rgba(255,255,255,.16); color: #8C9BC5; font: 700 36px/1 var(--texto); }
 @keyframes entra-linha { from { transform: translateY(-30px) scale(.94); opacity: 0; } to { transform: none; opacity: 1; } }
 
 /* Qual presente vota em quem, cada um em cima da urna do seu lado. */

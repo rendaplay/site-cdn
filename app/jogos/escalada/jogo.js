@@ -42,7 +42,7 @@ const Jogo = {
     this.configurar = montarConfigurar({
       jogo: "escalada",
       opcoes: () => config.faixas.map((_, i) => config.times.map(t => t.efeitos[i]).join(" / ")),
-      testar: presente => this.receber({ tipo: "presente", usuario: { id: "teste", nome: "teste", foto: null }, presente }),
+      testar: presente => this.receber({ tipo: "presente", usuario: { id: "teste", nome: nomeDeTeste(), foto: null }, presente }),
       avancado: () => Painel.alternar(true),
     });
     Cena.montar(document.getElementById("cena"), "vertical", config.personagem);
@@ -140,7 +140,7 @@ const Jogo = {
     const id = `teste${time}${Math.floor(Math.random() * 4)}`;
     this.receber({
       tipo: "presente",
-      usuario: { id, nome: `${id}`, foto: null },
+      usuario: { id, nome: nomeDeTeste(), foto: null },
       presente: { nome: config.times[time].presente.aceitos[0], moedas: total, quantidade: 1, total },
     });
   },

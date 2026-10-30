@@ -197,7 +197,7 @@ const Jogo = {
         case "rodada":
           Som.apito();
           Hud.esconderPodio();
-          Hud.anunciar({ fita: `Rodada ${a.rodada}`, cor: "#39E6FF", texto: "comente pra soltar sua bolinha", ms: 2200 });
+          Hud.anunciar({ fita: `Rodada ${a.rodada}`, cor: "#39E6FF", ms: 2200 });
           break;
       }
     }
@@ -246,7 +246,7 @@ const Jogo = {
         fita: f.nome,
         cor: a.lendario ? "#FF3D9A" : COR_FAIXA[a.faixa],
         jogador: j,
-        texto: `${a.quantidade > 1 ? a.quantidade + "× " : ""}${a.nome || "presente"} · ${f.texto}`,
+        texto: `${a.quantidade > 1 ? a.quantidade + "× " : ""}${simboloDoPresente(a.nome)} · ${f.texto}`,
         lendario: a.lendario,
         ms: a.lendario ? 3800 : a.faixa >= 3 ? 2800 : 2200,
       });
@@ -300,9 +300,9 @@ const Jogo = {
 
   testeId: 0,
   teste(tipo, extra = {}) {
-    const nomes = ["teste.ana", "teste.beto", "teste.cida", "teste.dudu", "teste.edu", "teste.fefe"];
-    const nome = extra.nome || nomes[this.testeId++ % nomes.length];
-    this.live.simular({ tipo, usuario: { id: nome, nome }, ...extra });
+    const ids = ["teste.ana", "teste.beto", "teste.cida", "teste.dudu", "teste.edu", "teste.fefe"];
+    const id = extra.nome || ids[this.testeId++ % ids.length];
+    this.live.simular({ tipo, usuario: { id, nome: nomeDeTeste() }, ...extra });
   },
 
   presenteTeste(moedas, nome) {

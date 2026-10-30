@@ -1,5 +1,5 @@
 /* Tudo que é texto na tela: placar de moedas, altura, as colunas dos times
-   (comando, cardápio, top 3), anúncios e os avatares voando até o Zé.
+   (comando, top 3), anúncios e os avatares voando até o Zé.
    Animação guiada pelo relógio do jogo (Hud.quadro), não por CSS: pausa
    junto e grava quadro a quadro igual. */
 "use strict";
@@ -69,22 +69,12 @@ const Hud = {
       col.innerHTML = `
         <div class="cab">
           <h2>${escapar(time.nome)}</h2>
-          <p class="comando">comente <b>${escapar(time.comandos[0])}</b>${this.seguro ? "" : `<span>ou mande ${escapar(time.presente.nome)}</span>`}</p>
+          <p class="comando"><b>${escapar(time.comandos[0])}</b>${this.seguro ? "" : `<span>${simboloDoPresente(time.presente.aceitos[0])}</span>`}</p>
           <p class="torcida">0 na torcida</p>
         </div>
-        <ol class="cardapio"></ol>
         <h3>${i === 0 ? "Quem mais ajudou" : "Quem mais derrubou"}</h3>
         <ol class="top"></ol>
         ${i === 1 ? '<p class="maior-queda" hidden></p>' : ""}`;
-      const lista = col.querySelector(".cardapio");
-      config.faixas.forEach((min, f) => {
-        const li = el("li");
-        const cv = document.createElement("canvas");
-        cv.width = cv.height = 64;
-        Desenho.icone(cv.getContext("2d"), i * 5 + f, time.cor);
-        li.append(cv, el("span", "efeito", time.efeitos[f]), el("span", "preco", `${fmt.format(min)}+`));
-        lista.append(li);
-      });
     });
     this.tops = [null, null];
     this.ultimos = [];
@@ -145,7 +135,7 @@ const Hud = {
       const ol = col.querySelector(".top");
       ol.textContent = "";
       if (!top.length) {
-        ol.append(el("li", "vazio", i === 0 ? "Ninguém ajudou ainda" : "Ninguém derrubou ainda"));
+        ol.append(el("li", "vazio", "—"));
         return;
       }
       top.forEach((t, k) => {
@@ -164,15 +154,15 @@ const Hud = {
     const resta = Math.max(0, Math.ceil((evento.ate - agora) / 1000));
     const frac = Math.max(0, (evento.ate - agora) / (evento.segundos * 1000));
     let linha = "";
-    if (evento.tipo === "dobro") linha = "todo presente vale o dobro";
-    else if (evento.tipo === "chuva") linha = `comente <b>${escapar(this.config.times[0].comandos[0])}</b> ou <b>${escapar(this.config.times[1].comandos[0])}</b>: vale 5×`;
-    else linha = `seguram com <b>${fmt.format(evento.meta)}</b> moedas de ajuda · ${fmt.format(Math.min(evento.segurado, evento.meta))}/${fmt.format(evento.meta)}`;
+    if (evento.tipo === "dobro") linha = "2×";
+    else if (evento.tipo === "chuva") linha = "5×";
+    else linha = `${fmt.format(Math.min(evento.segurado, evento.meta))}/${fmt.format(evento.meta)}`;
     const html = `<span class="titulo">${NOMES_SURPRESA[evento.tipo]}</span><span class="linha">${linha}</span><span class="resta">${resta}s</span><i style="width:${(evento.tipo === "ventania" ? Math.min(1, evento.segurado / evento.meta) : frac) * 100}%"></i>`;
     if (s.innerHTML !== html) s.innerHTML = html;
   },
 
-  /* Presente de quem ainda não escolheu time: o nome e o comando ficam na
-     tela até a pessoa comentar ou acabar a espera. */
+  /* Presente de quem ainda não escolheu time: o nome fica na tela até a
+     pessoa entrar num time ou acabar a espera. */
   pendentes(escalada, agora) {
     const caixa = this.$(".pendentes");
     const lista = [...escalada.pendentes.values()].sort((a, b) => b.ate - a.ate).slice(0, 2);
@@ -180,13 +170,10 @@ const Hud = {
     if (chave !== this.chavePendentes) {
       this.chavePendentes = chave;
       caixa.textContent = "";
-      const [ajuda, derruba] = this.config.times;
       for (const p of lista) {
         const total = p.lote.reduce((s, x) => s + x.total, 0);
         const card = el("div", `pendente${total >= (this.config.destaqueMoedas || Infinity) ? " grande" : ""}`);
-        const linha = el("span", "linha");
-        linha.innerHTML = `comente <i class="c0">${escapar(ajuda.comandos[0])}</i> ou <i class="c1">${escapar(derruba.comandos[0])}</i>`;
-        card.append(criarAvatar(p.quem), el("span", "nome", p.quem.nome), el("span", "moedas", this.valor(total)), linha, el("span", "resta"), el("i", "barra"));
+        card.append(criarAvatar(p.quem), el("span", "nome", p.quem.nome), el("span", "moedas", this.valor(total)), el("span", "linha", "sem time"), el("span", "resta"), el("i", "barra"));
         card.dataset.id = p.quem.id;
         caixa.append(card);
       }
@@ -275,7 +262,7 @@ const Hud = {
         this.anunciar(4, "recorde", 0, a.quem, "Novo recorde da live!", `passou de ${fmt.format(Math.floor(a.anterior))} m`);
       } else if (a.tipo === "surpresa") {
         const e = a.evento;
-        const linha = e.tipo === "dobro" ? "todo presente vale o dobro" : e.tipo === "chuva" ? `comentar ${times[0].comandos[0]} ou ${times[1].comandos[0]} vale 5×` : `${fmt.format(this.config.surpresa.ventania.metros)} m de queda em ${e.segundos} s. Ajuda segura com ${fmt.format(e.meta)} moedas`;
+        const linha = e.tipo === "dobro" ? "2×" : e.tipo === "chuva" ? "5×" : `${fmt.format(this.config.surpresa.ventania.metros)} m de queda em ${e.segundos} s`;
         this.anunciar(4, "surpresa", e.tipo === "ventania" ? 1 : 0, null, NOMES_SURPRESA[e.tipo], linha);
       } else if (a.tipo === "segurou") {
         this.anunciar(3, "salvou", 0, a.quem, "Seguraram a ventania!", a.quem ? `a última foi de ${a.quem.nome}` : "");

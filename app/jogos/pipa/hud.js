@@ -1,17 +1,9 @@
-/* O que fica por cima do céu, em DOM: rei do céu, moedas da live, ranking,
-   cardápio de presentes e eventos-surpresa. */
+/* O que fica por cima do céu, em DOM: rei do céu, moedas da live, ranking
+   e eventos-surpresa. */
 "use strict";
 
 const fmt = new Intl.NumberFormat("pt-BR");
 const CORES_AVATAR = ["#3B4C7A", "#6B3F7A", "#2F6E73", "#7A5A2F", "#4F6B2F", "#7A2F4A", "#2F4F7A", "#5E5E6E"];
-
-const ICONES = {
-  coroa: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18l-1.5-10-4.5 4-3-7-3 7-4.5-4z"/></svg>`,
-  moeda: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4"/></svg>`,
-  balao: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>`,
-  coracao: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>`,
-  presente: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16v10H4zM3 7h18v3H3zM12 7v13M12 7c-2-4-6-3-5-1s5 1 5 1zm0 0c2-4 6-3 5-1s-5 1-5 1z"/></svg>`,
-};
 
 function el(tag, cls, texto) {
   const e = document.createElement(tag);
@@ -50,9 +42,9 @@ function tempoNoAr(ms) {
 }
 
 const EVENTOS = {
-  ventania: { titulo: "Ventania!", texto: "Comente pra segurar sua linha" },
-  dourado: { titulo: "Cerol dourado", texto: "Todo presente sobe uma faixa" },
-  avoada: { titulo: "Pipa avoada!", texto: "Comente APAREI pra pegar" },
+  ventania: "Ventania!",
+  dourado: "Cerol dourado",
+  avoada: "Pipa avoada!",
 };
 
 const Hud = {
@@ -64,37 +56,10 @@ const Hud = {
     const q = s => palco.querySelector(s);
     this.$ = {
       rei: q(".rei"), moedas: q(".moedas"), ranking: q(".ranking ol"),
-      cardapio: q(".cardapio ol"), chamada: q(".chamada"), evento: q(".evento"),
-      sinal: q(".sem-sinal"),
+      evento: q(".evento"), sinal: q(".sem-sinal"),
     };
     q(".titulo-jogo").textContent = cfg.titulo;
-    this.$.chamada.innerHTML = cfg.modoSeguro
-      ? `<span>${ICONES.balao}<b>Comente</b> e sua pipa sobe</span><span>${ICONES.coracao}<b>Curtida</b> dá gás</span>`
-      : `<span>${ICONES.balao}<b>Comente</b> e sua pipa sobe</span><span>${ICONES.presente}<b>Presente</b> corta</span>`;
-    if (cfg.modoSeguro) q(".cardapio h3").textContent = "Na pipa";
-    this.montarCardapio();
     this.ranking([]);
-  },
-
-  montarCardapio() {
-    const lista = this.$.cardapio;
-    lista.replaceChildren();
-    const estampas = ["meio", "xadrez", "estrela", "olho", "fogo"];
-    this.cfg.faixas.forEach((f, i) => {
-      const li = el("li");
-      const icone = document.createElement("canvas");
-      icone.width = 64;
-      icone.height = 80;
-      icone.className = "mini";
-      const c = icone.getContext("2d");
-      Ceu.desenharPipa(c, { x: 32, y: 38, rot: -0.15 }, ["#E63946", "#F4A300"], estampas[i] || "meio", 56, 0.4);
-      const valor = el("span", "valor");
-      valor.innerHTML = `${ICONES.moeda}${fmt.format(f.moedas)}`;
-      const txt = el("span", "txt");
-      txt.innerHTML = `<b>${escapar(f.nome)}</b><small>${escapar(f.efeito)}</small>`;
-      li.append(icone, valor, txt);
-      lista.append(li);
-    });
   },
 
   /* ───────── placares ───────── */
@@ -114,7 +79,7 @@ const Hud = {
       r.dataset.id = "";
       r.classList.remove("ocupado");
       r.querySelector(".quem").replaceChildren(el("span", "nome vazio", "Ninguém ainda"));
-      r.querySelector(".tempo").textContent = `fique ${combate.cfg.rei.minimo} s no ar`;
+      r.querySelector(".tempo").textContent = "";
     }
 
     const m = this.$.moedas;
@@ -141,7 +106,7 @@ const Hud = {
       const li = el("li", j ? (i === 0 ? "primeiro" : "") : "vazio");
       li.append(el("span", "pos", String(i + 1)));
       if (j) li.append(criarAvatar(j), el("span", "quem", j.nome), el("span", "valor", String(j.cortes)));
-      else li.append(el("span", "quem", i === 0 ? "Corte uma pipa" : "—"));
+      else li.append(el("span", "quem", "—"));
       ol.append(li);
     }
   },
@@ -151,18 +116,13 @@ const Hud = {
   evento(ev, agora) {
     const caixa = this.$.evento;
     if (!ev) {
-      if (caixa.classList.contains("on")) {
-        caixa.classList.remove("on");
-        this.$.chamada.classList.remove("escondida");
-      }
+      caixa.classList.remove("on");
       return;
     }
-    const info = EVENTOS[ev.tipo];
     if (caixa.dataset.tipo !== ev.tipo || !caixa.classList.contains("on")) {
       caixa.dataset.tipo = ev.tipo;
-      caixa.innerHTML = `<b>${escapar(info.titulo)}</b><span>${escapar(info.texto)}</span><i><u></u></i>`;
+      caixa.innerHTML = `<b>${escapar(EVENTOS[ev.tipo])}</b><i><u></u></i>`;
       caixa.classList.add("on");
-      this.$.chamada.classList.add("escondida");
     }
     const resta = Math.max(0, (ev.fim - agora) / (ev.fim - ev.inicio));
     caixa.querySelector("u").style.width = (resta * 100).toFixed(1) + "%";
@@ -171,7 +131,7 @@ const Hud = {
   /* Onde os painéis estão (px do palco), pro céu não pôr pipa atrás deles. */
   areas() {
     const caixa = sec => [sec.offsetLeft, sec.offsetTop, sec.offsetLeft + sec.offsetWidth, sec.offsetTop + sec.offsetHeight];
-    return [caixa(this.$.ranking.parentElement), caixa(this.$.cardapio.parentElement)];
+    return [caixa(this.$.ranking.parentElement)];
   },
 
   sinal(estado) {

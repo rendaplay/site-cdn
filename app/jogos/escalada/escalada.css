@@ -206,26 +206,8 @@ body { font-family: var(--fonte); color: var(--texto); }
   color: #0A0C1E;
   background: var(--time);
 }
-.coluna .comando span { flex-basis: 100%; color: var(--apagado); font-size: 18px; }
+.coluna .comando span { font-size: 40px; line-height: 1; }
 .coluna .torcida { margin: 6px 0 0; font-size: 16px; color: var(--apagado); }
-
-.coluna .cardapio {
-  list-style: none;
-  margin: 14px 0 0;
-  padding: 0;
-  border-top: 1px solid var(--placa-borda);
-}
-.coluna .cardapio li {
-  display: grid;
-  grid-template-columns: 48px 1fr auto;
-  align-items: center;
-  gap: 10px;
-  height: 52px;
-  border-bottom: 1px solid var(--placa-borda);
-}
-.coluna .cardapio canvas { width: 46px; height: 46px; }
-.coluna .cardapio .efeito { font-size: 21px; font-weight: 600; white-space: nowrap; }
-.coluna .cardapio .preco { font: 800 26px var(--numero); color: var(--ouro); }
 
 .coluna h3 {
   margin: 14px 0 6px;
@@ -413,21 +395,6 @@ body { font-family: var(--fonte); color: var(--texto); }
   background: radial-gradient(circle at 35% 35%, #FFE38A, #E0A100 70%);
 }
 .pendente .linha { font-size: 22px; font-weight: 600; }
-.pendente .linha i {
-  display: inline-grid;
-  place-items: center;
-  min-width: 36px;
-  height: 36px;
-  margin: 0 2px;
-  padding: 0 6px;
-  border-radius: 9px;
-  font: 900 30px var(--numero);
-  font-style: normal;
-  color: #0A0C1E;
-  vertical-align: middle;
-}
-.pendente .linha .c0 { background: var(--ajuda); }
-.pendente .linha .c1 { background: var(--derruba); }
 .pendente .resta { min-width: 40px; text-align: right; font: 900 32px var(--numero); color: var(--ouro); }
 .pendente .barra { position: absolute; left: 0; bottom: 0; height: 5px; background: var(--ouro); }
 
@@ -541,7 +508,6 @@ body { font-family: var(--fonte); color: var(--texto); }
 .vertical .pendente .moedas { font-size: 44px; }
 .vertical .pendente .moedas::before { width: 24px; height: 24px; }
 .vertical .pendente .linha { font-size: 34px; }
-.vertical .pendente .linha i { min-width: 52px; height: 52px; font-size: 44px; border-radius: 12px; }
 .vertical .pendente .resta { font-size: 44px; }
 .vertical .pendente .barra { height: 6px; }
 
@@ -555,17 +521,8 @@ body { font-family: var(--fonte); color: var(--texto); }
 .vertical .coluna .comando { gap: 4px 14px; margin-top: 10px; font-size: 40px; font-weight: 600; }
 .vertical .c1 .comando { justify-content: flex-end; }
 .vertical .coluna .comando b { min-width: 76px; height: 76px; border-radius: 16px; font-size: 66px; }
-.vertical .coluna .comando span { font-size: 36px; }
+.vertical .coluna .comando span { font-size: 60px; }
 .vertical .coluna .torcida { margin-top: 2px; font-size: 36px; }
-.vertical .coluna .cardapio { margin-top: 12px; }
-.vertical .coluna .cardapio li { grid-template-columns: 62px 1fr auto; gap: 12px; height: auto; min-height: 78px; padding: 4px 0; }
-.vertical .c1 .cardapio li { grid-template-columns: auto 1fr 62px; }
-.vertical .c1 .cardapio canvas { order: 3; }
-.vertical .c1 .cardapio .preco { order: 1; }
-.vertical .c1 .cardapio .efeito { order: 2; }
-.vertical .coluna .cardapio canvas { width: 62px; height: 62px; }
-.vertical .coluna .cardapio .efeito { font-size: 37px; line-height: 1; letter-spacing: -0.01em; white-space: normal; }
-.vertical .coluna .cardapio .preco { font-size: 50px; line-height: 1; }
 .vertical .coluna h3 { margin: 14px 0 4px; font-size: 36px; letter-spacing: 0; text-transform: none; }
 /* Nome em cima, pontos embaixo: nome do TikTok é comprido e não cabe na
    mesma linha dos pontos com letra de celular. */
@@ -676,5 +633,4 @@ body { font-family: var(--fonte); color: var(--texto); }
 
 /* ───────── modo seguro TikTok ───────── */
 .seguro .placar .moedas,
-.seguro .pendente .moedas::before,
-.seguro .cardapio { display: none; }
+.seguro .pendente .moedas::before { display: none; }

@@ -91,24 +91,11 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .moedas .maior { font: 600 19px/1.15 var(--texto); color: rgba(255, 244, 226, .78); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
 .moedas .maior b { color: var(--fita); font-weight: 800; }
 
-/* ───────── chamada e evento ───────── */
+/* ───────── evento ───────── */
 
-.chamada, .evento { position: absolute; left: 50%; transform: translateX(-50%); }
-.vertical .chamada, .vertical .evento { top: calc(432px + var(--sobra) * .3); }
-.horizontal .chamada, .horizontal .evento { top: 150px; }
-
-.chamada { display: flex; gap: 14px; transition: opacity .3s; white-space: nowrap; }
-.chamada.escondida { opacity: 0; }
-.chamada span {
-  display: inline-flex; align-items: center; gap: 10px;
-  background: var(--creme); color: var(--tinta);
-  font: 600 25px/1 var(--texto);
-  padding: 10px 20px 10px 14px; border-radius: 999px;
-  box-shadow: 0 6px 18px rgba(20, 0, 30, .35);
-}
-.chamada span:nth-child(2) { background: var(--fita); }
-.chamada svg { font-size: 28px; }
-.chamada b { font-weight: 900; }
+.evento { position: absolute; left: 50%; transform: translateX(-50%); }
+.vertical .evento { top: calc(432px + var(--sobra) * .3); }
+.horizontal .evento { top: 150px; }
 
 .evento {
   display: none; width: 680px;
@@ -116,10 +103,9 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
   border-radius: 16px; padding: 8px 20px 10px;
   box-shadow: 0 0 0 4px var(--tinta), 0 14px 40px rgba(20, 0, 30, .55);
 }
-.evento.on { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 16px; animation: evento-entra .5s cubic-bezier(.2, .9, .3, 1.3); }
+.evento.on { display: grid; justify-items: stretch; text-align: center; animation: evento-entra .5s cubic-bezier(.2, .9, .3, 1.3); }
 .evento b { font: 900 46px/1 var(--display); text-transform: uppercase; letter-spacing: .02em; white-space: nowrap; }
-.evento span { font: 700 23px/1.1 var(--texto); }
-.evento i { grid-column: 1 / -1; display: block; height: 8px; margin-top: 6px; background: rgba(26, 11, 34, .2); border-radius: 6px; overflow: hidden; }
+.evento i { display: block; height: 8px; margin-top: 6px; background: rgba(26, 11, 34, .2); border-radius: 6px; overflow: hidden; }
 .evento u { display: block; height: 100%; background: var(--tinta); border-radius: 6px; }
 .evento[data-tipo="ventania"] { background: #C9BCFF; }
 .evento[data-tipo="avoada"] { background: linear-gradient(100deg, #FFE27A, #F2B51F); }
@@ -127,16 +113,10 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 
 /* ───────── painéis ───────── */
 
-.ranking, .cardapio { position: absolute; }
-/* Vertical: tudo numa faixa só lá em cima, na largura toda. Embaixo à
-   esquerda fica o chat do TikTok e à direita os botões dele, então o
-   cardápio não pode morar lá; o céu fica com o meio. */
-.vertical .cardapio { left: 28px; right: 28px; top: calc(524px + var(--sobra) * .3); }
+.ranking { position: absolute; }
+/* Embaixo à esquerda fica o chat do TikTok e à direita os botões dele. */
 .vertical .ranking { right: 28px; top: calc(754px + var(--sobra) * .3); width: 404px; }
-/* Fora do modo seguro o cardápio tem o nome da faixa e fica mais alto. */
-.vertical:not(.seguro) .ranking { top: calc(834px + var(--sobra) * .3); }
 .horizontal .ranking { right: 28px; top: 160px; width: 380px; }
-.horizontal .cardapio { right: 28px; top: 524px; width: 380px; }
 
 .fita-titulo {
   display: inline-block;
@@ -149,7 +129,7 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 }
 .ranking .fita-titulo { transform: rotate(1.4deg); }
 
-.ranking ol, .cardapio ol { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.ranking ol { list-style: none; display: flex; flex-direction: column; gap: 8px; }
 
 .ranking li {
   display: flex; align-items: center; gap: 10px;
@@ -165,32 +145,8 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .ranking li.primeiro .pos, .ranking li.primeiro .valor { color: var(--tinta); }
 .ranking li.vazio { color: rgba(255, 244, 226, .45); font-weight: 600; padding-block: 13px; }
 
-.cardapio li {
-  display: grid; grid-template-columns: 50px 104px 1fr; align-items: center; gap: 6px;
-  background: var(--tinta-vidro);
-  border-radius: 14px; padding: 4px 12px 4px 6px;
-}
-.cardapio .mini { width: 46px; height: 58px; }
-.cardapio .valor { display: inline-flex; align-items: center; gap: 5px; font: 900 30px/1 var(--display); color: var(--fita); }
-.cardapio .valor svg { font-size: 22px; }
-.cardapio .txt b { display: block; font: 800 23px/1.1 var(--texto); }
-.cardapio .txt small { display: block; font: 600 19px/1.15 var(--texto); color: rgba(255, 244, 226, .85); }
-.cardapio li:last-child { background: linear-gradient(100deg, rgba(160, 30, 10, .9), rgba(255, 106, 26, .85)); }
-.cardapio li:last-child .valor { color: #fff; }
-
-/* Modo seguro: sem placar de moedas e cardápio miúdo, só legenda. */
+/* Modo seguro: sem placar de moedas. */
 .seguro .moedas { visibility: hidden; }
-.seguro .cardapio { width: 300px; opacity: .85; }
-.seguro .cardapio .fita-titulo { font-size: 18px; padding: 6px 12px 5px; margin-bottom: 6px; }
-.seguro .cardapio ol { gap: 4px; }
-.seguro .cardapio li { grid-template-columns: 34px 74px 1fr; padding: 2px 10px 2px 4px; border-radius: 10px; }
-.seguro .cardapio .mini { width: 30px; height: 38px; }
-.seguro .cardapio .valor { font-size: 21px; }
-.seguro .cardapio .valor svg { font-size: 16px; }
-.seguro .cardapio .txt b { display: none; }
-.seguro .cardapio .txt small { font-size: 17px; }
-.seguro .cardapio li:last-child { background: var(--tinta-vidro); }
-.seguro .cardapio li:last-child .valor { color: var(--fita); }
 
 /* ───────── vertical: tamanhos pro celular ─────────
    O palco vertical chega no celular de quem assiste a ~0,36: 44 px aqui
@@ -214,39 +170,11 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .vertical.seguro .moedas { display: none; }
 .vertical.seguro .titulo-jogo { font-size: 104px; max-width: 420px; }
 
-.vertical .chamada { gap: 12px; }
-.vertical .chamada span { font-size: 44px; gap: 10px; padding: 12px 22px 12px 16px; }
-.vertical .chamada svg { font-size: 46px; }
-
-.vertical .evento { width: 1024px; padding: 6px 24px 10px; column-gap: 18px; }
+.vertical .evento { width: 1024px; padding: 6px 24px 10px; }
 .vertical .evento b { font-size: 54px; }
-.vertical .evento span { font-size: 40px; }
 .vertical .evento i { height: 8px; margin-top: 4px; }
 
 .vertical .fita-titulo { font-size: 36px; padding: 7px 20px 6px; margin-bottom: 8px; }
-
-.vertical .cardapio ol { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-.vertical .cardapio li {
-  grid-template-columns: auto 1fr; grid-template-rows: auto 1fr; align-items: center;
-  gap: 2px 6px; padding: 8px 10px 12px 6px; border-radius: 16px;
-}
-.vertical .cardapio .mini { width: 54px; height: 68px; }
-.vertical .cardapio .valor { font-size: 50px; gap: 4px; }
-.vertical .cardapio .valor svg { font-size: 30px; }
-.vertical .cardapio .txt { grid-column: 1 / -1; align-self: start; padding-left: 6px; }
-.vertical .cardapio .txt b { font: 800 36px/1 var(--display); text-transform: uppercase; letter-spacing: .02em; color: var(--fita); margin-bottom: 4px; }
-.vertical .cardapio .txt small { font: 700 37px/1.02 var(--display); text-transform: uppercase; letter-spacing: .02em; color: var(--creme); }
-.vertical .cardapio li:last-child .txt b { color: #fff; }
-/* Modo seguro: o cardápio fica do mesmo tamanho (é o que explica o jogo),
-   só sem o nome da faixa e sem o destaque do mais caro. */
-.vertical.seguro .cardapio { width: auto; opacity: 1; }
-.vertical.seguro .cardapio .fita-titulo { font-size: 36px; padding: 7px 20px 6px; margin-bottom: 8px; }
-.vertical.seguro .cardapio ol { gap: 8px; }
-.vertical.seguro .cardapio li { grid-template-columns: auto 1fr; padding: 8px 10px 12px 6px; border-radius: 16px; }
-.vertical.seguro .cardapio .mini { width: 54px; height: 68px; }
-.vertical.seguro .cardapio .valor { font-size: 50px; }
-.vertical.seguro .cardapio .valor svg { font-size: 30px; }
-.vertical.seguro .cardapio .txt small { font-size: 37px; }
 
 /* Ranking mostra 3 linhas: no celular cinco viravam letra miúda. */
 .vertical .ranking li:nth-child(n+4) { display: none; }
@@ -299,6 +227,3 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .painel kbd { display: inline-block; min-width: 30px; text-align: center; font: 800 17px var(--texto); padding: 2px 7px; border-radius: 6px; border: 2px solid #CDBBA6; background: #fff; }
 .vertical .painel { grid-template-columns: 1fr; }
 .vertical .painel .atalhos { grid-template-columns: 1fr; }
-
-/* Modo seguro TikTok: sem a lista de presentes. */
-.seguro .cardapio { display: none; }

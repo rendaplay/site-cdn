@@ -392,17 +392,11 @@ const Urnas = {
 
     c.fillStyle = "#CFD2CB";
     c.fillRect(X + 18, Y + 532, W - 36, 4);
-    const instrucao = (tecla, corTecla, resto, y) => {
-      c.font = "900 38px Figtree, sans-serif";
-      c.fillStyle = corTecla;
-      c.fillText(tecla, X + 22, y);
-      const largura = c.measureText(tecla).width;
-      c.font = "700 38px Figtree, sans-serif";
-      c.fillStyle = "#3A3A3A";
-      c.fillText(resto, X + 34 + largura, y);
-    };
-    instrucao("CONFIRMA", "#1B7C33", "para votar", Y + 588);
-    instrucao("CORRIGE", "#C76A12", "para refazer", Y + 640);
+    c.font = "900 38px Figtree, sans-serif";
+    c.fillStyle = "#1B7C33";
+    c.fillText("CONFIRMA", X + 22, Y + 588);
+    c.fillStyle = "#C76A12";
+    c.fillText("CORRIGE", X + 22, Y + 640);
     c.restore();
   },
 

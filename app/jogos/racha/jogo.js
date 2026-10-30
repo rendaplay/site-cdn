@@ -128,11 +128,9 @@ const Jogo = {
   },
 
   presenteDe(presente) {
-    const pilotos = [...racha.pilotos.values()];
-    const quem = pilotos.length ? pilotos[Math.floor(Math.random() * pilotos.length)] : { id: "teste1", nome: "teste1" };
     this.receber({
       tipo: "presente",
-      usuario: { id: quem.id, nome: quem.nome, foto: quem.foto || null },
+      usuario: { id: "teste1", nome: nomeDeTeste(), foto: null },
       presente,
     });
   },

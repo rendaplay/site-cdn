@@ -54,7 +54,7 @@ const Tela = {
       <div class="chave chave-${"ab"[i]}">
         <i class="chave-icone">${iconeDoPresente(c.presente)}</i>
       </div>`).join("")
-      + `<div class="chave-comente">${seguro ? "comente" : "ou comente"} <b class="a">VERMELHO</b> ou <b class="b">VERDE</b> no chat para participar</div>`;
+      + `<div class="chave-comente"><b class="a">VERMELHO</b> · <b class="b">VERDE</b></div>`;
 
     this.mesa = p.querySelector(".mesa");
     Urnas.montar(document.getElementById("urnas"), candidatos, this.artes);
@@ -125,7 +125,7 @@ const Tela = {
         this.ultimoTop[l] = chave;
         cartao.querySelector(".top").innerHTML = top.length
           ? top.map((d, i) => `<li><span class="pos">${i + 1}º</span>${avatar(d)}<span class="nick">${escapar(d.nick)}</span><b>${fmt(d.votos)}</b></li>`).join("")
-          : `<li class="vazio">Maiores apoiadores aqui</li>`;
+          : `<li class="vazio">—</li>`;
       }
     });
 
@@ -153,7 +153,7 @@ const Tela = {
     for (const a of lista) {
       if (a.tipo === "voto") this.voto(a);
       else if (a.tipo === "virada") this.emSeguida(() => this.virada(a), 2300);
-      else if (a.tipo === "pendente") this.aviso(`<b>${escapar(a.quem.nick)}</b>, comente <b class="a">${COR_DO_LADO[0]}</b> ou <b class="b">${COR_DO_LADO[1]}</b>`);
+      else if (a.tipo === "pendente") this.aviso(`<b>${escapar(a.quem.nick)}</b> ainda sem lado`);
       else if (a.tipo === "comentouPresente") this.aviso(`<b>${escapar(a.quem.nick)}</b> escolheu o <b class="${"ab"[a.lado]}">${COR_DO_LADO[a.lado]}</b>`);
     }
     this.placar(urna);

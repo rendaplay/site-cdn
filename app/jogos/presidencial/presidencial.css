@@ -128,22 +128,12 @@ body { font-family: var(--fonte); color: var(--texto); -webkit-font-smoothing: a
 .avatar i { font-style: normal; }
 .avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
-/* ───────── base: chaves e legenda ───────── */
+/* ───────── base e chaves ───────── */
 
 .base {
   position: absolute; left: 0; right: 0; bottom: 0; height: calc(400px + var(--sobra, 0px) * .9); pointer-events: none;
   background: linear-gradient(180deg, rgba(5, 8, 20, 0), rgba(5, 8, 20, .62) 34%, rgba(5, 8, 20, .82));
 }
-/* Efeitos na direita, em pé: cada um com os presentes que o disparam. */
-.legenda {
-  position: absolute; z-index: 2; right: 20px; top: calc(620px + var(--sobra, 0px) * .75); margin: 0; padding: 14px 14px 6px; pointer-events: none;
-  list-style: none; background: var(--vidro); border: 3px solid var(--vidro-borda); border-radius: 22px;
-  box-shadow: 0 10px 22px rgba(0, 0, 0, .35);
-}
-.legenda li { display: grid; grid-template-columns: 56px auto; grid-template-rows: auto auto; column-gap: 10px; align-items: center; margin-bottom: 12px; }
-.legenda li i { grid-row: span 2; font: normal 50px/1 var(--fonte); text-align: center; }
-.legenda li span { font: 900 28px/1 var(--fonte); color: #fff; text-transform: uppercase; white-space: nowrap; }
-.legenda li em { font: normal 36px/1.15 var(--fonte); letter-spacing: 4px; }
 .aviso .ca { color: var(--a); }
 .aviso .cb { color: var(--b); }
 
@@ -411,11 +401,6 @@ body { font-family: var(--fonte); color: var(--texto); -webkit-font-smoothing: a
 .horizontal .chave-texto b { font-size: 40px; padding: 6px 8px 1px; border-radius: 10px; }
 .horizontal .chave-comente { grid-column: auto; font-size: 30px; padding: 10px 22px; }
 .horizontal .chave-comente b { font-size: 40px; }
-.horizontal .legenda { top: 240px; right: 22px; padding: 10px 12px 2px; }
-.horizontal .legenda li { grid-template-columns: 44px auto; margin-bottom: 8px; }
-.horizontal .legenda li i { font-size: 40px; }
-.horizontal .legenda li span { font-size: 22px; }
-.horizontal .legenda li em { font-size: 28px; }
 .horizontal .faixa { top: 250px; }
 .horizontal .faixa .txt { font-size: 130px; }
 .horizontal .contagem { top: 200px; font-size: 380px; }
@@ -432,5 +417,5 @@ body { font-family: var(--fonte); color: var(--texto); -webkit-font-smoothing: a
 .horizontal .podio .mvp { left: auto; right: 90px; bottom: 270px; transform: none; }
 .horizontal .podio .proxima { left: auto; right: 90px; bottom: 170px; text-align: right; }
 
-/* Modo seguro TikTok: sem a rosa de cada lado e sem a lista de efeitos por presente. */
-.seguro .chave, .seguro .legenda { display: none; }
+/* Modo seguro TikTok: sem a rosa de cada lado. */
+.seguro .chave { display: none; }

@@ -440,6 +440,7 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 .faixa .avatar { width: 128px; height: 128px; font-size: 54px; border-width: 6px; }
 .faixa .quem { font: 800 46px/1 var(--texto); max-width: 600px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .faixa .oque { font: 600 28px/1.2 var(--texto); margin-top: 6px; }
+.faixa .oque img { height: 1.1em; vertical-align: -0.2em; }
 .vertical .faixa .oque { font-size: 36px; font-weight: 700; }
 .faixa .valor { font: 900 108px/0.82 var(--display); margin-top: 10px; text-shadow: 0 6px 0 rgba(0, 0, 0, .25); }
 
@@ -698,11 +699,10 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 .legenda-a .tijolo { background: var(--a); }
 .legenda-b .tijolo { background: var(--b); }
 
-/* ───────── vertical: cartões, golpes e regras ───────── */
+/* ───────── vertical: cartões ───────── */
 
-.cardapio, .golpes, .regras { display: none; }
+.cardapio { display: none; }
 .vertical .cardapio { display: block; }
-.vertical .golpes:not([hidden]), .vertical .regras { display: flex; }
 
 .cartao {
   position: absolute; top: calc(var(--y0) + 262px); width: 504px; height: 306px;
@@ -731,38 +731,12 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 .cartao-a .n { color: var(--a); }
 .cartao-b .n { color: var(--b); }
 
-.golpes {
-  position: absolute; top: calc(var(--y0) + 642px); left: 8px; right: 8px;
-  justify-content: center; gap: 6px;
-}
-.golpe-chip {
-  display: flex; align-items: center; gap: 6px;
-  height: 60px; padding: 0 14px 0 6px;
-  background: rgba(10, 21, 48, .86); border: 3px solid rgba(255, 255, 255, .55); border-radius: 999px;
-  font: 800 36px/1 var(--display); text-transform: uppercase; white-space: nowrap;
-}
-.golpe-chip-ico { font-size: 36px; }
-.golpe-chip b { font: 900 42px/1 var(--display); color: #FFD45A; margin-right: 2px; font-variant-numeric: tabular-nums; }
-
-.regras {
-  position: absolute; top: calc(var(--chao) + 86px); left: 20px; right: 20px;
-  justify-content: center; gap: 10px;
-}
-.regras span {
-  background: rgba(10, 21, 48, .72); border-radius: 999px; padding: 0 16px;
-  font: 700 36px/56px var(--texto); white-space: nowrap;
-}
-.regras b { font: 900 38px/1 var(--display); color: #FFD45A; }
-
 /* ───────── modo seguro TikTok ───────── */
 
 /* Sem chaves "Presente X = lado": a legenda das bordas faz esse papel
    também no horizontal. */
 .seguro .chave { display: none; }
-/* A instrução com "curtidas também empilham" é mais longa: menor, pra não
-   cobrir a torcida no vertical. */
-.seguro .so-presente { font-size: 27px; letter-spacing: .05em; padding: 7px 20px 6px; }
-.seguro.horizontal .legenda { display: flex; top: 250px; width: 108px; }
+.seguro.horizontal .legenda:not([hidden]) { display: flex; top: 250px; width: 108px; }
 .seguro.horizontal .leg { padding: 5px 4px 4px; }
 .seguro.horizontal .leg-ico { width: 36px; height: 36px; font-size: 20px; }
 .seguro.horizontal .leg-ico img { width: 30px; height: 30px; }
@@ -777,9 +751,9 @@ body { font-family: var(--texto); color: var(--branco); -webkit-font-smoothing: 
 /* Sem a tabela do que cada faixa de moedas empilha. */
 .seguro .cardapio { display: none; }
 
-/* HUD limpo: só o tempo, a altura de cada lado e o "comente X ou Y". */
+/* HUD limpo: só o tempo, a altura de cada lado e o "X · Y". */
 .hud-limpo .lado .info, .hud-limpo .meta, .hud-limpo .top, .hud-limpo .maior,
-.hud-limpo .legenda, .hud-limpo .cardapio, .hud-limpo .golpes, .hud-limpo .regras,
+.hud-limpo .legenda, .hud-limpo .cardapio,
 .hud-limpo .linha-ajuda, .hud-limpo .falta, .hud-limpo .empate, .hud-limpo .creditos,
 .hud-limpo .rodada, .hud-limpo .serie, .hud-limpo .bolhas, .hud-limpo .destaque,
 .hud-limpo .ataque, .hud-limpo .virada { display: none !important; }

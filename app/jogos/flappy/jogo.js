@@ -234,7 +234,7 @@ const Jogo = {
         fita: a.lendario ? `Lendário: ${f.nome}` : f.nome,
         cor,
         jogador: j,
-        texto: `${a.quantidade > 1 ? a.quantidade + "× " : ""}${a.nome || "presente"} · ${a.guardado ? "entra no próximo voo" : a.lendario ? (f.teto ? `${f.teto} s, o máximo` : "no máximo") : f.texto}`,
+        texto: `${a.quantidade > 1 ? a.quantidade + "× " : ""}${simboloDoPresente(a.nome)} · ${a.guardado ? "entra no próximo voo" : a.lendario ? (f.teto ? `${f.teto} s, o máximo` : "no máximo") : f.texto}`,
         lendario: a.lendario,
         ms: a.lendario ? 3800 : a.faixa >= 4 ? 3000 : 2400,
       });
@@ -349,9 +349,9 @@ const Jogo = {
 
   testeId: 0,
   teste(tipo, extra = {}) {
-    const nomes = ["teste.ana", "teste.beto", "teste.cida", "teste.dudu", "teste.edu", "teste.fefe"];
-    const nome = extra.nome || nomes[this.testeId++ % nomes.length];
-    this.live.simular({ tipo, usuario: { id: nome, nome }, ...extra });
+    const ids = ["teste.ana", "teste.beto", "teste.cida", "teste.dudu", "teste.edu", "teste.fefe"];
+    const id = extra.nome || ids[this.testeId++ % ids.length];
+    this.live.simular({ tipo, usuario: { id, nome: nomeDeTeste() }, ...extra });
   },
 
   tecla(e) {

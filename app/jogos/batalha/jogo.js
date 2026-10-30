@@ -192,7 +192,7 @@ const Jogo = {
 
   enviarTeste(data) {
     const id = "teste" + Math.floor(Math.random() * 6);
-    this.receber({ type: "gift", user: { id, nickname: id, avatar: null }, data });
+    this.receber({ type: "gift", user: { id, nickname: nomeDeTeste(), avatar: null }, data });
   },
 
   tecla(e) {

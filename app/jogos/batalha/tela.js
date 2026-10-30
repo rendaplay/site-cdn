@@ -120,27 +120,24 @@ const Tela = {
       if (l.presente.imagem) {
         const img = el("img");
         img.src = l.presente.imagem;
-        img.alt = l.presente.nome;
+        img.alt = "";
         icone.replaceChildren(img);
       } else icone.textContent = l.presente.icone;
       if (l.presente.fundo) icone.style.background = l.presente.fundo;
-      chave.querySelector(".chave-txt").innerHTML =
-        `<small>apoie o</small><b>${escapar(l.nome)}</b>`;
+      chave.querySelector(".chave-txt").innerHTML = `<b>${escapar(l.nome)}</b>`;
     });
     /* Modo seguro: sem chaves "Presente Rosa = Vermelho" e sem nada que peça
        presente; o vínculo fica pelo ícone na legenda do próprio lado. */
     this.seguro = cfg.modoSeguro !== false;
-    /* Ultra seguro: nem o ícone do presente nem os golpes por moeda na legenda;
-       o presente continua contando, só não aparece o que ele faz. */
+    /* Ultra seguro: nem o ícone do presente na legenda; o presente continua
+       contando, só não aparece. */
     this.ultra = !!cfg.ultraSeguro;
     p.classList.toggle("seguro", this.seguro);
     p.classList.toggle("hud-limpo", !!cfg.hudLimpo);
     const [a, b] = cfg.lados;
-    const curte = this.curtidaLigada(cfg);
     p.querySelector(".so-presente").innerHTML =
-      `Comente <span class="n n-a">${escapar(a.comandos[0])}</span> ou ` +
-      `<span class="n n-b">${escapar(b.comandos[0])}</span>` +
-      (cfg.hudLimpo ? "" : curte ? ` · curtidas também empilham` : ` pra empilhar`);
+      `<span class="n n-a">${escapar(a.comandos[0])}</span> · ` +
+      `<span class="n n-b">${escapar(b.comandos[0])}</span>`;
     p.querySelector(".creditos").textContent = cfg.creditos || "";
     Cenario.montar(p, cfg);
     this.montarLegenda(cfg);
@@ -161,92 +158,52 @@ const Tela = {
     requestAnimationFrame(quadro);
   },
 
-  curtidaLigada(cfg) { return !!(cfg.curtida && cfg.curtida.cada > 0 && cfg.curtida.metros > 0); },
-
   /* Coluna fina em cada borda (horizontal) ou cartões no alto (vertical):
-     ícone + efeito, sem verbo de pedido. */
+     só o presente de cada lado, sem tabela do que cada ação vale. */
   montarLegenda(cfg) {
-    const faixas = (cfg.ataque && cfg.ataque.faixas) || ATAQUE_PADRAO.faixas;
-    const golpe = { vento: "Ventania", raio: "Raio", bola: "Demolição", terremoto: "Terremoto" };
-    this.montarCardapio(cfg, faixas, golpe);
+    this.montarCardapio(cfg);
     cfg.lados.forEach((l, i) => {
-      const s = i ? "b" : "a";
-      const item = (icone, valor, sub) => {
-        const e = el("div", "leg");
-        const ico = el("span", "leg-ico");
-        if (icone instanceof Node) ico.append(icone); else ico.textContent = icone;
-        e.append(ico, el("b", "", valor), el("small", "", sub));
-        return e;
-      };
-      const itens = [];
-      if (cfg.comentario && cfg.comentario.metros > 0) {
-        itens.push(item(el("i", "tijolo", l.comandos[0]), `+${metros(cfg.comentario.metros)}`, `💬 ${l.comandos[0]}`));
-      }
-      if (this.curtidaLigada(cfg)) itens.push(item("❤", `+${metros(cfg.curtida.metros)}`, `${fmt.format(cfg.curtida.cada)} curtidas`));
-      if (cfg.seguiu && cfg.seguiu.metros > 0) itens.push(item("➕", `+${metros(cfg.seguiu.metros)}`, "seguiu"));
-      let presente = l.presente.icone;
+      const legenda = this.palco.querySelector(`.legenda-${i ? "b" : "a"}`);
+      legenda.hidden = this.ultra;
+      if (this.ultra) return;
+      const ico = el("span", "leg-ico");
       if (l.presente.imagem) {
-        presente = el("img");
-        presente.src = l.presente.imagem;
-        presente.alt = "";
-      }
-      if (this.ultra) {
-        this.palco.querySelector(`.legenda-${s}`).replaceChildren(...itens);
-        return;
-      }
-      itens.push(item(presente, "+1 m", l.presente.nome));
-      if (cfg.ataque && cfg.ataque.maxPct > 0) {
-        for (const f of faixas) itens.push(item(GOLPES[f.tipo].icone, fmt.format(f.de), golpe[f.tipo]));
-      }
-      this.palco.querySelector(`.legenda-${s}`).replaceChildren(...itens);
+        const img = el("img");
+        img.src = l.presente.imagem;
+        img.alt = "";
+        ico.append(img);
+      } else ico.textContent = l.presente.icone;
+      const item = el("div", "leg");
+      item.append(ico);
+      legenda.replaceChildren(item);
     });
   },
 
   /* Na vertical, em celular mais comprido que 9:16, o palco cresce em
      altura em vez de sobrar faixa preta; `--sobra` é quanto passou de 1920. */
   /* Vertical: um cartão por lado com o presente dele (no ultra seguro, o
-     comentário), os golpes numa linha e o resto do que empilha no chão. */
-  montarCardapio(cfg, faixas, golpe) {
+     comando) e o nome do time. */
+  montarCardapio(cfg) {
     const p = this.palco;
-    const comenta = cfg.comentario && cfg.comentario.metros > 0;
     cfg.lados.forEach((l, i) => {
       const s = i ? "b" : "a";
       const cartao = p.querySelector(`.cartao-${s}`);
       const icone = cartao.querySelector(".cartao-icone");
-      const n = `<i class="n">${escapar(l.comandos[0])}</i>`;
-      let nome, vale;
+      let chave = `<span><i class="n">${escapar(l.comandos[0])}</i></span>`;
       if (this.ultra) {
         icone.replaceChildren(el("i", "tijolo", l.comandos[0]));
-        nome = `Comente ${escapar(l.comandos[0])}`;
-        vale = comenta ? `<em>+${metros(cfg.comentario.metros)}</em> na torre` : `entra na torre`;
+        chave = "";
       } else {
         if (l.presente.imagem) {
           const img = el("img");
           img.src = l.presente.imagem;
-          img.alt = l.presente.nome;
+          img.alt = "";
           icone.replaceChildren(img);
         } else icone.textContent = l.presente.icone;
         if (l.presente.fundo) icone.style.background = l.presente.fundo;
-        nome = `apoie o ${n}`;
-        vale = `<em>+1 m</em> na torre`;
       }
-      cartao.querySelector(".cartao-txt").innerHTML = `<b>${nome}</b><span>${vale}</span>`;
+      cartao.querySelector(".cartao-txt").innerHTML = `<b>${escapar(l.nome)}</b>${chave}`;
     });
-
-    const golpes = p.querySelector(".golpes");
-    const temGolpe = !this.ultra && cfg.ataque && cfg.ataque.maxPct > 0;
-    golpes.hidden = !temGolpe;
-    golpes.replaceChildren(...(temGolpe ? faixas.map(f => {
-      const g = el("span", "golpe-chip");
-      g.append(el("span", "golpe-chip-ico", GOLPES[f.tipo].icone), el("b", null, fmt.format(f.de)), el("span", null, golpe[f.tipo]));
-      return g;
-    }) : []));
-
-    const regras = [];
-    if (comenta) regras.push(`💬 <b>+${metros(cfg.comentario.metros)}</b>`);
-    if (this.curtidaLigada(cfg)) regras.push(`❤ ${fmt.format(cfg.curtida.cada)} curtidas <b>+${metros(cfg.curtida.metros)}</b>`);
-    if (cfg.seguiu && cfg.seguiu.metros > 0) regras.push(`➕ seguiu <b>+${metros(cfg.seguiu.metros)}</b>`);
-    p.querySelector(".regras").innerHTML = regras.map(t => `<span>${t}</span>`).join("");
   },
 
   aplicarFormato() {
@@ -355,8 +312,9 @@ const Tela = {
     });
     const falta = p.querySelector(".falta");
     const vazio = !alturas[0] && !alturas[1];
-    if (vazio) falta.innerHTML = "O primeiro comentário começa a torre";
-    else if (!ft) falta.innerHTML = this.seguro ? "Empate! A próxima peça desempata" : "Empate! O próximo presente desempata";
+    falta.hidden = vazio;
+    if (vazio) falta.textContent = "";
+    else if (!ft) falta.textContent = "Empate! A próxima peça desempata";
     else {
       falta.style.setProperty("--cor-lado", misturar(this.cfg.lados[ft.lado].cor, "#ffffff", 0.45));
       falta.innerHTML = `${ft.metros === 1 ? "Falta" : "Faltam"} <b>${fmtM1.format(ft.metros)} m</b> pro ${escapar(this.cfg.lados[ft.lado].nome)} virar`;
@@ -374,8 +332,7 @@ const Tela = {
       const li = el("li", d ? (i === 0 ? "primeiro" : "") : "vazio");
       li.append(el("span", "pos", String(i + 1)));
       if (d) li.append(criarAvatar(d), el("span", "quem", d.nick), el("span", "valor", metros(d.pontos)));
-      else if (this.seguro) li.append(el("span", "quem", "—"));
-      else li.append(el("span", "quem", i === 0 ? `Seja o 1º do ${lado.nome}` : "Seu nome aqui"));
+      else li.append(el("span", "quem", "—"));
       lista.append(li);
     }
   },
@@ -530,13 +487,20 @@ const Tela = {
     const txt = el("div");
     txt.append(el("div", "quem", a.quem.nick));
     const oque = el("div", "oque");
-    /* A live manda "Rose"; na tela vale o nome do preset ("Rosa"). */
-    const simbolo = lado.presente.aceitos.some(x => normalizar(x) === normalizar(a.presente));
-    oque.textContent = this.ultra
-      ? `reforçou a torre do ${lado.nome}`
-      : a.liberado
-      ? `escolheu o ${lado.nome} e o presente entrou na torre`
-      : `mandou ${a.quantidade > 1 ? a.quantidade + "× " : ""}${simbolo ? lado.presente.nome : a.presente} pra torre do ${lado.nome}`;
+    if (this.ultra) oque.textContent = `reforçou a torre do ${lado.nome}`;
+    else if (a.liberado) oque.textContent = `escolheu o ${lado.nome} e o presente entrou na torre`;
+    else {
+      /* Presente só pelo ícone: o do preset quando é o símbolo do lado (a
+         live manda "Rose"), senão o emoji do presente. */
+      const simbolo = lado.presente.aceitos.some(x => normalizar(x) === normalizar(a.presente));
+      let icone = simbolo ? lado.presente.icone : simboloDoPresente(a.presente);
+      if (simbolo && lado.presente.imagem) {
+        icone = el("img");
+        icone.src = lado.presente.imagem;
+        icone.alt = "";
+      }
+      oque.append(`mandou ${a.quantidade > 1 ? a.quantidade + "× " : ""}`, icone, ` pra torre do ${lado.nome}`);
+    }
     txt.append(oque, el("div", "valor", `+${metros(a.pontos)}${a.dobrado ? " (2×)" : ""}`));
     faixa.append(criarAvatar(a.quem), txt);
     caixa.replaceChildren(faixa);
@@ -553,9 +517,7 @@ const Tela = {
     const linha = this.palco.querySelector(".linha-ajuda");
     linha.classList.remove("alerta");
     this.palco.classList.remove("com-alerta");
-    linha.innerHTML = this.seguro
-      ? `🏆 Torre mais alta no fim do tempo <b class="forte">VENCE</b>`
-      : `💥 Presente grande <b class="forte">DERRUBA</b> a torre do outro!`;
+    linha.innerHTML = `🏆 Torre mais alta no fim do tempo <b class="forte">VENCE</b>`;
   },
 
   alerta(html, ms) {
@@ -567,10 +529,7 @@ const Tela = {
   },
 
   pendente(a) {
-    const [la, lb] = this.cfg.lados;
-    this.alerta(
-      `<b>${escapar(a.quem.nick)}</b>, comente <span class="cmd">${escapar(la.comandos[0])}</span> ou ` +
-      `<span class="cmd">${escapar(lb.comandos[0])}</span> pra empilhar +${metros(a.pontos)}`, 8000);
+    this.alerta(`<b>${escapar(a.quem.nick)}</b> · +${metros(a.pontos)} ainda sem time`, 8000);
   },
 
   /* Quem escreve "gg" achou que era o presente: o tijolinho conta, e ele
@@ -647,8 +606,8 @@ const Tela = {
     const lado = this.cfg.lados[a.lado];
     const d = this.palco.querySelector(".dobro");
     d.style.setProperty("--cor-lado", lado.cor);
-    d.innerHTML = `<span class="grande">Próximo presente vale 2×</span>` +
-      `<span class="sub">pra torre do ${escapar(lado.nome)} · só nos próximos ${a.segundos} s</span><i></i>`;
+    d.innerHTML = `<span class="grande">Torre do ${escapar(lado.nome)} em 2×</span>` +
+      `<span class="sub">por ${a.segundos} s</span><i></i>`;
     d.querySelector("i").animate([{ transform: "scaleX(1)" }, { transform: "scaleX(0)" }],
       { duration: Math.max(0, a.ate - Date.now()), fill: "forwards" });
     this.palco.classList.add("com-dobro");
@@ -820,10 +779,9 @@ const Tela = {
 
   contagemVitoria(seg) {
     if (!this.proxima) return;
-    const conta = this.seguro ? "O que entrar agora já conta pra ela." : "Presentes de agora já contam pra ela.";
     this.proxima.textContent = seg == null
-      ? `Aperte N pra começar a próxima rodada. ${conta}`
-      : `Próxima rodada em ${Math.max(0, Math.ceil(seg))} s. ${conta}`;
+      ? "Aperte N pra começar a próxima rodada."
+      : `Próxima rodada em ${Math.max(0, Math.ceil(seg))} s`;
   },
 
   fecharVitoria() {

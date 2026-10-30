@@ -176,7 +176,7 @@
     return cv;
   }
 
-  const SLOGANS = ["QUEM VAI GANHAR?", "DISPUTA AO VIVO", "CORRIDA DA LIVE", "A TORCIDA DECIDE", "CHEGUE AO FINAL"];
+  const SLOGANS = ["QUEM VAI GANHAR?", "DISPUTA AO VIVO", "CORRIDA DA LIVE", "A TORCIDA DECIDE", "RETA FINAL"];
 
   function placasLed(altura) {
     const w = 2400;

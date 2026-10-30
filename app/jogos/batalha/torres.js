@@ -783,7 +783,7 @@ const Torres = {
     });
   },
 
-  /* Torre vazia: contorno tracejado com o presente que começa ela. */
+  /* Torre vazia: contorno tracejado com o presente do lado. */
   fantasma(i) {
     const c = this.c;
     const L = this.L;
@@ -805,16 +805,11 @@ const Torres = {
     c.textAlign = "center";
     c.textBaseline = "middle";
     const icone = this.icones && this.icones[i];
-    if (icone && icone.complete && icone.naturalWidth) c.drawImage(icone, x - 34, y + 16, 68, 68);
+    if (icone && icone.complete && icone.naturalWidth) c.drawImage(icone, x - 48, y + h / 2 - 48, 96, 96);
     else {
-      c.font = `900 60px ${FONTE_NUM}`;
-      c.fillText(lado.presente.icone, x, y + 50);
+      c.font = `900 84px ${FONTE_NUM}`;
+      c.fillText(lado.presente.icone, x, y + h / 2);
     }
-    c.font = `800 34px ${FONTE_TXT}`;
-    /* Modo seguro: o fantasma não pede presente. */
-    c.fillText(this.cfg.modoSeguro !== false ? `Comente ${lado.comandos[0]}` : `Mande ${lado.presente.nome}`, x, y + 112);
-    c.font = `700 30px ${FONTE_TXT}`;
-    c.fillText("pra começar", x, y + 148);
     c.restore();
   },
 

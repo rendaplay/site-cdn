@@ -1,6 +1,6 @@
 /* O que fica por cima do voo, em DOM: placar, recorde, moedas, quem pilota,
-   vidas, efeitos ativos, evento-surpresa, anúncios, cardápio do quiosque,
-   feed, ranking e a tela de quem derrubou o Tuca. */
+   vidas, efeitos ativos, evento-surpresa, anúncios, barras do chat no
+   quiosque, feed, ranking e a tela de quem derrubou o Tuca. */
 "use strict";
 
 const fmt = new Intl.NumberFormat("pt-BR");
@@ -18,7 +18,6 @@ const ICONES = {
   vida: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg>`,
   turbo: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 15c4 0 8-2 11-6 2-2.6 4-4 7-4-1 5-4 9-8 11-3 1.5-6 1-10-1z"/><path d="M8 15c1 2 3 3 6 3"/></svg>`,
   chinelo: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c3 0 4 3 4 7s-1 11-4 11-4-7-4-11 1-7 4-7z"/><path d="M12 6 9.5 11M12 6l2.5 5"/></svg>`,
-  moeda: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4"/></svg>`,
   piloto: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 4v4M9 13h.01M15 13h.01M9.5 16h5"/></svg>`,
   streamer: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9h12a4 4 0 0 1 3.8 5.2l-1 3a2.5 2.5 0 0 1-4.3.8L15 16H9l-1.5 2a2.5 2.5 0 0 1-4.3-.8l-1-3A4 4 0 0 1 6 9z"/><path d="M8 11.5v3M6.5 13h3M16 12.5h.01M18 14h.01"/></svg>`,
   dobro: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7l6 10M10 7 4 17M14 9a3 3 0 0 1 6 0c0 3-6 4-6 8h6"/></svg>`,
@@ -32,8 +31,8 @@ const COR_EFEITO = {
 };
 
 const EVENTOS = {
-  chinelo: { titulo: "Hora do chinelo", texto: "Comente 2 e taque um chinelo no Tuca" },
-  dobro: { titulo: "Pontos em dobro", texto: "Cada pilar vale 2: o recorde tá perto" },
+  chinelo: { titulo: "Hora do chinelo", texto: "" },
+  dobro: { titulo: "Pontos em dobro", texto: "Cada pilar vale 2" },
   queijo: { titulo: "Chuva de pão de queijo", texto: "Cada pão de queijo pego vale +1" },
 };
 
@@ -80,28 +79,12 @@ const Hud = {
       recorde: q(".card.recorde"), moedas: q(".card.moedas"),
       controle: q(".controle"), vidas: q(".vidas"), efeitos: q(".efeitos"),
       evento: q(".evento"), anuncio: q(".anuncio"), dica: q(".dica"),
-      faixas: q(".quiosque .faixas"), barraAjuda: q(".barra.ajuda"), barraCaos: q(".barra.caos"),
+      barraAjuda: q(".barra.ajuda"), barraCaos: q(".barra.caos"),
       feed: q(".feed ol"), ranking: q(".ranking ol"), morte: q(".morte"), sinal: q(".sem-sinal"),
     };
-    q(".titulo-jogo").textContent = `Cardápio do ${cfg.titulo.replace(/^Voa,\s*/i, "").replace(/!$/, "") || "Tuca"}`;
-    this.montarCardapio();
+    q(".titulo-jogo").textContent = cfg.titulo;
     this.ranking(null);
     this.ultimo = {};
-  },
-
-  montarCardapio() {
-    this.$.faixas.replaceChildren(...this.cfg.faixas.map(f => {
-      const li = el("li");
-      const valor = el("span", "valor");
-      valor.innerHTML = `${ICONES.moeda}${fmt.format(f.moedas)}`;
-      const ef = (time, x) => {
-        const s = el("span", `ef ${time}`);
-        s.innerHTML = `<span class="ic">${ICONES[x.efeito] || ""}</span><b>${escapar(x.nome)}</b><small>${escapar(x.texto || "")}</small>`;
-        return s;
-      };
-      li.append(valor, ef("caos", f.caos), ef("ajuda", f.ajuda));
-      return li;
-    }));
   },
 
   /* ───────── por quadro (barato: só mexe no que mudou) ───────── */
@@ -143,7 +126,7 @@ const Hud = {
       void num.offsetWidth;
       num.classList.add("pulo");
       const m = partida.maiorPresente;
-      this.$.moedas.querySelector(".sub").innerHTML = m ? `maior: <b>${escapar(encurtar(m.nome, 14))}</b> ${fmt.format(m.moedas)}` : "manda o primeiro";
+      this.$.moedas.querySelector(".sub").innerHTML = m ? `maior: <b>${escapar(encurtar(m.nome, 14))}</b> ${fmt.format(m.moedas)}` : "";
       u.moedas = partida.moedas;
     }
 
@@ -228,7 +211,7 @@ const Hud = {
     if (box.dataset.nome !== ev.nome + ev.inicio) {
       box.dataset.nome = ev.nome + ev.inicio;
       const info = EVENTOS[ev.nome];
-      box.innerHTML = `<div class="rot">Evento-surpresa</div><h4>${escapar(info.titulo)}</h4><p>${escapar(info.texto)}</p><span class="tempo"></span>`;
+      box.innerHTML = `<div class="rot">Evento-surpresa</div><h4>${escapar(info.titulo)}</h4>${info.texto ? `<p>${escapar(info.texto)}</p>` : ""}<span class="tempo"></span>`;
       box.classList.add("on");
     }
     box.querySelector(".tempo").style.transform = `scaleX(${Math.max(0, (ev.ate - partida.t) / (ev.ate - ev.inicio))})`;

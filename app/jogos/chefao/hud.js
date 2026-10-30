@@ -1,5 +1,5 @@
 /* O que fica por cima da arena, em DOM (texto nítido): barra de vida,
-   placar de moedas, ranking de dano, cardápio, faixa de estado, "faltam",
+   placar de moedas, ranking de dano, faixa de estado, "faltam",
    balão de fala, anúncios, golpe final e tela de vitória. */
 "use strict";
 
@@ -7,19 +7,15 @@ const fmt = new Intl.NumberFormat("pt-BR");
 
 const ICONES = {
   coroa: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18l-1.5-10-4.5 4-3-7-3 7-4.5-4z"/></svg>`,
-  moeda: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4"/></svg>`,
-  coracao: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg>`,
-  balao: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>`,
-  presente: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16v10H4zM3 7h18v3H3zM12 7v13M12 7c-2-4-6-3-5-1s5 1 5 1zm0 0c2-4 6-3 5-1s-5 1-5 1z"/></svg>`,
   caveira: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a8 8 0 0 0-5 14v3h10v-3a8 8 0 0 0-5-14z"/><circle cx="9" cy="11" r="1.6"/><circle cx="15" cy="11" r="1.6"/><path d="M10 20v-2M14 20v-2"/></svg>`,
   fogo: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-9z"/></svg>`,
   escudo: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/></svg>`,
 };
 
 const EVENTOS = {
-  dobro: { titulo: "Dano em dobro", texto: "Todo golpe vale 2×", cor: "#FFD23F" },
-  pontoFraco: { titulo: "Ponto fraco exposto!", texto: "Todo golpe é crítico: 3×", textoSeguro: "Comentário e curtida: 3×", cor: "#FF5AE0" },
-  mutirao: { titulo: "Mutirão!", texto: "pessoas comentando = golpe coletivo", cor: "#5CFF9A" },
+  dobro: { titulo: "Dano em dobro", texto: "", cor: "#FFD23F" },
+  pontoFraco: { titulo: "Ponto fraco exposto!", texto: "dano 3×", cor: "#FF5AE0" },
+  mutirao: { titulo: "Mutirão!", texto: "", cor: "#5CFF9A" },
 };
 
 function el(tag, cls, texto) {
@@ -69,41 +65,15 @@ const Hud = {
       nome: q(".nome-chefe"), chips: q(".chips"), barra: q(".barra"), cheio: q(".barra .cheio"),
       rastro: q(".barra .rastro"), escudo: q(".barra .escudo"), vidaNum: q(".vida-num"), pct: q(".pct"),
       estado: q(".estado"), faltam: q(".faltam"), fala: q(".fala"), anuncio: q(".anuncio"), aviso: q(".aviso"),
-      cardapio: q(".cardapio ol"), ranking: q(".ranking ol"),
-      final: q(".final"), sinal: q(".sem-sinal"), chamada: q(".chamada"),
+      ranking: q(".ranking ol"), final: q(".final"), sinal: q(".sem-sinal"),
     };
     q(".titulo-jogo").textContent = cfg.titulo;
-    this.$.chamada.innerHTML = cfg.modoSeguro
-      ? `<span>${ICONES.balao}<b>Comentário</b> = soco de ${fmt.format(cfg.comentario.dano)}</span>` +
-        `<span>${ICONES.coracao}<b>${fmt.format(cfg.curtida.cada)} curtidas</b> = 1 soco</span>`
-      : `<span>${ICONES.balao}<b>Comente</b> = soco de ${fmt.format(cfg.comentario.dano)}</span>` +
-        `<span>${ICONES.presente}<b>Presente</b> = golpe</span>`;
     const m50 = q(".barra .m50");
     const m25 = q(".barra .m25");
     m50.style.left = cfg.fases.furia * 100 + "%";
     m25.style.left = cfg.fases.escudo * 100 + "%";
     m50.innerHTML = ICONES.fogo;
     m25.innerHTML = ICONES.escudo;
-    this.montarCardapio();
-  },
-
-  montarCardapio() {
-    const ol = this.$.cardapio;
-    ol.replaceChildren();
-    for (const f of this.cfg.faixas) {
-      const li = el("li", "golpe-" + f.golpe);
-      const icone = document.createElement("canvas");
-      icone.width = 96;
-      icone.height = 96;
-      icone.className = "icone";
-      Cena.icone(icone, f.golpe);
-      const valor = el("span", "valor");
-      valor.innerHTML = `${ICONES.moeda}${fmt.format(f.moedas)}${f === this.cfg.faixas[this.cfg.faixas.length - 1] ? "+" : ""}`;
-      const nome = el("span", "nome", f.nome);
-      if (this.cfg.modoSeguro) nome.prepend(el("i", "seta", "→ "));
-      li.append(icone, valor, nome);
-      ol.append(li);
-    }
   },
 
   /* ───────── chefão e barra ───────── */
@@ -171,7 +141,7 @@ const Hud = {
       modo = "contra";
       const falta = Math.max(0, c.contra.meta - c.contra.feito);
       titulo = `${c.def.contra}! ${Math.ceil((c.contra.fim - agora) / 1000)} s`;
-      texto = `Bata <b>${fmt.format(falta)}</b> pra interromper, senão ele cura ${Math.round(raid.cfg.contra.cura * 100)}%`;
+      texto = `falta <b>${fmt.format(falta)}</b> de dano · ou ele cura ${Math.round(raid.cfg.contra.cura * 100)}%`;
       progresso = Math.min(1, c.contra.feito / c.contra.meta);
       cor = "#FF4A3A";
     } else if (raid.evento) {
@@ -182,13 +152,12 @@ const Hud = {
       cor = info.cor;
       if (ev.tipo === "mutirao") {
         const meta = raid.cfg.surpresa.mutirao.pessoas;
-        texto = `<b>${ev.pessoas.size}/${meta}</b> pessoas comentando = golpe coletivo`;
-      } else texto = raid.cfg.modoSeguro && info.textoSeguro || info.texto;
+        texto = `<b>${ev.pessoas.size}/${meta}</b> pessoas`;
+      } else texto = info.texto;
       progresso = Math.max(0, (ev.fim - agora) / (ev.fim - ev.inicio));
     } else if (c.estado === "luta" && c.curando) {
       modo = "cura";
       titulo = "Ele está se curando!";
-      texto = raid.cfg.modoSeguro ? "Cada golpe interrompe a cura" : "Comente ou mande presente pra parar";
       progresso = c.vida / c.vidaMax;
       cor = "#5CFF9A";
     }
@@ -222,9 +191,7 @@ const Hud = {
     }
     const f = raid.faltam();
     const valor = f.alvo === "escudo" ? Math.ceil(c.escudo + emVoo.escudo) : Math.ceil(vida);
-    const sug = raid.sugestao(valor + (f.alvo === "escudo" ? Math.ceil(vida) : 0), agora);
-    const html = `<span><b>Faltam ${fmt.format(valor)}</b> ${f.alvo === "escudo" ? "de escudo" : "de vida"}!</span>` +
-      (sug ? `<small>1 <em>${escapar(sug.nome)}</em> derruba</small>` : "");
+    const html = `<span><b>Faltam ${fmt.format(valor)}</b> ${f.alvo === "escudo" ? "de escudo" : "de vida"}</span>`;
     if (caixa.dataset.html !== html) {
       caixa.dataset.html = html;
       caixa.innerHTML = html;
@@ -275,7 +242,7 @@ const Hud = {
       if (j) {
         li.append(criarAvatar(j), el("span", "quem", j.nome), el("span", "valor", fmt.format(j.danoChefe)));
         li.style.setProperty("--parte", (j.danoChefe / max * 100).toFixed(1) + "%");
-      } else li.append(el("span", "quem", i === 0 ? "Dê o primeiro golpe" : "—"));
+      } else li.append(el("span", "quem", "—"));
       ol.append(li);
     }
   },
