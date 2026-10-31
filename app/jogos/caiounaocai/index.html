@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cai ou Não Cai? · Renda Play</title>
+<link rel="stylesheet" href="caiounaocai.css">
+</head>
+<body>
+<div id="palco" class="palco" aria-live="polite">
+  <canvas id="mesa" aria-hidden="true"></canvas>
+
+  <section class="ranking" hidden>
+    <h2>Ranking da live</h2>
+    <div class="campeao"></div>
+    <ol></ol>
+    <div class="proxima"></div>
+  </section>
+
+  <div class="sem-sinal" hidden></div>
+  <div class="pausa" hidden>Pausado</div>
+  <form class="painel" hidden></form>
+</div>
+
+<script src="../comum/live.js"></script>
+<script src="../comum/presentes.js"></script>
+<script src="../comum/configurar.js"></script>
+<script src="preset.js"></script>
+<script src="config.js"></script>
+<script src="falas.js"></script>
+<script src="regras.js"></script>
+<script src="cena.js"></script>
+<script src="hud.js"></script>
+<script src="som.js"></script>
+<script src="painel.js"></script>
+<script src="jogo.js"></script>
+</body>
+</html>
