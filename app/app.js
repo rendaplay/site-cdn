@@ -236,7 +236,7 @@ function segurado(id) {
 
 function textoLibera(espera) {
   const faltam = espera.dias != null ? espera.dias : Math.ceil((espera.libera_em * 1000 - Date.now()) / 86400000);
-  return faltam <= 1 ? "Libera amanhã" : `Libera em ${faltam} dias`;
+  return faltam <= 1 ? "Libera amanhã" : `Faltam ${faltam} dias pra liberar`;
 }
 
 function montarInicio() {
