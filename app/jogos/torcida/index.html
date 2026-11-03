@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maior Torcida do Brasil · Renda Play</title>
+<link rel="stylesheet" href="torcida.css">
+</head>
+<body>
+<div id="palco" class="palco" aria-live="polite">
+  <canvas id="estadio" aria-hidden="true"></canvas>
+
+  <div class="tempo">3:00</div>
+  <aside class="lateral" aria-label="Placar das torcidas"></aside>
+
+  <div class="faixa" hidden></div>
+  <div class="final" hidden></div>
+  <section class="ranking" hidden></section>
+
+  <div class="sem-sinal" hidden></div>
+  <div class="pausa" hidden>Pausado</div>
+  <form class="painel" hidden></form>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="../comum/live.js"></script>
+<script src="../comum/presentes.js"></script>
+<script src="../comum/configurar.js"></script>
+<script src="preset.js"></script>
+<script src="config.js"></script>
+<script src="falas.js"></script>
+<script src="regras.js"></script>
+<script src="texturas.js"></script>
+<script src="personagens.js"></script>
+<script src="cena.js"></script>
+<script src="hud.js"></script>
+<script src="som.js"></script>
+<script src="painel.js"></script>
+<script src="jogo.js"></script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Davi x Golias · Renda Play</title>
+<link rel="stylesheet" href="davigolias.css">
+</head>
+<body>
+<div id="palco" class="palco" aria-live="polite">
+  <canvas id="vale" aria-hidden="true"></canvas>
+
+  <header class="topo">
+    <div class="davi"><span>Davi</span><b>0</b></div>
+    <div class="tempo">2:00</div>
+    <div class="golias"><b>0</b><span>Golias</span></div>
+  </header>
+  <div class="dono" hidden><span>👑</span><b></b></div>
+  <div class="barra perto" aria-hidden="true"><i></i></div>
+  <div class="barra funda" aria-hidden="true"><i></i><em></em></div>
+
+  <div class="faixa" hidden></div>
+  <section class="placar" hidden></section>
+
+  <div class="sem-sinal" hidden></div>
+  <div class="pausa" hidden>Pausado</div>
+  <form class="painel" hidden></form>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="../comum/live.js"></script>
+<script src="../comum/presentes.js"></script>
+<script src="../comum/configurar.js"></script>
+<script src="preset.js"></script>
+<script src="config.js"></script>
+<script src="falas.js"></script>
+<script src="regras.js"></script>
+<script src="texturas.js"></script>
+<script src="personagens.js"></script>
+<script src="cena.js"></script>
+<script src="hud.js"></script>
+<script src="som.js"></script>
+<script src="painel.js"></script>
+<script src="jogo.js"></script>
+</body>
+</html>

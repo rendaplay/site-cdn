@@ -226,7 +226,17 @@ function liberado(id) {
 
 function jogavel(id) {
   const jogo = JOGOS.find(j => j.id === id);
-  return !!jogo && !jogo.indisponivel && liberado(id);
+  return !!jogo && !jogo.indisponivel && liberado(id) && !segurado(id);
+}
+
+/* Jogo do plano que só abre depois da garantia. API antiga não manda `segurados`: nada segurado. */
+function segurado(id) {
+  return (app.conta && app.conta.segurados && app.conta.segurados[id]) || null;
+}
+
+function textoLibera(espera) {
+  const faltam = espera.dias != null ? espera.dias : Math.ceil((espera.libera_em * 1000 - Date.now()) / 86400000);
+  return faltam <= 1 ? "Libera amanhã" : `Libera em ${faltam} dias`;
 }
 
 function montarInicio() {
@@ -267,10 +277,13 @@ function montarInicio() {
     botao.className = "jogo";
     botao.disabled = !jogavel(jogo.id);
     botao.setAttribute("aria-pressed", String(jogo.id === app.jogo));
-    const selo = jogo.indisponivel ? '<span class="selo-indisponivel">Temporariamente indisponível</span>' : "";
+    const espera = !jogo.indisponivel && segurado(jogo.id);
+    const selo = jogo.indisponivel ? '<span class="selo-indisponivel">Temporariamente indisponível</span>'
+      : espera ? `<span class="selo-libera">${textoLibera(espera)}</span>` : "";
+    const motivo = espera ? "Já está no seu plano, libera depois da garantia" : "Não está no seu plano";
     botao.innerHTML = `<img src="${CONFIG.assets}capas/${jogo.id}.webp" alt="" loading="lazy">
       <span class="jogo-texto">${selo}<b></b><small></small></span>
-      ${botao.disabled && !jogo.indisponivel ? '<span class="cadeado" aria-label="Não está no seu plano">🔒</span>' : ""}`;
+      ${botao.disabled && !jogo.indisponivel ? `<span class="cadeado" aria-label="${motivo}">🔒</span>` : ""}`;
     botao.querySelector("b").textContent = jogo.nome;
     botao.querySelector("small").textContent = jogo.descricao;
     botao.addEventListener("click", () => escolherJogo(jogo.id));

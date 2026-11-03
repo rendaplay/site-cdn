@@ -26,4 +26,7 @@ const JOGOS = [
   { id: "presidencial", indisponivel: true, nome: "Corrida da Live", descricao: "Uma corrida fictícia ao vivo em que as interações movimentam a disputa." },
   { id: "bolinha", nome: "Chuva de Bolinha", descricao: "Cada comentário solta uma bolinha com a sua foto." },
   { id: "caiounaocai", nome: "Cai ou Não Cai?", descricao: "O chat salva o time do coração do rebaixamento." },
+  { id: "davigolias", nome: "Davi x Golias", descricao: "O chat carrega a funda e derruba o gigante." },
+  { id: "empurra", nome: "Empurra-Empurra", descricao: "O chat empurra os mascotes pra fora do círculo." },
+  { id: "torcida", nome: "Maior Torcida do Brasil", descricao: "O chat lota o estádio com a torcida do seu time." },
 ];

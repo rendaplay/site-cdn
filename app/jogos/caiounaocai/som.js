@@ -150,7 +150,8 @@ const Som = {
     if (!this.narrador || !this.rodando()) return;
     const c = this._ctx, agora = c.currentTime;
     const forte = FALA_FORTE.has(momento);
-    if (!forte && agora < this._livreEm) return;
+    // A forte só corta a fala comum: duas fortes seguidas não se atropelam.
+    if (agora < this._livreEm && (!forte || this._falaForte)) return;
     const prontas = this.falas.filter(f => f.momento === momento && this._buf.has("voz:" + f.id));
     const doTime = time ? prontas.filter(f => f.time === time) : [];
     const gerais = prontas.filter(f => !f.time);
@@ -162,6 +163,7 @@ const Som = {
     this._fala = this.tocar("voz:" + fala.id, { volume: 1.15 });
     if (!this._fala) return;
     this._ultimaFala = fala.id;
+    this._falaForte = forte;
     const dur = this._fala.duracao;
     this._livreEm = agora + dur + RESPIRO;
     const g = this._trilha.gain, cheio = this.musica * VOLUME_TRILHA;
@@ -190,6 +192,27 @@ const Som = {
     o.connect(g).connect(this._mestre);
     o.start(t);
     o.stop(t + 0.13);
+  },
+
+  /* Arpejo do presente: cada faixa sobe mais notas, mais alto e mais forte,
+     pra dar pra ouvir o tamanho do presente sem olhar. */
+  subida(faixa) {
+    if (!this.rodando()) return;
+    const c = this._ctx, t0 = c.currentTime;
+    const notas = [0, 4, 7, 12, 16, 19, 24].slice(0, faixa + 3);
+    const passo = 0.075 - faixa * 0.008, volume = 0.06 + faixa * 0.025;
+    notas.forEach((semitom, i) => {
+      const t = t0 + i * passo, ultima = i === notas.length - 1;
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = faixa >= 3 ? "square" : "triangle";
+      o.frequency.value = 523.25 * 2 ** (semitom / 12);
+      const dur = ultima ? 0.18 + faixa * 0.08 : 0.1;
+      g.gain.setValueAtTime(volume * (faixa >= 3 ? 0.6 : 1), t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.connect(g).connect(this._mestre);
+      o.start(t);
+      o.stop(t + dur + 0.02);
+    });
   },
 
   /* Ronco grave do terremoto: ruído passando por um passa-baixa que treme. */

@@ -37,6 +37,7 @@ const Jogo = {
   pausado: false,
   agenda: [],
   pontuados: 0,
+  lendarioLivre: 0,
 
   iniciar() {
     Som.aplicar(config);
@@ -108,7 +109,31 @@ const Jogo = {
 
   nome(id) { return this.nomes.get(id) || ""; },
 
+  /* Quem o presente deixou pra trás: os que desceram na mesma leva, do que
+     ficou mais bem colocado pro pior. */
+  passados(lista, id) {
+    return lista.filter(a => a.tipo === "mudou" && a.time !== id && a.para > a.de)
+      .sort((a, b) => a.para - b.para).map(a => a.time);
+  },
+
+  /* O acontecimento mais forte que o presente causou vira linha do cartão;
+     os outros esperam o cartão sair pra virar faixa. */
+  manchete(lista, doado) {
+    const achar = (tipo, rival) => lista.find(a => a.tipo === tipo && (rival ? a.time !== doado.time : a.time === doado.time));
+    let a = achar("lider");
+    if (a) return { de: a, texto: "na liderança!" };
+    if ((a = achar("saiuZ4"))) return { de: a, texto: "saiu do Z4!" };
+    if ((a = achar("entrouZ4", true))) return { de: a, texto: `jogou o ${this.nome(a.time)} no Z4` };
+    a = lista.find(x => x.tipo === "presidente" && x.tomou && x.id === doado.id);
+    if (a) return { de: a, texto: "👑 novo presidente" };
+    return null;
+  },
+
   contar(lista) {
+    const doado = lista.find(a => a.tipo === "presente");
+    const passados = doado ? this.passados(lista, doado.time) : [];
+    const manchete = doado ? this.manchete(lista, doado) : null;
+    const anunciar = (a, texto, cor) => { if (!manchete || manchete.de !== a) Cena.faixa(texto, cor); };
     for (const a of lista) {
       switch (a.tipo) {
         case "comentou":
@@ -119,24 +144,26 @@ const Jogo = {
           if (++this.pontuados % 40 === 0) { Som.onda(); Som.falar("torcida"); }
           break;
         case "curtiu": Cena.comemorar(a.time); break;
-        case "presente": this.presente(a); break;
+        case "presente": this.presente(a, passados, manchete && manchete.texto); break;
         case "presidente":
           if (!a.tomou) break;
-          Cena.faixa(`👑 @${encurtar(a.nome, 14)} TOMOU A PRESIDÊNCIA DO ${this.nome(a.time)}`, OURO);
+          anunciar(a, `👑 @${encurtar(a.nome, 14)} TOMOU A PRESIDÊNCIA DO ${this.nome(a.time)}`, OURO);
           Som.falar("presidente");
           break;
         case "mudou": Cena.mudou(a.time, a.de, a.para); break;
         case "saiuZ4":
-          Cena.faixa(a.por ? `@${encurtar(a.por, 14)} TIROU O ${this.nome(a.time)} DO Z4!` : `${this.nome(a.time)} SAIU DO Z4!`, VERDE);
+          anunciar(a, a.por ? `@${encurtar(a.por, 14)} TIROU O ${this.nome(a.time)} DO Z4!` : `${this.nome(a.time)} SAIU DO Z4!`, VERDE);
           Som.falar("salvou", a.time);
           Som.onda();
           break;
         case "entrouZ4":
-          Cena.faixa(`${this.nome(a.time)} ENTROU NO Z4 😱`, VERMELHO);
+          anunciar(a, `${this.nome(a.time)} ENTROU NO Z4 😱`, VERMELHO);
           Som.falar("z4", a.time);
           break;
         case "lider":
-          Cena.faixa(`${this.nome(a.time)} É O LÍDER!`, OURO);
+          anunciar(a, doado && doado.time === a.time
+            ? `@${encurtar(doado.nome, 14)} PÔS O ${this.nome(a.time)} NA LIDERANÇA!`
+            : `${this.nome(a.time)} É O LÍDER!`, OURO);
           Som.falar("lider", a.time);
           Som.onda();
           break;
@@ -153,42 +180,71 @@ const Jogo = {
     }
   },
 
-  presente(a) {
-    const simbolo = simboloDoPresente(a.presente);
-    Cena.pop(a.time, `@${encurtar(a.nome, 12)} ${simbolo}${a.quantidade > 1 ? "×" + a.quantidade : ""}`, true);
-    Cena.comemorar(a.time);
-    switch (Math.min(4, a.faixa)) {
+  /* Todo presente vira o cartão do @ colado no time, a placa piscando na cor
+     dele e o placar contando; a faixa decide o tamanho do resto. Os rivais
+     que ficaram pra trás aparecem no cartão e ficam com cara de susto. */
+  presente(a, passados, manchete) {
+    const faixa = Math.min(4, a.faixa);
+    /* Lendário em cima de lendário entra na fila: cada um tem o seu holofote. */
+    if (faixa === 4) {
+      const espera = Math.max(0, this.lendarioLivre - this.tabela.t);
+      this.lendarioLivre = this.tabela.t + espera + DURACAO_DESTAQUE[4];
+      if (espera > 0) {
+        this.depois(espera, () => this.reagir(a, faixa, passados, manchete));
+        return;
+      }
+    }
+    this.reagir(a, faixa, passados, manchete);
+  },
+
+  reagir(a, faixa, passados, manchete) {
+    const pontuou = !a.semTime && this.tabela.fase === "rodada";
+    const passou = passados.length ? `passou o ${this.nome(passados[0])}` : "";
+    Cena.destaque(a.time, {
+      quem: a.id, nome: a.nome, simbolo: simboloDoPresente(a.presente), quantidade: a.quantidade, faixa,
+      pontos: pontuou ? a.pontos : 0, linhas: [manchete, passou].filter(Boolean),
+    });
+    Cena.ultrapassados(passados);
+    Som.subida(faixa);
+    switch (faixa) {
       case 0:
-        Cena.confete(a.time, 14);
+        Cena.confete(a.time, 26);
         Som.tocar("confete", { volume: 0.6 });
         break;
       case 1:
-        Cena.confete(a.time, 30);
+        Cena.confete(a.time, 40);
         Cena.saltoDuplo(a.time);
         Som.tocar("nitro", { volume: 0.8 });
-        if (Math.random() < 0.5) Som.falar("pulo");
+        Som.tocar("torcida-forte", { volume: 0.35 });
+        Som.onda();
         break;
       case 2:
-        Cena.confete(a.time, 70);
+        Cena.confete(a.time, 50);
         Cena.foguete(a.time);
         Som.tocar("jato");
+        Som.tocar("torcida-forte", { volume: 0.5 });
         Som.falar("foguete");
         Som.onda();
         break;
       case 3:
-        Cena.confete(a.time, 40);
+        Cena.confete(a.time, 50);
         Cena.terremoto(a.time, this.tabela.time(a.time).pos);
         Som.estrondo();
         Som.tocar("nitro", { volume: 0.6, taxa: 0.7 });
+        Som.tocar("torcida-forte", { volume: 0.7 });
         Som.falar("terremoto");
         break;
       case 4:
-        Cena.confete(a.time, 120);
         Cena.lendario(a.time);
-        Som.tocar("jato");
-        Som.tocar("torcida-forte", { volume: 0.9 });
-        Som.falar("lendario");
-        Som.onda();
+        Som.tocar("rufar", { volume: 0.7, taxa: 1.4 });
+        this.depois(0.5, () => {
+          Cena.confete(a.time, 90);
+          Som.tocar("jato");
+          Som.tocar("torcida-forte");
+          Som.tocar("fanfarra", { volume: 0.6 });
+          Som.falar("lendario");
+          Som.onda();
+        });
         break;
     }
   },
@@ -291,6 +347,7 @@ const Jogo = {
     this.tabela.zerar();
     this.agenda = [];
     this.pontuados = 0;
+    this.lendarioLivre = 0;
     Hud.esconderRanking();
     Cena.novaRodada(this.tabela);
   },
