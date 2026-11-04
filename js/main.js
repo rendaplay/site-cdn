@@ -60,6 +60,37 @@ async function seguirCheckoutAtivo() {
 
 seguirCheckoutAtivo();
 
+// O checkout leva de 1 a 5 s pra desenhar no 4G e a página ficava parada: no Clarity a pessoa
+// tocava o botão 6 vezes. O 1º toque segue normal; os seguintes são ignorados até a página sair.
+// O texto troca depois do clique: o pixel da UTMify lê o rótulo pra disparar o InitiateCheckout.
+const ROTULO_ABRINDO = '<span class="giro" aria-hidden="true"></span>Abrindo checkout…';
+
+function soltarCheckout(botao) {
+  if (!botao.dataset.rotulo) return;
+  botao.innerHTML = botao.dataset.rotulo;
+  delete botao.dataset.rotulo;
+  botao.classList.remove('abrindo');
+  botao.removeAttribute('aria-busy');
+}
+
+document.addEventListener('click', (e) => {
+  const botao = e.target.closest('a[data-checkout], a[href*="pay.kiwify.com.br"]');
+  if (!botao || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || botao.target === '_blank') return;
+  if (botao.classList.contains('abrindo')) { e.preventDefault(); return; }
+  setTimeout(() => {
+    botao.dataset.rotulo = botao.innerHTML;
+    botao.classList.add('abrindo');
+    botao.setAttribute('aria-busy', 'true');
+    botao.innerHTML = ROTULO_ABRINDO;
+    setTimeout(() => soltarCheckout(botao), 12000);
+  });
+});
+
+// Quem volta da Kiwify pelo "voltar" recebe a página do cache, ainda com o botão girando.
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) for (const botao of $$('a.abrindo')) soltarCheckout(botao);
+});
+
 // ───────── WhatsApp: origem ─────────
 
 // O wa.me só leva o texto: sem isto as UTMs do anúncio morrem no clique e a venda
@@ -180,20 +211,22 @@ function botaoDePlay(video) {
   video.after(botao);
 }
 
-// O criativo do topo roda mudo sozinho, mas só depois que a página carregou, pra não
-// disputar banda com a primeira tela. Volta a rodar quando reaparece, enquanto ninguém ligou o som.
+// O depoimento do topo (2-3 MB) roda mudo sozinho, mas só depois que a pessoa rolou ou tocou:
+// baixar no carregamento disputava banda com a primeira tela e com o botão de compra no 4G.
+// Volta a rodar quando reaparece, enquanto ninguém ligou o som.
 function tocarMudo(video) {
   let visivel = false;
   let liberado = false;
   const seguir = () => {
     if (visivel && liberado && video.paused && video.muted) video.play().catch(() => {});
   };
-  const liberar = () => { liberado = true; seguir(); };
-  if (document.readyState === 'complete') liberar();
-  else {
-    window.addEventListener('load', liberar, { once: true });
-    setTimeout(liberar, 2500);
-  }
+  const liberar = () => {
+    if (liberado) return;
+    liberado = true;
+    for (const evento of ['scroll', 'pointerdown', 'keydown']) window.removeEventListener(evento, liberar);
+    seguir();
+  };
+  for (const evento of ['scroll', 'pointerdown', 'keydown']) window.addEventListener(evento, liberar, { passive: true });
   quandoVisivel(video, (v) => { visivel = v; seguir(); }, 0.25);
 }
 
@@ -207,8 +240,8 @@ for (const plano of $$('.plano')) {
 
 // Jogo do PC só vem no Pro; o resto entra no Celular, que é o passe mais barato.
 const COMPRA_JOGO = {
-  celular: { micro: 'Vem em todos os planos: Celular a partir de R$ 49,90 ou Pro com os jogos do PC.', selo: 'Roda no celular', icone: 'celular' },
-  pc: { micro: 'Vem no plano Pro e no Vitalício, junto com os 11 jogos do celular.', selo: 'PC com avatar do Roblox', icone: 'windows' },
+  celular: { plano: 'celularPasse', rotulo: 'Quero por R$ 49,90', micro: 'Vem em todos os planos: Celular a partir de R$ 49,90 ou Pro com os jogos do PC.', selo: 'Roda no celular', icone: 'celular' },
+  pc: { plano: 'proPasse', rotulo: 'Quero o Pro por R$ 79,90', micro: 'Vem no plano Pro e no Vitalício, junto com os 11 jogos do celular.', selo: 'PC com avatar do Roblox', icone: 'windows' },
 };
 
 const modalJogo = $('#modal-jogo');
@@ -217,6 +250,7 @@ if (modalJogo) {
   const telaModal = $('.modal-tela', modalJogo);
   const imagemModal = $('.modal-capa', modalJogo);
   const comprar = $('.modal-comprar', modalJogo);
+  const verPlanos = $('.modal-planos', modalJogo);
 
   // O vídeo vem do CDN e o primeiro acesso demora uns segundos: começa a baixar
   // na intenção (mouse em cima, dedo encostando) pra ganhar esse tempo antes do clique.
@@ -240,7 +274,14 @@ if (modalJogo) {
       $('.modal-selo span', modalJogo).textContent = compra.selo;
       $('.modal-selo use', modalJogo).setAttribute('href', `#i-${compra.icone}`);
       $('.modal-micro', modalJogo).textContent = compra.micro;
-      comprar.dataset.cta = card.dataset.cta.replace('jogo_', 'planos_');
+      // Copia o href de um botão da página, que já tem as UTMs e o checkout ativo (Kiwify ou /pay).
+      const origem = $(`[data-checkout="${compra.plano}"]:not(.modal-comprar)`);
+      soltarCheckout(comprar);
+      if (origem) comprar.href = origem.href;
+      comprar.dataset.checkout = compra.plano;
+      comprar.textContent = compra.rotulo;
+      comprar.dataset.cta = card.dataset.cta.replace('jogo_', 'modal_');
+      verPlanos.dataset.cta = card.dataset.cta.replace('jogo_', 'planos_');
       telaModal.hidden = !video;
       imagemModal.hidden = !imagem;
       if (imagem) imagemModal.src = imagem;
@@ -252,7 +293,7 @@ if (modalJogo) {
     });
   }
   $('.modal-fechar', modalJogo).addEventListener('click', () => modalJogo.close());
-  comprar.addEventListener('click', () => modalJogo.close());
+  verPlanos.addEventListener('click', () => modalJogo.close());
   modalJogo.addEventListener('click', (e) => { if (e.target === modalJogo) modalJogo.close(); });
   modalJogo.addEventListener('close', () => videoModal.pause());
 }

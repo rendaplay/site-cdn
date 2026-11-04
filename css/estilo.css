@@ -476,8 +476,11 @@ a.hero-selo:hover { background: rgba(23, 248, 100, 0.2); }
 
 .secao-tutorial { background: radial-gradient(60% 50% at 50% 60%, rgba(23, 248, 100, 0.10), transparent 70%), var(--noite-fundo); }
 .tutorial { display: grid; justify-items: center; gap: 30px; }
+/* No Clarity, "Pelo PC" levou mais toques que "Pelo celular": as duas opções ficam do mesmo tamanho, lado a lado. */
 .tutorial-abas {
-  display: inline-flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: min(100%, 480px);
   gap: 4px;
   padding: 5px;
   border-radius: 999px;
@@ -485,9 +488,10 @@ a.hero-selo:hover { background: rgba(23, 248, 100, 0.2); }
   box-shadow: inset 0 0 0 1px var(--noite-3);
 }
 .tutorial-aba {
-  display: inline-flex; align-items: center; gap: 8px;
-  min-height: 44px;
-  padding: 0 20px;
+  display: grid; grid-template-columns: auto auto; justify-content: center; align-items: center; column-gap: 8px;
+  min-height: 56px;
+  padding: 6px 12px;
+  line-height: 1.15;
   border: 0;
   border-radius: 999px;
   background: transparent;
@@ -496,7 +500,8 @@ a.hero-selo:hover { background: rgba(23, 248, 100, 0.2); }
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
-.tutorial-aba .ico { width: 20px; height: 20px; }
+.tutorial-aba .ico { width: 20px; height: 20px; grid-row: span 2; }
+.tutorial-aba small { grid-column: 2; font-size: 0.75rem; font-weight: 600; opacity: 0.8; }
 .tutorial-aba[aria-selected="true"] { background: var(--verde); color: var(--noite); box-shadow: 0 3px 0 var(--verde-sombra); }
 .tutorial-aba:focus-visible { outline: 3px solid var(--branco); outline-offset: 2px; }
 
@@ -1311,6 +1316,15 @@ a.hero-selo:hover { background: rgba(23, 248, 100, 0.2); }
 
 .plano-selo .ico { width: 1.1em; height: 1.1em; margin: -2px 4px 0 0; vertical-align: middle; }
 .video-play.carregando { cursor: progress; opacity: 0.85; }
+.video-play.carregando .ico { display: none; }
+.video-play.carregando::before { content: ""; width: 22px; height: 22px; border-radius: 50%; border: 3px solid currentColor; border-right-color: transparent; animation: girar 0.7s linear infinite; }
+
+.giro { flex: none; width: 1em; height: 1em; border-radius: 50%; border: 0.16em solid currentColor; border-right-color: transparent; animation: girar 0.7s linear infinite; }
+@keyframes girar { to { transform: rotate(360deg); } }
+.botao.abrindo { cursor: progress; }
+
+.modal-planos { font-size: 0.85rem; color: var(--prata); text-underline-offset: 3px; }
+.modal-planos:hover { color: var(--verde); }
 
 .card-selo .ico { width: 1.05em; height: 1.05em; margin: -2px 3px 0 -1px; vertical-align: middle; stroke-width: 2.4; }
 .mais-legenda { display: flex; align-items: center; gap: 8px; margin: 0; padding: 0 20px 20px; font-size: 0.85rem; color: var(--prata); }
