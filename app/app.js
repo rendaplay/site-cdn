@@ -589,6 +589,8 @@ async function trocarArroba(evento) {
 async function vigiarConector() {
   try {
     const { estado } = await pedir(RELAY, "/api/conector/estado", { cabecalhos: { "x-canal": app.conta.canal } });
+    // Corpo cortado (volta do segundo plano no meio do pedido) chega como {}: o selo mostrava "undefined".
+    if (!estado) throw new Error("resposta vazia do relay");
     // Desligado sem a gente pedir (relay reiniciou, ficou sem leitor): liga de novo.
     if (estado === "parado" && app.aoVivo) await ligarConector(app.aoVivo.simular);
     mostrarSelo(estado);
