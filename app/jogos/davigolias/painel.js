@@ -17,6 +17,7 @@ const Painel = {
       <fieldset class="faixa"><legend>Faixa ${i + 1}</legend>
         ${campo("A partir de (moedas)", `faixas.${i}.moedas`, f.moedas, "number")}
         ${campo("Efeito", `faixas.${i}.nome`, f.nome)}
+        ${campo("O que faz (Como funciona do ⚙)", `faixas.${i}.efeito`, f.efeito, "text", "cheia")}
       </fieldset>`;
 
     this.form.innerHTML = `

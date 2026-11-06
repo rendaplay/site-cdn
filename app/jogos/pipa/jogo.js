@@ -30,6 +30,14 @@ const Jogo = {
       opcoes: () => config.faixas.map(f => f.nome),
       testar: presente => this.teste("presente", { presente }),
       avancado: () => Painel.alternar(true),
+      regras: [
+        "💬 Comentou, soltou a pipa. Com a pipa no ar, cada comentário dá gás e ela fica mais forte no relo.",
+        "🪁 As pipas se enroscam sozinhas (relo) e a mais forte corta a outra. Cortado, comenta de novo pra voltar.",
+        "🎁 Presente corta pipas dos outros, conforme a faixa abaixo. O ataque vai primeiro em quem te cortou.",
+        "❤️ Curtidas dão gás. Seguiu: solta a pipa. Compartilhou: escudo por uns segundos.",
+        "👑 Rei do céu: quem está há mais tempo no ar.",
+      ],
+      efeitos: () => config.faixas.map(f => f.efeito),
     });
     combate.distancia = (a, b) => Ceu.distancia(a, b);
 

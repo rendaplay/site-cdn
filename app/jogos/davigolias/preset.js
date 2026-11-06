@@ -46,11 +46,11 @@ window.DAVIGOLIAS_PRESETS = {
     },
 
     faixas: [
-      { moedas: 1, nome: "Faísca" },
-      { moedas: 10, nome: "Pedra extra" },
-      { moedas: 100, nome: "Funda de fogo" },
-      { moedas: 500, nome: "Tremor" },
-      { moedas: 3000, nome: "Pedra lendária" },
+      { moedas: 1, nome: "Faísca", efeito: "carrega um pouco a funda" },
+      { moedas: 10, nome: "Pedra extra", efeito: "carrega bem a funda" },
+      { moedas: 100, nome: "Funda de fogo", efeito: "carrega muito a funda" },
+      { moedas: 500, nome: "Tremor", efeito: "carrega muito e empurra o gigante pra trás" },
+      { moedas: 3000, nome: "Pedra lendária", efeito: "atira na hora e sempre acerta" },
     ],
 
     som: true,

@@ -8,6 +8,8 @@
      opcoes: () => ["Rabiola", ...],       // nome de cada faixa, em ordem
      testar: presente => ...,              // { nome, moedas, quantidade, total }
      avancado: () => Painel.alternar(true),
+     regras: ["Comentou, soltou a pipa.", ...],   // opcional: "Como funciona"
+     efeitos: () => ["corta 1", ...],      // opcional: o que cada faixa faz
    });
    cfg.faixa(nome, moedasUnitarias)        // índice escolhido ou null
 
@@ -34,6 +36,12 @@
 .rp-cfg header { display: flex; align-items: center; gap: 12px; padding: 16px 16px 10px; }
 .rp-cfg h2 { flex: 1; margin: 0; font-size: 19px; font-weight: 800; }
 .rp-cfg .rp-cfg-sub { margin: 0 16px 10px; color: #B9B2CC; font-size: 13px; }
+.rp-cfg .rp-cfg-ajuda { margin: 0 16px 10px; padding: 0 12px; border-radius: 10px; background: rgba(255,255,255,.06); }
+.rp-cfg .rp-cfg-ajuda summary { padding: 10px 0; font-weight: 800; cursor: pointer; }
+.rp-cfg .rp-cfg-ajuda > div { max-height: 34vh; overflow-y: auto; padding-bottom: 10px; scrollbar-width: thin; }
+.rp-cfg .rp-cfg-ajuda p { margin: 0 0 6px; font-size: 14px; }
+.rp-cfg .rp-cfg-ajuda .rp-cfg-efeitos { color: #D9D3EA; }
+.rp-cfg .rp-cfg-ajuda p:not(.rp-cfg-efeitos) + .rp-cfg-efeitos { margin-top: 12px; }
 .rp-cfg ul { flex: 1; overflow-y: auto; margin: 0; padding: 0 16px 8px; list-style: none; scrollbar-width: thin; }
 .rp-cfg li { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 10px;
   padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
@@ -52,7 +60,7 @@
   .rp-cfg { top: auto; width: 100vw; height: 58vh; border-radius: 18px 18px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,.5); }
 }`;
 
-  function montarConfigurar({ jogo, opcoes, testar, avancado }) {
+  function montarConfigurar({ jogo, opcoes, testar, avancado, regras = [], efeitos = null }) {
     const CHAVE = `rendaplay.${jogo}.presentes`;
     let escolhas = ler();
     let timer = null;
@@ -82,6 +90,7 @@
     folha.innerHTML = `
       <header><h2>⚙ 🎁</h2><button type="button" class="rp-cfg-fechar" aria-label="Fechar">✕</button></header>
       <p class="rp-cfg-sub">${PELO_VALOR} = pelo valor · ${SIMBOLOS_FAIXA.slice(0, 5).join(" ")} = efeito do mais fraco ao mais forte</p>
+      ${regras.length || efeitos ? '<details class="rp-cfg-ajuda"><summary>Como funciona</summary><div></div></details>' : ""}
       <ul></ul>
       <footer><span class="rp-cfg-status"></span>${avancado ? '<button type="button" class="rp-cfg-avancado">Ajustes avançados</button>' : ""}</footer>`;
     const lista = folha.querySelector("ul");
@@ -103,8 +112,24 @@
       if (e.key === "Escape") fechar();
     });
 
+    /* Fica fechado: o painel aparece na transmissão e aqui tem nome de faixa. */
+    function desenharAjuda(nomes) {
+      const caixa = folha.querySelector(".rp-cfg-ajuda > div");
+      if (!caixa) return;
+      const linha = (texto, cls) => {
+        const p = document.createElement("p");
+        if (cls) p.className = cls;
+        p.textContent = texto;
+        return p;
+      };
+      const descricoes = efeitos ? efeitos() : [];
+      caixa.replaceChildren(...regras.map(r => linha(r)),
+        ...nomes.map((nome, i) => linha(`${SIMBOLOS_FAIXA[i] || i + 1} ${nome}${descricoes[i] ? `: ${descricoes[i]}` : ""}`, "rp-cfg-efeitos")));
+    }
+
     function desenhar() {
       const nomes = opcoes();
+      desenharAjuda(nomes);
       lista.replaceChildren(...PRESENTES_TIKTOK.map(p => {
         const li = document.createElement("li");
         li.innerHTML = `<span class="rp-cfg-icone"></span><span class="rp-cfg-faixas"></span>

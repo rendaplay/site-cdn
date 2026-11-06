@@ -30,6 +30,14 @@ const Jogo = {
       opcoes: () => config.faixas.map(f => f.nome),
       testar: presente => this.presenteTeste(presente),
       avancado: () => Painel.alternar(true),
+      regras: [
+        "👑 Quem mais manda presente na rodada vira o Golias. Presente dele faz o gigante andar e crescer.",
+        "💬 Cada comentário de quem não é o Golias carrega a funda do Davi (1 por segundo por pessoa). Curtidas também carregam.",
+        "🎁 Presente de quem não é o Golias carrega mais, conforme a faixa abaixo.",
+        "🪨 Funda cheia: o Davi atira e derruba o gigante. Se o gigante chegar no Davi, o Golias vence.",
+        "⏱️ Acabou o tempo: a pedra sai com o que tiver e só acerta se a funda passou da metade.",
+      ],
+      efeitos: () => config.faixas.map(f => f.efeito),
     });
     this.aplicarFormato(true);
 
