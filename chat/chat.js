@@ -5,7 +5,7 @@
     pro: { nome: 'Pro', preco: 'R$ 79,90', de: 'R$ 119,90', detalhe: '15 jogos · celular + Roblox no PC · lançamentos', checkout: 'proPasse', destaque: true },
     vitalicio: { nome: 'Vitalício', preco: 'R$ 397', de: '', detalhe: 'Os 15 jogos de hoje, pra sempre', checkout: 'vitalicio' },
   };
-  const ZAP_EQUIPE = 'https://wa.me/5511941867789?text=' + encodeURIComponent('Oi! Vim pelo chat do site da Renda Play e queria falar com a equipe.');
+  const ZAP_EQUIPE = 'https://wa.me/5511947462354?text=' + encodeURIComponent('Oi! Vim pelo chat do site da Renda Play e queria falar com a equipe.');
   const EMAIL_EQUIPE = 'contato.rendaplay@gmail.com';
 
   const conversaId = Math.random().toString(36).slice(2, 10);

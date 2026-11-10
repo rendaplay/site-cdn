@@ -10,7 +10,7 @@ const CONFIG = {
   assets: "",
   guia: "https://rendaplay.com.br/guia-restricoes.pdf",
   grupo: "https://chat.whatsapp.com/I5AYvPoBZI5GyO6uqGQ53Z",
-  suporte: "https://wa.me/5511941867789?text=" + encodeURIComponent("Oi! Preciso de ajuda com o app da Renda Play no celular."),
+  suporte: "https://wa.me/5511947462354?text=" + encodeURIComponent("Oi! Preciso de ajuda com o app da Renda Play no celular."),
 };
 
 /* Só os jogos web: os de Roblox ainda precisam do PC. */
