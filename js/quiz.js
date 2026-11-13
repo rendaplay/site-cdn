@@ -184,9 +184,13 @@
 
   // ───────── resultado ─────────
 
+  // Mesma pasta das capas da vitrine: no ar elas vêm do CDN, e já estão em cache.
+  const PASTA_CAPAS = $('.vitrine img').src.replace(/[^/]+$/, '');
+  const capaDe = (id) => `${PASTA_CAPAS}${id}-480.webp`;
+
   function capa(id) {
     const img = document.createElement('img');
-    Object.assign(img, { src: `img/jogos/${id}-480.webp`, width: 480, height: 640, alt: '', decoding: 'async' });
+    Object.assign(img, { src: capaDe(id), width: 480, height: 640, alt: '', decoding: 'async' });
     return img;
   }
 
@@ -217,7 +221,7 @@
     const resultado = $('.resultado');
     const semanas = QuizRegras.semanas(r);
     const primeiro = semanas[0].jogo;
-    $('.seu-jogo-capa', resultado).src = `img/jogos/${primeiro}-480.webp`;
+    $('.seu-jogo-capa', resultado).src = capaDe(primeiro);
     $('.seu-jogo-nome', resultado).textContent = QuizRegras.JOGOS[primeiro].nome;
 
     if (!Array.isArray(respostas.dias)) respostas.dias = QuizRegras.diasDeLive(QuizRegras.plano(r).livesPorSemana);
