@@ -1,8 +1,8 @@
 (function () {
-  const ETAPA_DEMO = 6;
-  const ETAPA_DINHEIRO = 7;
-  const ETAPA_MONTANDO = 8;
-  const ETAPA_RESULTADO = 9;
+  const ETAPA_DEMO = 5;
+  const ETAPA_DINHEIRO = 6;
+  const ETAPA_MONTANDO = 7;
+  const ETAPA_RESULTADO = 8;
   const PERGUNTAS = ETAPA_DINHEIRO;
   const ESPERA_JOGO_MS = 4000;
   const LIBERA_RESULTADO_MS = 15000;
@@ -69,7 +69,6 @@
     if (trocar) history.replaceState({ n }, '');
     else if (empilhar) history.pushState({ n }, '');
     registrar(nomeDa(n));
-    if (n === 1) prepararJogo();
     if (n === ETAPA_DEMO) abrirDemo();
     if (n === ETAPA_MONTANDO) setTimeout(() => { if (atual === ETAPA_MONTANDO) montarResultado(); }, 2000);
   }
@@ -122,6 +121,7 @@
   let presentes = 0;
   let toques = 0;
 
+  // Só cria o jogo na tela da demo: escondido ele segue rodando e, no navegador do Instagram, trava os toques das perguntas.
   function prepararJogo() {
     if (jogo) return;
     jogo = document.createElement('iframe');
@@ -146,6 +146,7 @@
     video.hidden = false;
     video.play().catch(() => {});
     liberarResultado();
+    registrar('06_demo_video');
   }
 
   let demoAberta = false;
