@@ -135,6 +135,7 @@
     if (/^[a-z0-9]{6,32}$/.test(canal)) saida.canal = canal;
     const relay = (q.get("relay") || "").trim();
     if (/^https?:\/\/[^\s]+$/.test(relay)) saida.relay = relay.replace(/\/+$/, "");
+    saida.vitrine = q.get("vitrine") === "1";
     return saida;
   }
 
@@ -473,6 +474,16 @@
       if (timer) { clearTimeout(timer); timer = null; }
       if (plateia) plateia.parar();
       if (socket) { const s = socket; socket = null; s.close(); }
+    }
+
+    /* ?vitrine=1: o jogo embutido numa página de venda (o quiz do site), que
+       manda os presentes do visitante. Só a página mãe fala, e só com a chave. */
+    if (url.vitrine && raiz.addEventListener) {
+      raiz.addEventListener("message", e => {
+        if (e.source !== raiz.parent || !e.data || e.data.rendaplay !== "simular") return;
+        entregar(normalizarEvento(e.data.evento));
+      });
+      if (raiz.parent && raiz.parent !== raiz) raiz.parent.postMessage({ rendaplay: "pronto" }, "*");
     }
 
     if (demoLigado) ligarDemo();
