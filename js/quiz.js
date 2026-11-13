@@ -3,7 +3,6 @@
   const ETAPA_DINHEIRO = 7;
   const ETAPA_MONTANDO = 8;
   const ETAPA_RESULTADO = 9;
-  const ETAPA_OFERTA = 10;
   const PERGUNTAS = ETAPA_DINHEIRO;
   const ESPERA_JOGO_MS = 4000;
   const LIBERA_RESULTADO_MS = 15000;
@@ -42,12 +41,22 @@
     try { return JSON.parse(sessionStorage.getItem(GUARDADO)) || null; } catch (e) { return null; }
   }
 
+  // Funil: cada tela conta uma vez por visita, com nome fixo (o número muda quando entra tela nova).
   function registrar(etapa) {
     if (registradas.has(etapa)) return;
     registradas.add(etapa);
     if (typeof gtag === 'function') gtag('event', 'quiz_etapa', { etapa });
-    if (window.clarity) clarity('event', `quiz_etapa_${etapa}`);
+    if (window.clarity) clarity('event', `quiz_${etapa}`);
   }
+
+  // As respostas viram segmento: no Clarity filtra as gravações, no GA4 cruza com quem comprou.
+  function registrarResposta(campo, valor) {
+    if (typeof gtag === 'function') gtag('event', 'quiz_resposta', { campo, valor: String(valor) });
+    if (window.clarity) clarity('set', `quiz_${campo}`, String(valor));
+  }
+
+  const nomeDa = (n) => $(`.etapa[data-etapa="${n}"]`).dataset.nome;
+  if (window.clarity) clarity('set', 'pagina', 'quiz');
 
   function mostrar(n, { empilhar = true, trocar = false } = {}) {
     atual = n;
@@ -59,7 +68,7 @@
     window.scrollTo(0, 0);
     if (trocar) history.replaceState({ n }, '');
     else if (empilhar) history.pushState({ n }, '');
-    registrar(n);
+    registrar(nomeDa(n));
     if (n === 1) prepararJogo();
     if (n === ETAPA_DEMO) abrirDemo();
     if (n === ETAPA_MONTANDO) setTimeout(() => { if (atual === ETAPA_MONTANDO) montarResultado(); }, 2000);
@@ -90,6 +99,7 @@
       const daqui = atual;
       const seguir = (ms) => setTimeout(() => { if (atual === daqui) avancar(); }, ms);
       guardar();
+      registrarResposta(campo, respostas[campo]);
 
       if (campo === 'aparecer') {
         const retorno = $('.retorno', etapa);
@@ -167,6 +177,7 @@
         contador.classList.add('pulo');
       }
       toques += 1;
+      if (toques === 1) registrar('06_demo_tocou');
       if (toques >= TOQUES_PRA_LIBERAR) liberarResultado();
     });
   }
@@ -198,6 +209,7 @@
     respostas.dias = respostas.dias.includes(dia) ? respostas.dias.filter((d) => d !== dia) : [...respostas.dias, dia];
     pintarAgenda();
     guardar();
+    registrar('09_trocou_dias');
   });
 
   function montarResultado() {
@@ -255,7 +267,7 @@
   let ofertaVista = false;
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(([e]) => {
-      if (e.isIntersecting && !ofertaVista) { ofertaVista = true; registrar(ETAPA_OFERTA); }
+      if (e.isIntersecting && !ofertaVista) { ofertaVista = true; registrar('10_oferta'); }
     }, { threshold: 0.3 }).observe($('.plano-recomendado'));
   }
 
@@ -265,6 +277,6 @@
     montarResultado();
   } else {
     history.replaceState({ n: 0 }, '');
-    registrar(0);
+    registrar(nomeDa(0));
   }
 })();
