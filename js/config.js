@@ -11,6 +11,8 @@ window.CONFIG = {
     liveAnual: 'https://pay.kiwify.com.br/3KsnBH8',
     completoAnual: 'https://pay.kiwify.com.br/QCuO3UL',
     vitalicio: 'https://pay.kiwify.com.br/bIhXLuY',
+    // Oferta do Pro a R$ 49,90, só pela roleta de saída. Vazio = roleta desligada.
+    proRoleta: 'https://pay.kiwify.com.br/eoXrGPB',
   },
   links: {
     // A Kiwify dá um link de afiliação por produto; a aprovação é automática.
