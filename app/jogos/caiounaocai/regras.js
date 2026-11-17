@@ -38,11 +38,10 @@ class Tabela {
     this.t = 0;
     this.rodada = 1;
     this.fase = "rodada";
-    this.fimFase = this.cfg.rodada.duracao;
     this.torcedores = new Map();
     this.times = this.cfg.times.map(t => ({
       id: t.id, nome: t.nome, pontos: 0, reserva: 0, pos: 0,
-      vitorias: 0, quedas: 0, presidente: null, doacoes: new Map(),
+      vitorias: 0, quedas: 0, presidente: null, doacoes: new Map(), parcelas: [],
     }));
     this.porId = new Map(this.times.map(t => [t.id, t]));
     const ordem = [...this.times];
@@ -51,6 +50,13 @@ class Tabela {
       [ordem[i], ordem[j]] = [ordem[j], ordem[i]];
     }
     ordem.forEach((t, i) => { t.pos = i; });
+    this.fimFase = this.duracaoRodada();
+  }
+
+  /* A rodada não tem sempre o mesmo tamanho: a live não fica com cara de loop. */
+  duracaoRodada() {
+    const { duracao, variacao = 0 } = this.cfg.rodada;
+    return variacao ? duracao + (this.sorte() * 2 - 1) * variacao : duracao;
   }
 
   time(id) { return this.porId.get(id) || null; }
@@ -131,7 +137,7 @@ class Tabela {
       return lista;
     }
     this.doar(time, j, moedas, lista);
-    this.somar(time, pontos, j, lista);
+    this.parcelar(time, pontos);
     return lista;
   }
 
@@ -146,6 +152,35 @@ class Tabela {
       time.presidente = { id: j.id, nome: j.nome, moedas: total };
       lista.push({ tipo: "presidente", time: time.id, id: j.id, nome: j.nome, tomou: !!atual });
     }
+  }
+
+  /* Os pontos do presente entram aos poucos, misturados às subidas do chat:
+     o time não salta logo depois do presente (a IA do TikTok lê isso como
+     "presente compra vantagem"). Perto do apito a parcela encurta e o resto
+     entra no fecharRodada. */
+  parcelar(time, pontos) {
+    if (!pontos) return;
+    const { diluirMin = 20, diluirMax = 40 } = this.cfg.presente || {};
+    const dur = Math.min(diluirMin + this.sorte() * (diluirMax - diluirMin), Math.max(0.5, this.resta() - 1.5));
+    time.parcelas.push({ total: pontos, dado: 0, decorrido: 0, dur });
+  }
+
+  /* Por parcela, entra o devido até agora (inteiro); na última volta entra o total. */
+  pingar(dt, lista, tudo = false) {
+    let mudou = false;
+    for (const t of this.times) {
+      if (!t.parcelas.length) continue;
+      for (const p of t.parcelas) {
+        p.decorrido += dt;
+        const devido = tudo || p.decorrido >= p.dur ? p.total : Math.floor(p.total * p.decorrido / p.dur);
+        if (devido === p.dado) continue;
+        t.pontos += devido - p.dado;
+        p.dado = devido;
+        mudou = true;
+      }
+      t.parcelas = t.parcelas.filter(p => p.dado < p.total);
+    }
+    if (mudou) this.reordenar(null, lista);
   }
 
   /* ───────── tabela ───────── */
@@ -178,6 +213,7 @@ class Tabela {
   passo(dt) {
     this.t += dt;
     const lista = [];
+    if (this.fase === "rodada") this.pingar(dt, lista);
     if (this.t < this.fimFase) return lista;
     if (this.fase === "rodada") this.fecharRodada(lista);
     else if (this.fase === "queda") {
@@ -194,6 +230,7 @@ class Tabela {
 
   /* Os de baixo caem do último pro primeiro da zona; o líder leva a rodada. */
   fecharRodada(lista) {
+    this.pingar(0, lista, true);
     const ordem = this.ordem();
     const caidos = ordem.slice(ordem.length - this.cfg.zonas.queda).reverse();
     const campeao = ordem[0];
@@ -212,10 +249,11 @@ class Tabela {
       t.reserva = 0;
       t.presidente = null;
       t.doacoes.clear();
+      t.parcelas = [];
     }
     this.rodada++;
     this.fase = "rodada";
-    this.fimFase = this.t + this.cfg.rodada.duracao;
+    this.fimFase = this.t + this.duracaoRodada();
     lista.push({ tipo: "rodada", rodada: this.rodada });
     this.reordenar(null, []);
   }

@@ -33,11 +33,21 @@ function ladosDaDemo(times) {
   return lados;
 }
 
+const CLIMAS = ["chuva", "vento", "passeio", "drone", "refletor", "ceu"];
+const sortear = lista => lista[Math.floor(Math.random() * lista.length)];
+const entre = (a, b) => a + Math.random() * (b - a);
+
 const Jogo = {
   pausado: false,
   agenda: [],
   pontuados: 0,
   lendarioLivre: 0,
+  proximoClima: 0,
+  ultimoClima: null,
+  chamadaTroca: 10,
+  chamadaVisivel: false,
+  ultimaChamada: null,
+  ladoChamada: 0,
 
   iniciar() {
     Som.aplicar(config);
@@ -54,6 +64,13 @@ const Jogo = {
       opcoes: () => config.faixas.map(f => f.nome),
       testar: presente => this.presenteTeste(presente),
       avancado: () => Painel.alternar(true),
+      regras: [
+        "Comentou o nome do time, veste a camisa e empurra ele pra cima.",
+        "Curtida também ajuda o time de quem curtiu.",
+        "Presente faz festa na tabela e dá força pro time de quem mandou.",
+        "No fim da rodada os 4 de baixo caem pra Série B.",
+        "Dica: fale com o chat, chame os times pelo nome e apareça com voz ou câmera. Live sem ninguém falando perde alcance.",
+      ],
     });
     this.aplicarFormato(true);
 
@@ -68,6 +85,7 @@ const Jogo = {
       aoEstado: estado => { if (estado !== "conectando") Hud.sinal(estado); },
     });
     this.depois(1.5, () => { Som.tocar("apito"); Som.falar("inicio"); });
+    this.proximoClima = entre(config.eventos.min, config.eventos.max);
 
     let antes = performance.now();
     const quadro = () => {
@@ -109,29 +127,15 @@ const Jogo = {
 
   nome(id) { return this.nomes.get(id) || ""; },
 
-  /* Quem o presente deixou pra trás: os que desceram na mesma leva, do que
-     ficou mais bem colocado pro pior. */
-  passados(lista, id) {
-    return lista.filter(a => a.tipo === "mudou" && a.time !== id && a.para > a.de)
-      .sort((a, b) => a.para - b.para).map(a => a.time);
-  },
-
-  /* O acontecimento mais forte que o presente causou vira linha do cartão;
-     os outros esperam o cartão sair pra virar faixa. */
+  /* Os pontos do presente entram aos poucos (regras.js), então o cartão só
+     pode contar a presidência; a subida do time aparece depois, sozinha. */
   manchete(lista, doado) {
-    const achar = (tipo, rival) => lista.find(a => a.tipo === tipo && (rival ? a.time !== doado.time : a.time === doado.time));
-    let a = achar("lider");
-    if (a) return { de: a, texto: "na liderança!" };
-    if ((a = achar("saiuZ4"))) return { de: a, texto: "saiu do Z4!" };
-    if ((a = achar("entrouZ4", true))) return { de: a, texto: `jogou o ${this.nome(a.time)} no Z4` };
-    a = lista.find(x => x.tipo === "presidente" && x.tomou && x.id === doado.id);
-    if (a) return { de: a, texto: "👑 novo presidente" };
-    return null;
+    const a = lista.find(x => x.tipo === "presidente" && x.tomou && x.id === doado.id);
+    return a ? { de: a, texto: "👑 novo presidente" } : null;
   },
 
   contar(lista) {
     const doado = lista.find(a => a.tipo === "presente");
-    const passados = doado ? this.passados(lista, doado.time) : [];
     const manchete = doado ? this.manchete(lista, doado) : null;
     const anunciar = (a, texto, cor) => { if (!manchete || manchete.de !== a) Cena.faixa(texto, cor); };
     for (const a of lista) {
@@ -144,7 +148,7 @@ const Jogo = {
           if (++this.pontuados % 40 === 0) { Som.onda(); Som.falar("torcida"); }
           break;
         case "curtiu": Cena.comemorar(a.time); break;
-        case "presente": this.presente(a, passados, manchete && manchete.texto); break;
+        case "presente": this.presente(a, manchete && manchete.texto); break;
         case "presidente":
           if (!a.tomou) break;
           anunciar(a, `👑 @${encurtar(a.nome, 14)} TOMOU A PRESIDÊNCIA DO ${this.nome(a.time)}`, OURO);
@@ -161,9 +165,7 @@ const Jogo = {
           Som.falar("z4", a.time);
           break;
         case "lider":
-          anunciar(a, doado && doado.time === a.time
-            ? `@${encurtar(doado.nome, 14)} PÔS O ${this.nome(a.time)} NA LIDERANÇA!`
-            : `${this.nome(a.time)} É O LÍDER!`, OURO);
+          anunciar(a, a.por ? `@${encurtar(a.por, 14)} PÔS O ${this.nome(a.time)} NA LIDERANÇA!` : `${this.nome(a.time)} É O LÍDER!`, OURO);
           Som.falar("lider", a.time);
           Som.onda();
           break;
@@ -180,65 +182,64 @@ const Jogo = {
     }
   },
 
-  /* Todo presente vira o cartão do @ colado no time, a placa piscando na cor
-     dele e o placar contando; a faixa decide o tamanho do resto. Os rivais
-     que ficaram pra trás aparecem no cartão e ficam com cara de susto. */
-  presente(a, passados, manchete) {
+  /* Todo presente vira o cartão do @ (símbolo e quantidade, sem pontos) e
+     uma festa na tabela inteira, sorteada entre variações da faixa: nada
+     gruda no time, pra a tela não virar "presente = time subiu". */
+  presente(a, manchete) {
     const faixa = Math.min(4, a.faixa);
     /* Lendário em cima de lendário entra na fila: cada um tem o seu holofote. */
     if (faixa === 4) {
       const espera = Math.max(0, this.lendarioLivre - this.tabela.t);
       this.lendarioLivre = this.tabela.t + espera + DURACAO_DESTAQUE[4];
       if (espera > 0) {
-        this.depois(espera, () => this.reagir(a, faixa, passados, manchete));
+        this.depois(espera, () => this.reagir(a, faixa, manchete));
         return;
       }
     }
-    this.reagir(a, faixa, passados, manchete);
+    this.reagir(a, faixa, manchete);
   },
 
-  reagir(a, faixa, passados, manchete) {
-    const pontuou = !a.semTime && this.tabela.fase === "rodada";
-    const passou = passados.length ? `passou o ${this.nome(passados[0])}` : "";
+  reagir(a, faixa, manchete) {
     Cena.destaque(a.time, {
       quem: a.id, nome: a.nome, simbolo: simboloDoPresente(a.presente), quantidade: a.quantidade, faixa,
-      pontos: pontuou ? a.pontos : 0, linhas: [manchete, passou].filter(Boolean),
+      pontos: 0, linhas: manchete ? [manchete] : [],
     });
-    Cena.ultrapassados(passados);
     Som.subida(faixa);
+    const variacao = Math.random() < 0.5;
     switch (faixa) {
       case 0:
-        Cena.confete(a.time, 26);
+        if (variacao) Cena.chuvaConfete(30);
+        else Cena.confete(sortear(config.times).id, 26);
         Som.tocar("confete", { volume: 0.6 });
         break;
       case 1:
-        Cena.confete(a.time, 40);
-        Cena.saltoDuplo(a.time);
+        if (variacao) Cena.chuvaConfete(50);
+        else { Cena.varrer(3); Cena.chuvaConfete(20); }
         Som.tocar("nitro", { volume: 0.8 });
         Som.tocar("torcida-forte", { volume: 0.35 });
         Som.onda();
         break;
       case 2:
-        Cena.confete(a.time, 50);
-        Cena.foguete(a.time);
+        if (variacao) { Cena.varrer(4); Cena.flash = 0.8; }
+        else { Cena.chuvaConfete(70); Cena.tremor = Math.max(Cena.tremor, 0.5); }
         Som.tocar("jato");
         Som.tocar("torcida-forte", { volume: 0.5 });
         Som.falar("foguete");
         Som.onda();
         break;
       case 3:
-        Cena.confete(a.time, 50);
-        Cena.terremoto(a.time, this.tabela.time(a.time).pos);
+        if (variacao) { Cena.terremoto(); Cena.chuvaConfete(40); }
+        else { Cena.varrer(5); Cena.chuvaConfete(80); Cena.tremor = Math.max(Cena.tremor, 1); }
         Som.estrondo();
         Som.tocar("nitro", { volume: 0.6, taxa: 0.7 });
         Som.tocar("torcida-forte", { volume: 0.7 });
         Som.falar("terremoto");
         break;
       case 4:
-        Cena.lendario(a.time);
+        Cena.lendario();
         Som.tocar("rufar", { volume: 0.7, taxa: 1.4 });
         this.depois(0.5, () => {
-          Cena.confete(a.time, 90);
+          Cena.chuvaConfete(90);
           Som.tocar("jato");
           Som.tocar("torcida-forte");
           Som.tocar("fanfarra", { volume: 0.6 });
@@ -287,7 +288,47 @@ const Jogo = {
       for (const x of prontos) x.f();
     }
     if (tab.fase === "intervalo") Hud.proxima(tab.resta());
+    if (dtJogo) {
+      this.clima(tab);
+      this.chamada(tab);
+    }
     Cena.quadro(tab, dtJogo, agora);
+  },
+
+  /* Evento de tela de tempos em tempos, nunca dois iguais seguidos; espera
+     o holofote, a queda ou outro evento acabar. */
+  clima(tab) {
+    if (tab.fase !== "rodada" || tab.t < this.proximoClima) return;
+    if (Cena.lenda || Cena.carimbo || Cena.clima || Cena.refletor) {
+      this.proximoClima = tab.t + 5;
+      return;
+    }
+    this.ultimoClima = sortear(CLIMAS.filter(c => c !== this.ultimoClima));
+    Cena.mudarClima(this.ultimoClima);
+    this.proximoClima = tab.t + entre(config.eventos.min, config.eventos.max);
+  },
+
+  /* Chamada pra comentar o time: aparece um tempo, some outro, troca de frase
+     e de lado a cada volta. Fora da rodada fica escondida. */
+  chamada(tab) {
+    const c = config.chamada;
+    if (tab.fase !== "rodada") {
+      if (this.chamadaVisivel) Hud.esconderChamada();
+      this.chamadaVisivel = false;
+      this.chamadaTroca = tab.t + entre(4, 10);
+      return;
+    }
+    if (tab.t < this.chamadaTroca) return;
+    if (this.chamadaVisivel) {
+      Hud.esconderChamada();
+      this.chamadaTroca = tab.t + entre(c.escondida - 10, c.escondida + 10);
+    } else {
+      this.ultimaChamada = sortear(config.chamadas.filter(f => f !== this.ultimaChamada));
+      this.ladoChamada = 1 - this.ladoChamada;
+      Hud.chamada(this.ultimaChamada, this.ladoChamada);
+      this.chamadaTroca = tab.t + entre(c.visivel - 3, c.visivel + 3);
+    }
+    this.chamadaVisivel = !this.chamadaVisivel;
   },
 
   /* Últimos 10 s: rufar em 3 ondas cada vez mais rápidas e bipe nos 5 finais. */
@@ -348,6 +389,10 @@ const Jogo = {
     this.agenda = [];
     this.pontuados = 0;
     this.lendarioLivre = 0;
+    this.proximoClima = entre(config.eventos.min, config.eventos.max);
+    this.chamadaTroca = 10;
+    this.chamadaVisivel = false;
+    Hud.esconderChamada();
     Hud.esconderRanking();
     Cena.novaRodada(this.tabela);
   },

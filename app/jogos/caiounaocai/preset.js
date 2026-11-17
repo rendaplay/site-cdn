@@ -47,15 +47,18 @@ window.CAIOUNAOCAI_PRESETS = {
     zonas: { topo: 3, queda: 4 },
 
     /* `queda` é o tempo da cena dos times caindo; `intervalo`, o do ranking
-       da live na tela antes da próxima rodada. */
-    rodada: { duracao: 180, queda: 8, intervalo: 7 },
+       da live na tela antes da próxima rodada. A duração sorteia até
+       `variacao` s pra mais ou pra menos a cada rodada. */
+    rodada: { duracao: 180, queda: 8, intervalo: 7, variacao: 15 },
 
     /* Comentário: 1 ponto por pessoa a cada `intervalo` s, pra o spam não
        decidir sozinho. Curtida: 1 ponto a cada tantas curtidas da pessoa. */
     chat: { intervalo: 1.5, ponto: 1, curtidasPorPonto: 15 },
 
-    /* Presente: pontos = moedas do envio × isto. */
+    /* Presente: pontos = moedas do envio × isto, entrando aos poucos em
+       diluirMin a diluirMax s (sorteado por presente). */
     pontosPorMoeda: 5,
+    presente: { diluirMin: 20, diluirMax: 40 },
 
     faixas: [
       { moedas: 1, nome: "Confete" },
@@ -63,6 +66,20 @@ window.CAIOUNAOCAI_PRESETS = {
       { moedas: 100, nome: "Foguete" },
       { moedas: 500, nome: "Terremoto" },
       { moedas: 3000, nome: "Foguete lendário" },
+    ],
+
+    /* Evento de tela (chuva, vento, drone…) a cada min–max s, sorteado. */
+    eventos: { min: 40, max: 90 },
+
+    /* Chamada pra comentar: fica `visivel` s e some `escondida` s (±). Nunca
+       cita presente. */
+    chamada: { visivel: 15, escondida: 45 },
+    chamadas: [
+      "Comente o nome do seu time pra subir na tabela",
+      "Seu time tá no Z4? Comenta o nome dele!",
+      "Escreve o nome do seu time e veste a camisa",
+      "Cada comentário empurra o seu time pra cima",
+      "Qual time não pode cair hoje? Comenta aí!",
     ],
 
     som: true,

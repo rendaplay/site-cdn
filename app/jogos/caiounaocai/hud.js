@@ -1,5 +1,5 @@
 /* O que fica por cima do canvas, em DOM: o ranking da live entre as rodadas,
-   o aviso de conector e a pausa. O resto (tabela, faixas, carimbo) é canvas. */
+   a chamada pra comentar, o aviso de conector e a pausa. O resto (tabela, faixas, carimbo) é canvas. */
 "use strict";
 
 function el(tag, cls, texto) {
@@ -27,6 +27,7 @@ const Hud = {
     this.$ = {
       ranking: q(".ranking"), campeao: q(".ranking .campeao"),
       lista: q(".ranking ol"), proxima: q(".ranking .proxima"), sinal: q(".sem-sinal"),
+      chamada: q(".chamada"),
     };
   },
 
@@ -53,6 +54,16 @@ const Hud = {
   },
 
   esconderRanking() { this.$.ranking.hidden = true; },
+
+  /* `lado` 0 = esquerda, 1 = direita, sempre na faixa de grama embaixo da tabela. */
+  chamada(texto, lado) {
+    const c = this.$.chamada;
+    c.textContent = texto;
+    c.classList.toggle("direita", lado === 1);
+    c.hidden = false;
+  },
+
+  esconderChamada() { this.$.chamada.hidden = true; },
 
   sinal(estado) {
     const s = this.$.sinal;

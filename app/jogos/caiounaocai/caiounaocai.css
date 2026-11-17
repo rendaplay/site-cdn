@@ -71,6 +71,17 @@ body { font-family: var(--texto); color: var(--tinta); -webkit-font-smoothing: a
 
 /* ───────── estado ───────── */
 
+/* Chamada pra comentar: na grama embaixo da tabela, alternando o lado. */
+.chamada {
+  position: absolute; left: 28px; bottom: 3.2%; max-width: 560px;
+  background: var(--papel); color: var(--tinta); border: 6px solid var(--tinta); border-radius: 28px;
+  padding: 14px 24px 12px; box-shadow: 0 8px 0 var(--tinta);
+  font: 400 40px/1.08 var(--display); text-align: center; transform: rotate(-2deg);
+  animation: chamada-entra .45s cubic-bezier(.2, 1.6, .4, 1) both;
+}
+.chamada.direita { left: auto; right: 28px; transform: rotate(2deg); }
+@keyframes chamada-entra { from { opacity: 0; scale: .6; } to { opacity: 1; scale: 1; } }
+
 .sem-sinal {
   position: absolute; left: 50%; bottom: 150px; transform: translateX(-50%);
   background: rgba(29, 20, 51, .9); color: #fff;

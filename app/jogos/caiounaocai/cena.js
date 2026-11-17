@@ -29,6 +29,14 @@ const DURACAO_DESTAQUE = [1.9, 2.2, 2.5, 2.8, 3.6];
 const TAMANHO_DESTAQUE = [1.25, 1.35, 1.45, 1.55, 1.75];
 const DURACAO_DUPLO = 1.4;
 const TITULO_DESTAQUE = ["", "", "", "BALANÇOU A TABELA!", "LENDÁRIO!"];
+/* Céu de cada rodada: topo, meio e chão do gradiente. */
+const PALETAS = [
+  ["#3fb4ff", "#a9e4ff", "#ffe9b8"],
+  ["#2f8fe0", "#9fd4ff", "#ffd28a"],
+  ["#5b3d99", "#ff8a5c", "#ffd27a"],
+  ["#0e1a40", "#2b3f7a", "#6a5a9a"],
+];
+const FAIXAS_DRONE = ["VAMO TORCIDA!", "QUEM CAI HOJE?", "NINGUÉM SEGURA!", "OLHA A TABELA!"];
 
 /* Placar curto: até 9.999 inteiro, depois "15 mil", "150 mil", "1,2 mi". */
 function compacto(n) {
@@ -78,6 +86,11 @@ const Cena = {
   faixasEspera: [],
   fumacas: [],
   lenda: null,
+  refletor: null,
+  clima: null,
+  paleta: 0,
+  fundoAntes: null,
+  troca: 0,
 
   montar(canvas, cfg) {
     this.canvas = canvas;
@@ -96,7 +109,8 @@ const Cena = {
     this.W = this.canvas.width = W;
     this.H = this.canvas.height = H;
     this.u = W / 100;
-    this.fundo = this.pintarFundo();
+    this.fundo = this.pintarFundo(PALETAS[this.paleta]);
+    this.fundoAntes = null;
     for (const t of tabela.times) this.assentar(t.id, t.pos);
   },
 
@@ -192,21 +206,55 @@ const Cena = {
     this.tremor = Math.max(this.tremor, 0.5);
   },
 
-  /* Os degraus de quem está acima racham e balançam: o terremoto é contra
-     os rivais, que se agarram no degrau. */
-  terremoto(id, pos) {
-    this.sacode = { t: 0, dur: 2.4, acimaDe: pos };
+  /* Todos os degraus racham e balançam e a tabela inteira se agarra. */
+  terremoto() {
+    this.sacode = { t: 0, dur: 2.4, acimaDe: this.N };
     this.tremor = Math.max(this.tremor, 1.6);
-    this.bonecos.get(id).braco = 1;
   },
 
-  /* Tela escurece, o holofote abre no time e ele voa pro topo com a câmera
-     chegando perto, mesmo antes dos pontos levarem ele lá. */
-  lendario(id) {
-    const b = this.bonecos.get(id);
-    this.lenda = { id, t: 0, dur: 3.6, abriu: false };
-    b.voo = { t: -0.5, dur: 2.8 };
-    b.foguete = 3.3;
+  /* Tela escurece e o holofote varre a tabela com a câmera chegando perto. */
+  lendario() {
+    this.lenda = { t: 0, dur: 3.6, abriu: false };
+  },
+
+  centroLenda() {
+    const k = this.lenda.t * 1.3;
+    return { x: this.W * (0.71 + Math.sin(k) * 0.2), y: this.H * (0.5 + Math.sin(k * 0.6 + 1) * 0.2) };
+  },
+
+  /* Confete caindo do céu na largura toda, nas cores de todos os times. */
+  chuvaConfete(n) {
+    const u = this.u, cores = [...this.bonecos.values()].flatMap(b => [b.cor, b.cor2]).concat(OURO);
+    n = Math.round(n * PARTICULAS);
+    for (let i = 0; i < n; i++) {
+      this.confetes.push({
+        x: Math.random() * this.W, y: -u * (2 + Math.random() * 30), vx: (Math.random() - 0.5) * u * 0.4, vy: u * (0.2 + Math.random() * 0.5),
+        r: u * (0.45 + Math.random() * 0.5), giro: Math.random() * 6, vida: 1.8, cor: cores[i % cores.length],
+      });
+    }
+    if (this.confetes.length > MAX_CONFETES) this.confetes.splice(0, this.confetes.length - MAX_CONFETES);
+  },
+
+  /* Dois refletores saindo do chão e cruzando a tabela. */
+  varrer(dur) {
+    this.refletor = { t: 0, dur, fase: Math.random() * 6 };
+  },
+
+  /* Evento de tela sem ligação com presente, pra live não ficar com cara de loop. */
+  mudarClima(tipo) {
+    if (tipo === "refletor") { this.varrer(6); return; }
+    if (tipo === "ceu") { this.trocarCeu(); return; }
+    const dur = { chuva: 6 + Math.random() * 2, vento: 6, passeio: 5, drone: 8 }[tipo];
+    this.clima = { tipo, t: 0, dur, lado: Math.random() < 0.5 ? 1 : -1, texto: FAIXAS_DRONE[Math.floor(Math.random() * FAIXAS_DRONE.length)] };
+    if (tipo === "chuva") this.gotas = Array.from({ length: Math.round(90 * PARTICULAS) }, () => ({ x: Math.random(), y: Math.random(), v: 0.7 + Math.random() * 0.5 }));
+  },
+
+  trocarCeu() {
+    const outras = PALETAS.map((_, i) => i).filter(i => i !== this.paleta);
+    this.paleta = outras[Math.floor(Math.random() * outras.length)];
+    this.fundoAntes = this.fundo;
+    this.fundo = this.pintarFundo(PALETAS[this.paleta]);
+    this.troca = 0;
   },
 
   /* Faixa de evento espera o cartão de presente sair: os dois disputam a
@@ -235,6 +283,8 @@ const Cena = {
     this.carimbo = null;
     this.trofeu = null;
     this.lenda = null;
+    this.clima = null;
+    this.trocarCeu();
     for (const t of tabela.times) {
       const b = this.bonecos.get(t.id);
       b.caindo = null;
@@ -249,16 +299,16 @@ const Cena = {
 
   /* ───────── fundo (pintado uma vez) ───────── */
 
-  pintarFundo() {
+  pintarFundo(paleta) {
     const { W, H, u } = this;
     const tela = document.createElement("canvas");
     tela.width = W;
     tela.height = H;
     const c = tela.getContext("2d");
     const g = c.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, "#3fb4ff");
-    g.addColorStop(0.55, "#a9e4ff");
-    g.addColorStop(1, "#ffe9b8");
+    g.addColorStop(0, paleta[0]);
+    g.addColorStop(0.55, paleta[1]);
+    g.addColorStop(1, paleta[2]);
     c.fillStyle = g;
     c.fillRect(0, 0, W, H);
     c.fillStyle = "rgba(255,255,255,.35)";
@@ -293,13 +343,16 @@ const Cena = {
 
   rr(x, y, w, h, r) { caminhoArredondado(this.ctx, x, y, w, h, r); },
 
+  ventando() { return !!this.clima && this.clima.tipo === "vento"; },
+
   nuvensPassando(dt) {
     const { ctx, W, H, u } = this;
     ctx.fillStyle = "#fff";
     ctx.strokeStyle = OL;
     ctx.lineWidth = u * 0.5;
+    const vento = this.ventando() ? 5 : 1;
     for (const n of this.nuvens) {
-      n.x += n.v * dt;
+      n.x += n.v * dt * vento;
       if (n.x > 1.2) n.x = -0.3;
       const x = n.x * W, y = n.y * H, s = n.s * u * 7;
       ctx.beginPath();
@@ -811,6 +864,7 @@ const Cena = {
   bandeirinhas(agora) {
     const { ctx, W, H, u } = this;
     const y = TOPO * H * 0.94, cores = [VERMELHO, OURO, VERDE, "#3aa6ee", "#fff"];
+    const vento = this.ventando();
     ctx.strokeStyle = OL;
     ctx.lineWidth = u * 0.35;
     ctx.beginPath();
@@ -818,7 +872,7 @@ const Cena = {
     ctx.quadraticCurveTo(W / 2, y + u * 3, W, y);
     ctx.stroke();
     for (let i = 0; i < 16; i++) {
-      const p = (i + 0.5) / 16, x = p * W, yy = y + Math.sin(p * Math.PI) * u * 1.5, bal = Math.sin(agora / 300 + i) * u * 0.5;
+      const p = (i + 0.5) / 16, x = p * W, yy = y + Math.sin(p * Math.PI) * u * 1.5, bal = Math.sin(agora / (vento ? 70 : 300) + i) * u * (vento ? 1.6 : 0.5);
       ctx.fillStyle = cores[i % cores.length];
       ctx.beginPath();
       ctx.moveTo(x - u * 2, yy);
@@ -865,6 +919,97 @@ const Cena = {
     ctx.restore();
   },
 
+  refletores(dt) {
+    const R = this.refletor;
+    if (!R) return;
+    if ((R.t += dt) >= R.dur) { this.refletor = null; return; }
+    const { ctx, W, H } = this;
+    const a = Math.max(0, Math.min(1, R.t / 0.4, (R.dur - R.t) / 0.5)) * 0.45;
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    for (const [bx, k] of [[W * 0.2, 1], [W * 0.95, -1]]) {
+      const ang = -Math.PI / 2 + Math.sin(R.t * 1.4 + R.fase + k) * 0.55 * k, alcance = H * 1.1;
+      const tx = bx + Math.cos(ang) * alcance, ty = H + Math.sin(ang) * alcance;
+      const nx = -Math.sin(ang) * W * 0.12, ny = Math.cos(ang) * W * 0.12;
+      const g = ctx.createLinearGradient(bx, H, tx, ty);
+      g.addColorStop(0, `rgba(255,248,200,${a})`);
+      g.addColorStop(1, "rgba(255,248,200,0)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.moveTo(bx, H);
+      ctx.lineTo(tx + nx, ty + ny);
+      ctx.lineTo(tx - nx, ty - ny);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  },
+
+  desenharClima(dt) {
+    const c = this.clima;
+    if (!c) return;
+    const { ctx, W, H, u } = this;
+    const entra = Math.max(0, Math.min(1, c.t / 0.8, (c.dur - c.t) / 0.8));
+    if (c.tipo === "chuva") {
+      ctx.fillStyle = `rgba(30,40,70,${0.18 * entra})`;
+      ctx.fillRect(-W * 0.1, -H * 0.1, W * 1.2, H * 1.2);
+      ctx.strokeStyle = `rgba(220,235,255,${0.75 * entra})`;
+      ctx.lineWidth = u * 0.3;
+      ctx.beginPath();
+      for (const g of this.gotas) {
+        g.y += g.v * dt;
+        if (g.y > 1) { g.y -= 1; g.x = Math.random(); }
+        const x = g.x * W, y = g.y * H;
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - u * 0.6, y + u * 3.5);
+      }
+      ctx.stroke();
+    } else if (c.tipo === "vento" && Math.random() < 0.5 * PARTICULAS) {
+      const cores = [VERDE, "#8bd05a", OURO];
+      this.confetes.push({ x: c.lado > 0 ? -u * 2 : W + u * 2, y: H * (0.15 + Math.random() * 0.7), vx: c.lado * u * (1.6 + Math.random()), vy: -u * 0.3,
+        r: u * (0.4 + Math.random() * 0.3), giro: Math.random() * 6, vida: 1.2, cor: cores[Math.floor(Math.random() * cores.length)] });
+    } else if (c.tipo === "drone") {
+      this.drone(c);
+    }
+  },
+
+  /* Drone atravessando o céu acima do título, rebocando a faixa de torcida. */
+  drone(c) {
+    const { ctx, W, H, u } = this;
+    const p = c.t / c.dur, x = c.lado > 0 ? -W * 0.6 + p * W * 2.2 : W * 1.6 - p * W * 2.2;
+    const y = H * 0.032 + Math.sin(c.t * 3) * u * 0.5;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = OL;
+    ctx.lineWidth = u * 0.5;
+    ctx.font = `${u * 3.4}px ${LETRA}`;
+    const larg = ctx.measureText(c.texto).width + u * 4, alto = u * 5, corda = u * 5;
+    const bx = -c.lado * (corda + larg / 2 + u * 3);
+    ctx.beginPath();
+    ctx.moveTo(-c.lado * u * 3, 0);
+    ctx.lineTo(bx + c.lado * larg / 2, 0);
+    ctx.stroke();
+    ctx.fillStyle = "#fffaf0";
+    this.rr(bx - larg / 2, -alto / 2 + Math.sin(c.t * 5) * u * 0.4, larg, alto, u * 1.2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = VERMELHO;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(c.texto, bx, u * 0.3 + Math.sin(c.t * 5) * u * 0.4);
+    ctx.fillStyle = "#3a3f4a";
+    this.rr(-u * 3, -u * 1, u * 6, u * 2, u * 0.8);
+    ctx.fill();
+    ctx.stroke();
+    for (const k of [-1, 1]) {
+      ctx.beginPath();
+      ctx.ellipse(k * u * 3.6, -u * 1.6, Math.max(0.1, u * 2.6 * Math.abs(Math.sin(c.t * 40 + k))), u * 0.4, 0, 0, 6.28);
+      ctx.fill();
+    }
+    ctx.restore();
+  },
+
   efeitos(dt) {
     const { ctx, W, H, u } = this;
     this.pops = this.pops.filter(p => (p.t += dt) < 1.4);
@@ -901,7 +1046,7 @@ const Cena = {
     /* A chuva dourada cai só na coluna do holofote: a tabela segue legível. */
     if (this.chuvaDourada > 0 && this.lenda) {
       this.chuvaDourada -= dt;
-      const meio = this.bonecos.get(this.lenda.id).tela.x;
+      const meio = this.centroLenda().x;
       for (let i = 0; i < Math.max(1, Math.round(5 * PARTICULAS)); i++) {
         this.confetes.push({ x: meio + (Math.random() - 0.5) * W * 0.34, y: -u * 2, vx: (Math.random() - 0.5) * u * 0.3, vy: u * (0.4 + Math.random() * 0.6),
           r: u * (0.5 + Math.random() * 0.5), giro: Math.random() * 6, vida: 1.6, cor: Math.random() < 0.7 ? OURO : "#fff6c2" });
@@ -1152,11 +1297,11 @@ const Cena = {
     const L = this.lenda;
     if (!L) return;
     const { ctx, W, H } = this;
-    const b = this.bonecos.get(L.id), s = this.linhaH() * 1.15;
+    const s = this.linhaH() * 1.15, centro = this.centroLenda();
     const sai = L.t > L.dur - 0.5 ? (L.t - (L.dur - 0.5)) / 0.5 : 0;
     const escuro = Math.min(1, L.t / 0.35) * 0.72 * (1 - sai);
     const abre = Math.max(0, Math.min(1, (L.t - 0.5) / 0.25));
-    const cx = b.tela.x, cy = b.tela.y - s * 0.55, R = s * (0.15 + abre * 1.5);
+    const cx = centro.x, cy = centro.y, R = s * (0.15 + abre * 2.2);
     const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
     g.addColorStop(0, "rgba(8,5,20,0)");
     g.addColorStop(0.6, "rgba(8,5,20,0)");
@@ -1179,12 +1324,15 @@ const Cena = {
 
   /* Câmera chega perto do time do lendário depois que o holofote abre. */
   zoom() {
-    const L = this.lenda;
-    if (!L || L.t < 0.5) return null;
+    const L = this.lenda, c = this.clima;
     const suave = p => (p = Math.max(0, Math.min(1, p))) * p * (3 - 2 * p);
-    const z = 1 + 0.12 * Math.min(suave((L.t - 0.5) / 0.5), suave((L.dur - 0.3 - L.t) / 0.7));
-    const b = this.bonecos.get(L.id);
-    return { z, x: b.tela.x, y: b.tela.y - this.linhaH() * 0.6 };
+    if (!L && c && c.tipo === "passeio") {
+      const z = 1 + 0.1 * Math.min(suave(c.t / 1.2), suave((c.dur - c.t) / 1.2));
+      return { z, x: this.W * 0.7, y: this.linhaY(this.N - 2) };
+    }
+    if (!L || L.t < 0.5) return null;
+    const z = 1 + 0.08 * Math.min(suave((L.t - 0.5) / 0.5), suave((L.dur - 0.3 - L.t) / 0.7));
+    return { z, x: this.W * 0.7, y: this.H * 0.5 };
   },
 
   animar(dt) {
@@ -1221,6 +1369,7 @@ const Cena = {
       if (L.t >= L.dur) this.lenda = null;
     }
     if (this.sacode && (this.sacode.t += dt) >= this.sacode.dur) this.sacode = null;
+    if (this.clima && (this.clima.t += dt) >= this.clima.dur) this.clima = null;
     this.tremor = Math.max(0, this.tremor - dt);
   },
 
@@ -1240,6 +1389,15 @@ const Cena = {
     }
     if (this.tremor > 0) ctx.translate((Math.random() - 0.5) * u * 2 * this.tremor, (Math.random() - 0.5) * u * 2 * this.tremor);
     ctx.drawImage(this.fundo, 0, 0);
+    if (this.fundoAntes) {
+      this.troca += dt / 3;
+      if (this.troca >= 1) this.fundoAntes = null;
+      else {
+        ctx.globalAlpha = 1 - this.troca;
+        ctx.drawImage(this.fundoAntes, 0, 0);
+        ctx.globalAlpha = 1;
+      }
+    }
     this.nuvensPassando(dt);
     this.bandeirinhas(agora);
     for (let r = 0; r < this.N; r++) this.degrau(r, agora);
@@ -1254,7 +1412,9 @@ const Cena = {
     const ordem = tabela.times.map(t => [t, this.bonecos.get(t.id)]).sort((a, b) => a[1].y - b[1].y);
     for (const [t, b] of ordem) this.boneco(t, b, tabela.fase, agora, dt);
     this.holofote();
+    this.refletores(dt);
     this.efeitos(dt);
+    this.desenharClima(dt);
     ctx.restore();
     /* Fora do zoom e do tremor: o cartão fica parado na faixa dos degraus. */
     this.cartoes(dt);
