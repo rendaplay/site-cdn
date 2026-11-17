@@ -254,7 +254,7 @@ for (const plano of $$('.plano')) {
 // Jogo do PC só vem no Pro; o resto entra no Celular, que é o passe mais barato.
 const COMPRA_JOGO = {
   celular: { plano: 'celularPasse', rotulo: 'Quero por R$ 49,90', micro: 'Vem em todos os planos: Celular a partir de R$ 49,90 ou Pro com os jogos do PC.', selo: 'Roda no celular', icone: 'celular' },
-  pc: { plano: 'proPasse', rotulo: 'Quero o Pro por R$ 79,90', micro: 'Vem no plano Pro e no Vitalício, junto com os 11 jogos do celular.', selo: 'PC com avatar do Roblox', icone: 'windows' },
+  pc: { plano: 'proPasse', rotulo: 'Quero o Pro por R$ 79,90', micro: 'Vem no plano Pro e no Vitalício, junto com os 16 jogos do celular.', selo: 'PC com avatar do Roblox', icone: 'windows' },
 };
 
 const modalJogo = $('#modal-jogo');
