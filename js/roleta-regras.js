@@ -21,7 +21,8 @@
     if (grupo !== 'roleta' || jaViu || !temCheckout) return false;
     if (desdeEntradaMs < ESPERA_ARMAR_MS) return false;
     // Quem abriu o checkout e voltou já passou do meio da página, mesmo tendo vindo do topo.
-    if (gatilho === 'voltou_checkout') return true;
+    // Mouse indo pra aba ou pro X no PC é saída clara: não precisa ter rolado.
+    if (gatilho === 'voltou_checkout' || gatilho === 'mouse_saiu') return true;
     return rolagem >= ROLAGEM_MINIMA;
   }
 

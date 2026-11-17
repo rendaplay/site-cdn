@@ -1,5 +1,5 @@
 // Roleta de saída: quem ameaça sair ganha o Pro pelo preço do Celular, com o Kit Live Lotada
-// e a aula de estreia. Todo pedaço é algo que a pessoa recebe de verdade; a roleta para sempre
+// e o tutorial de live. Todo pedaço é algo que a pessoa recebe de verdade; a roleta para sempre
 // no Pro porque ele leva os outros dois junto. Sem back redirect: a política do Meta veta.
 (function () {
   'use strict';
@@ -11,7 +11,9 @@
   if (!R) return;
 
   const CHAVE = 'rendaplay.roleta';
-  const guardado = ler('localStorage', CHAVE) || {};
+  // ?roleta=1 abre na hora pra conferir o desenho: não sorteia, não grava e não conta no A/B.
+  const TESTE = new URLSearchParams(location.search).get('roleta') === '1' && !!LINK;
+  const guardado = TESTE ? { grupo: 'roleta' } : ler('localStorage', CHAVE) || {};
   if (!guardado.grupo) {
     guardado.grupo = R.sortearGrupo(Math.random());
     // Sem armazenamento a roleta não lembraria que já apareceu e voltaria a cada página.
@@ -28,16 +30,17 @@
   const FATIAS = [
     { linhas: ['Pro por', 'R$ 49,90'], cor: 'var(--verde)', tinta: 'var(--noite)' },
     { linhas: ['Kit Live', 'Lotada'], cor: 'var(--noite-3)', tinta: 'var(--branco)' },
-    { linhas: ['Aula', 'ao vivo'], cor: 'var(--ouro)', tinta: 'var(--noite)' },
+    { linhas: ['Tutorial', 'de live'], cor: 'var(--ouro)', tinta: 'var(--noite)' },
     { linhas: ['Pro por', 'R$ 49,90'], cor: 'var(--verde)', tinta: 'var(--noite)' },
     { linhas: ['Kit Live', 'Lotada'], cor: 'var(--noite-3)', tinta: 'var(--branco)' },
-    { linhas: ['Aula', 'ao vivo'], cor: 'var(--ouro)', tinta: 'var(--noite)' },
+    { linhas: ['Tutorial', 'de live'], cor: 'var(--ouro)', tinta: 'var(--noite)' },
   ];
 
   let aberta = false;
   let relogioId = 0;
 
-  if (guardado.expira && R.restanteMs(guardado.expira, Date.now()) > 0) mostrarPilula();
+  if (TESTE) setTimeout(abrir, 800);
+  else if (guardado.expira && R.restanteMs(guardado.expira, Date.now()) > 0) mostrarPilula();
   else armarGatilhos();
 
   // ───────── gatilhos ─────────
@@ -66,7 +69,8 @@
 
     if (matchMedia('(pointer: fine)').matches) {
       document.addEventListener('mouseout', (e) => {
-        if (!e.relatedTarget && e.clientY <= 0) tentar('mouse_saiu');
+        // Alguns navegadores dão clientY de 1 a 5 ao sair rápido pelo topo.
+        if (!e.relatedTarget && e.clientY < 10) tentar('mouse_saiu');
       });
     }
 
@@ -127,12 +131,12 @@
           <ul class="roleta-itens">
             <li><b>Todos os jogos</b>: os do celular e os do Roblox no PC</li>
             <li><b>Kit Live Lotada</b>: capas, roteiro do que falar e títulos de live</li>
-            <li><b>Aula ao vivo de estreia</b>: a gente monta sua 1ª live junto com você</li>
+            <li><b>Tutorial de live</b>: passo a passo pra configurar e abrir sua 1ª live</li>
           </ul>
           <p class="roleta-relogio">Seu prêmio fica guardado por <b data-relogio>10:00</b></p>
           <a class="botao botao-g roleta-pegar" data-plano="roleta_pro" href="#">Quero meu prêmio</a>
           <p class="roleta-micro">30 dias de acesso, pagamento único. Garantia de 7 dias.</p>
-          ${WHATS ? '<a class="roleta-aula" href="#">Agora não. Quero só a aula grátis</a>' : ''}
+          ${WHATS ? '<a class="roleta-aula" href="#">Agora não. Quero só o tutorial grátis</a>' : ''}
         </div>
       </div>`;
     document.body.appendChild(fundo);
@@ -200,7 +204,7 @@
     if (aula) {
       // encodeURIComponent e não searchParams: o "+" no lugar do espaço aparece cru em alguns WhatsApp.
       const url = new URL(WHATS);
-      const texto = 'Oi! Ganhei na roleta do site e quero a aula grátis de como fazer minha primeira live.';
+      const texto = 'Oi! Ganhei na roleta do site e quero o tutorial grátis de como configurar minha primeira live.';
       aula.href = `${url.origin}${url.pathname}?text=${encodeURIComponent(texto)}`;
       aula.addEventListener('click', () => marcar('aula'));
     }
@@ -260,12 +264,14 @@
   }
 
   function marcarGrupo() {
+    if (TESTE) return;
     if (window.clarity) clarity('set', 'roleta_grupo', guardado.grupo);
     else setTimeout(() => window.clarity && clarity('set', 'roleta_grupo', guardado.grupo), 3000);
     if (typeof gtag === 'function') gtag('event', 'roleta_grupo', { grupo: guardado.grupo });
   }
 
   function marcar(etapa, extra) {
+    if (TESTE) return;
     if (typeof gtag === 'function') gtag('event', 'roleta', { etapa, ...extra });
     if (window.clarity) clarity('event', `roleta_${etapa}`);
   }
@@ -275,6 +281,7 @@
   }
 
   function gravar(armazem, chave, valor) {
+    if (TESTE) return true;
     try {
       window[armazem].setItem(chave, JSON.stringify(valor));
       return true;
