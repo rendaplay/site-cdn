@@ -36,8 +36,9 @@ aplicarLinks();
 
 // ───────── checkout ativo ─────────
 
-// A API diz se as compras saem pela Kiwify ou pelo checkout próprio (/pay). Sem resposta em 1,5 s
-// a página fica como está, em Kiwify, que é o que o HTML já traz.
+// A API diz se as compras saem pela Kiwify, pelo checkout próprio (/pay) ou pela Pagou. Sem resposta
+// em 1,5 s a página fica como está, em Kiwify, que é o que o HTML já traz. Na Pagou, botão sem link
+// na API segue na Kiwify.
 const API = 'https://api.rendaplay.com.br';
 
 async function seguirCheckoutAtivo() {
@@ -47,7 +48,19 @@ async function seguirCheckoutAtivo() {
     const resposta = await fetch(`${API}/checkout/provedor`, { signal: controle.signal });
     if (!resposta.ok) return;
     const { provedor, links, cartao } = await resposta.json();
-    if (provedor !== 'asaas' || !links) return;
+    if (!links) return;
+    if (provedor === 'pagou') {
+      for (const botao of $$('[data-checkout]')) {
+        const link = links[botao.dataset.checkout];
+        if (typeof link === 'string' && link.startsWith('https://')) apontar(botao, link);
+      }
+      // A roleta monta o link só quando aparece, lendo do CONFIG.
+      for (const [chave, link] of Object.entries(links)) {
+        if (typeof link === 'string' && link.startsWith('https://')) CONFIG.checkout[chave] = link;
+      }
+      return;
+    }
+    if (provedor !== 'asaas') return;
     for (const botao of $$('[data-checkout]')) {
       const caminho = links[botao.dataset.checkout];
       if (typeof caminho === 'string' && caminho.startsWith('/pay/')) apontar(botao, new URL(caminho, location.origin).href);

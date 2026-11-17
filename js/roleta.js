@@ -1,6 +1,6 @@
-// Roleta de saída: quem ameaça sair ganha o Pro pelo preço do Celular, com o Kit Live Lotada
+// Roleta de saída: quem ameaça sair ganha o PC + Celular pelo preço do Celular, com o Kit Live Lotada
 // e o tutorial de live. Todo pedaço é algo que a pessoa recebe de verdade; a roleta para sempre
-// no Pro porque ele leva os outros dois junto. Sem back redirect: a política do Meta veta.
+// no PC + Celular porque ele leva os outros dois junto. Sem back redirect: a política do Meta veta.
 (function () {
   'use strict';
 
@@ -28,10 +28,10 @@
   marcarGrupo();
 
   const FATIAS = [
-    { linhas: ['Pro por', 'R$ 49,90'], cor: 'var(--verde)', tinta: 'var(--noite)' },
+    { linhas: ['PC+Celular', 'R$ 49,90'], cor: 'var(--verde)', tinta: 'var(--noite)' },
     { linhas: ['Kit Live', 'Lotada'], cor: 'var(--noite-3)', tinta: 'var(--branco)' },
     { linhas: ['Tutorial', 'de live'], cor: 'var(--ouro)', tinta: 'var(--noite)' },
-    { linhas: ['Pro por', 'R$ 49,90'], cor: 'var(--verde)', tinta: 'var(--noite)' },
+    { linhas: ['PC+Celular', 'R$ 49,90'], cor: 'var(--verde)', tinta: 'var(--noite)' },
     { linhas: ['Kit Live', 'Lotada'], cor: 'var(--noite-3)', tinta: 'var(--branco)' },
     { linhas: ['Tutorial', 'de live'], cor: 'var(--ouro)', tinta: 'var(--noite)' },
   ];
@@ -126,7 +126,7 @@
         </div>
         <div class="roleta-premio" hidden>
           <p class="roleta-selo">🎉 Caiu no maior prêmio</p>
-          <h2>Pro pelo preço do Celular</h2>
+          <h2>PC + Celular pelo preço só do Celular</h2>
           <p class="roleta-preco"><s>R$ 79,90</s> <b>R$ 49,90</b></p>
           <ul class="roleta-itens">
             <li><b>Todos os jogos</b>: os do celular e os do Roblox no PC</li>
@@ -198,7 +198,7 @@
 
   function prepararLinks(raiz) {
     const pegar = raiz.querySelector('.roleta-pegar');
-    pegar.href = comOrigem(LINK);
+    pegar.href = comOrigem(CONFIG.checkout.proRoleta);
     pegar.addEventListener('click', () => marcar('checkout'));
     const aula = raiz.querySelector('.roleta-aula');
     if (aula) {
@@ -226,8 +226,8 @@
     const pilula = document.createElement('a');
     pilula.className = 'roleta-pilula';
     pilula.dataset.plano = 'roleta_pro';
-    pilula.href = comOrigem(LINK);
-    pilula.innerHTML = '<span aria-hidden="true">🎁</span> Pro por R$&nbsp;49,90&nbsp;· <b data-relogio></b>';
+    pilula.href = comOrigem(CONFIG.checkout.proRoleta);
+    pilula.innerHTML = '<span aria-hidden="true">🎁</span> PC&nbsp;+&nbsp;Celular por R$&nbsp;49,90&nbsp;· <b data-relogio></b>';
     pilula.addEventListener('click', () => marcar('checkout', { de: 'pilula' }));
     document.body.appendChild(pilula);
     document.body.classList.add('roleta-ativa');

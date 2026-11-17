@@ -752,6 +752,7 @@ a.hero-selo:hover { background: rgba(23, 248, 100, 0.2); }
 .preco-risco { margin-top: 16px; font-size: 0.95rem; color: var(--claro-texto); font-weight: 600; }
 .preco-risco[hidden] { display: none; }
 .preco-risco s { text-decoration-thickness: 2px; text-decoration-color: var(--presente); }
+.preco-off { margin-left: 4px; padding: 2px 8px; border-radius: 999px; background: var(--presente); color: var(--branco); font-size: 0.8rem; letter-spacing: .02em; }
 .preco { margin-top: 14px; display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
 .preco-risco:not([hidden]) + .preco { margin-top: 2px; }
 .preco-valor { font-family: var(--display); font-size: 2.7rem; line-height: 1; font-variant-numeric: tabular-nums; }
