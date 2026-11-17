@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Embaixadinha Coletiva · Renda Play</title>
+<link rel="stylesheet" href="embaixadinha.css">
+</head>
+<body>
+<div id="palco" class="palco" aria-live="polite">
+  <canvas id="campo" aria-hidden="true"></canvas>
+
+  <header class="placar" hidden>
+    <div class="lado a"><span class="chip"></span><span class="sigla"></span><b class="melhor">0</b></div>
+    <div class="meio"><span class="relogio">2:00</span><span class="rotulo"></span></div>
+    <div class="lado b"><b class="melhor">0</b><span class="sigla"></span><span class="chip"></span></div>
+    <div class="recorde" hidden></div>
+  </header>
+
+  <div class="contador a" hidden>
+    <b class="num">0</b>
+    <div class="folego"><i></i></div>
+    <div class="reforco" hidden>Reforço · toque vale 2</div>
+    <div class="efeito" hidden></div>
+  </div>
+  <div class="contador b" hidden>
+    <b class="num">0</b>
+    <div class="folego"><i></i></div>
+    <div class="reforco" hidden>Reforço · toque vale 2</div>
+    <div class="efeito" hidden></div>
+  </div>
+  <div class="caiu a" hidden></div>
+  <div class="caiu b" hidden></div>
+  <div class="pops"></div>
+
+  <div class="faixas"></div>
+  <div class="presentes"></div>
+  <section class="telao" hidden></section>
+  <div class="resultado" hidden></div>
+  <div class="dica"></div>
+
+  <section class="abertura" hidden></section>
+  <section class="chamada" hidden></section>
+  <section class="ranking" hidden></section>
+
+  <div class="sem-sinal" hidden></div>
+  <div class="pausa" hidden>Pausado</div>
+  <form class="painel" hidden></form>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="../comum/live.js"></script>
+<script src="../comum/presentes.js"></script>
+<script src="../comum/configurar.js"></script>
+<script src="preset.js"></script>
+<script src="config.js"></script>
+<script src="falas.js"></script>
+<script src="regras.js"></script>
+<script src="personagens.js"></script>
+<script src="cena.js"></script>
+<script src="hud.js"></script>
+<script src="som.js"></script>
+<script src="painel.js"></script>
+<script src="jogo.js"></script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pênaltis da Live · Renda Play</title>
+<link rel="stylesheet" href="penaltis.css">
+</head>
+<body>
+<div id="palco" class="palco" aria-live="polite">
+  <canvas id="campo" aria-hidden="true"></canvas>
+
+  <header class="placar" hidden>
+    <div class="lado a"><span class="chip"></span><span class="sigla"></span><b class="gols">0</b></div>
+    <div class="meio"><span class="rotulo"></span></div>
+    <div class="lado b"><b class="gols">0</b><span class="sigla"></span><span class="chip"></span></div>
+    <ol class="historico a"></ol>
+    <ol class="historico b"></ol>
+    <div class="pressao a"><i></i><span>PRESSÃO</span></div>
+    <div class="pressao b"><i></i><span>PRESSÃO</span></div>
+  </header>
+
+  <div class="faixas"></div>
+  <div class="presentes"></div>
+  <div class="resultado" hidden></div>
+
+  <section class="batedor" hidden>
+    <div class="topo"><span class="cobranca"></span><span class="time"></span></div>
+    <div class="nome"></div>
+    <div class="extra"></div>
+  </section>
+
+  <footer class="rodape" hidden>
+    <div class="fila a"><h3></h3><ol></ol></div>
+    <div class="fila b"><h3></h3><ol></ol></div>
+  </footer>
+  <div class="dica"></div>
+
+  <section class="abertura" hidden></section>
+  <section class="chamada" hidden></section>
+  <section class="ranking" hidden></section>
+
+  <div class="sem-sinal" hidden></div>
+  <div class="pausa" hidden>Pausado</div>
+  <form class="painel" hidden></form>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="../comum/live.js"></script>
+<script src="../comum/presentes.js"></script>
+<script src="../comum/configurar.js"></script>
+<script src="preset.js"></script>
+<script src="config.js"></script>
+<script src="falas.js"></script>
+<script src="regras.js"></script>
+<script src="personagens.js"></script>
+<script src="cena.js"></script>
+<script src="hud.js"></script>
+<script src="som.js"></script>
+<script src="painel.js"></script>
+<script src="jogo.js"></script>
+</body>
+</html>

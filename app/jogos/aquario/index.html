@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aquário da Live · Renda Play</title>
+<link rel="stylesheet" href="aquario.css">
+</head>
+<body>
+<div id="palco" class="palco" aria-live="polite">
+  <canvas id="aquario" aria-hidden="true"></canvas>
+
+  <header class="topo">
+    <div class="barra"><i></i><span class="titulo-jogo"></span><b class="nivel">Nível 1</b></div>
+    <div class="linha">
+      <div class="maiores"><span class="rotulo">Maior peixe da live</span><ol></ol></div>
+      <div class="contagem"><b class="n">0</b><span class="rotulo">peixes</span><span class="toca">nadando</span></div>
+    </div>
+  </header>
+
+  <div class="faixas"></div>
+  <section class="telao" hidden></section>
+  <div class="resultado" hidden></div>
+  <div class="presentes"></div>
+  <div class="dica"></div>
+
+  <section class="chamada" hidden></section>
+
+  <div class="sem-sinal" hidden></div>
+  <div class="pausa" hidden>Pausado</div>
+  <form class="painel" hidden></form>
+</div>
+
+<script src="../comum/live.js"></script>
+<script src="../comum/presentes.js"></script>
+<script src="../comum/configurar.js"></script>
+<script src="preset.js"></script>
+<script src="config.js"></script>
+<script src="falas.js"></script>
+<script src="regras.js"></script>
+<script src="hud.js"></script>
+<script src="sprites.js"></script>
+<script src="aquario.js"></script>
+<script src="som.js"></script>
+<script src="painel.js"></script>
+<script src="jogo.js"></script>
+</body>
+</html>

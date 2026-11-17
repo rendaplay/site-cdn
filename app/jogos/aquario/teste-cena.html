@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teste da cena · Aquário da Live</title>
+<style>
+  @font-face { font-family: "Lilita One"; src: url("fontes/LilitaOne-Regular.ttf") format("truetype"); font-display: block; }
+  @font-face { font-family: "Figtree"; src: url("fontes/Figtree.ttf") format("truetype"); font-weight: 300 900; font-display: block; }
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  #palco { position: absolute; left: 0; top: 0; width: 1080px; transform-origin: 0 0; overflow: hidden; }
+  #aquario { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+  #erros { position: fixed; left: 0; right: 0; bottom: 0; font: 14px monospace; color: #fff; background: #b00; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div id="palco"><canvas id="aquario"></canvas></div>
+<pre id="erros"></pre>
+<script>
+  /* Só o aquário, sem HUD nem live:
+     ?momento=demo|bolhas|aguaviva|tartaruga|tubarao|baleia|reforco|nivel|dormindo&peixes=40&t=segundos&leve=1.
+     A live roda de verdade (regras.js) com semente fixa, pra repetir a mesma foto. */
+  const erros = document.getElementById("erros");
+  addEventListener("error", e => { erros.textContent += `${e.message} (${e.filename}:${e.lineno})\n`; });
+  let semente = Number(new URLSearchParams(location.search).get("semente") || 7);
+  Math.random = () => ((semente = (semente * 16807) % 2147483647) - 1) / 2147483646;
+</script>
+<script src="preset.js"></script>
+<script src="regras.js"></script>
+<script src="hud.js"></script>
+<script src="sprites.js"></script>
+<script src="aquario.js"></script>
+<script>
+(async () => {
+  try { await Promise.all([document.fonts.load('40px "Lilita One"'), document.fonts.load('800 27px "Figtree"')]); }
+  catch (e) { /* segue com a fonte reserva */ }
+  const url = new URLSearchParams(location.search);
+  const momento = url.get("momento") || "demo";
+  const t = Number(url.get("t") ?? NaN);
+  const quantos = Number(url.get("peixes") || 40);
+  const config = JSON.parse(JSON.stringify(AQUARIO_PRESETS[AQUARIO_PRESET_PADRAO]));
+
+  const W = 1080, H = Math.round(Math.min(2520, Math.max(1920, W * innerHeight / innerWidth)) / ARTE) * ARTE;
+  const escala = Math.min(innerWidth / W, innerHeight / H);
+  const palco = document.getElementById("palco");
+  palco.style.height = `${H}px`;
+  palco.style.transform = `scale(${escala})`;
+
+  const p = new Aquario(config, Math.random);
+  p.formato(H / ARTE);
+  Tanque.montar(document.getElementById("aquario"), config, p, url.get("leve") === "1");
+  Tanque.aplicarFormato(W, H, escala);
+
+  const vistos = [];
+  const repassar = lista => {
+    for (const a of lista) vistos.push(a.tipo);
+    if (lista.length) Tanque.ver(lista);
+  };
+  const passo = 1 / 60;
+  const andar = s => {
+    for (let i = 0; i < Math.round(s / passo); i++) {
+      repassar(p.passo(passo));
+      Tanque.quadro(passo, 0);
+    }
+  };
+
+  const nomes = ["gabizinha", "joaozin", "mari_10", "zeca", "dudinha", "lucas.fla", "bia", "rafa_vp", "tete", "nanda.oficial",
+    "carlinhos", "pri", "juju_sp", "theo", "malu", "vitinho", "ana.clara", "kaka", "duda_rj", "leozin"];
+  const gente = Array.from({ length: quantos }, (_, i) => nomes[i % nomes.length] + (i >= nomes.length ? i : ""));
+  const doador = { id: gente[0], nome: gente[0] };
+  gente.forEach((n, i) => { repassar(p.comentario({ id: n, nome: n }, "oi")); andar(0.12); });
+  for (let r = 0; r < 3; r++) gente.forEach((n, i) => { if ((i + r) % 3 === 0) repassar(p.comentario({ id: n, nome: n }, "come")); });
+  andar(6);
+
+  const presente = faixa => repassar(p.presente(doador, { nome: "Rose", moedas: 1, faixa }));
+  const padrao = { demo: 2, bolhas: 1.2, aguaviva: 2, tartaruga: 4, tubarao: 3, baleia: 5, reforco: 0.6, nivel: 1.5, dormindo: 3 };
+  if (momento === "bolhas") presente(0);
+  else if (momento === "aguaviva") presente(1);
+  else if (momento === "tartaruga") presente(2);
+  else if (momento === "tubarao") presente(3);
+  else if (momento === "baleia") presente(4);
+  else if (momento === "reforco") { repassar(p.seguiu(doador)); repassar(p.compartilhou({ id: gente[1], nome: gente[1] })); }
+  else if (momento === "nivel") {
+    for (let i = 0; i < 5; i++) { const l = []; p.encher(p.aquario.meta - p.aquario.valor, l, null); repassar(l); }
+  } else if (momento === "dormindo") andar(config.ociosidade);
+  andar(Number.isFinite(t) ? t : padrao[momento] ?? 1);
+
+  document.title = `peixes=${p.peixes.length} toca=${p.naToca()} nivel=${p.aquario.nivel} eventos=${[...new Set(vistos)].join(",")}`;
+  document.body.dataset.pronto = "1";
+})().catch(e => { document.getElementById("erros").textContent += e.stack + "\n"; document.title = "ERRO " + e.message; });
+</script>
+</body>
+</html>

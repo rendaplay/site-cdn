@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teste da cena · Embaixadinha</title>
+<style>
+  @font-face { font-family: "Lilita One"; src: url("fontes/LilitaOne-Regular.ttf") format("truetype"); font-display: block; }
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  #palco { position: absolute; left: 0; top: 0; width: 1080px; transform-origin: 0 0; overflow: hidden; }
+  #campo { display: block; }
+  .faixa { position: absolute; left: 0; right: 0; background: rgba(255, 0, 255, .18); border: 2px dashed #f0f; pointer-events: none; }
+  #erros { position: fixed; left: 0; right: 0; bottom: 0; font: 14px monospace; color: #fff; background: #b00; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div id="palco"><canvas id="campo"></canvas></div>
+<pre id="erros"></pre>
+<script>
+  /* ?momento=jogo|truque|reforco|brilho|lento|vento|fogo|show|caiu|recorde|fim|ocioso|neutro&t=segundos
+     &faixas=1 marca as áreas do placar e do rodapé. A rodada roda de verdade
+     (regras.js) com semente fixa, pra repetir a mesma foto. */
+  const erros = document.getElementById("erros");
+  addEventListener("error", e => { erros.textContent += `${e.message} (${e.filename}:${e.lineno})\n`; });
+  let semente = Number(new URLSearchParams(location.search).get("semente") || 7);
+  Math.random = () => ((semente = (semente * 16807) % 2147483647) - 1) / 2147483646;
+</script>
+<script src="vendor/three.min.js"></script>
+<script src="preset.js"></script>
+<script src="regras.js"></script>
+<script src="personagens.js"></script>
+<script src="cena.js"></script>
+<script>
+(async () => {
+  try { await document.fonts.load('40px "Lilita One"'); } catch (e) { /* segue com a fonte reserva */ }
+  const url = new URLSearchParams(location.search);
+  const momento = url.get("momento") || "jogo";
+  const t = Number(url.get("t") ?? NaN);
+  const config = JSON.parse(JSON.stringify(EMBAIXADINHA_PRESETS.brasileirao));
+  const time = id => config.times.find(x => x.id === id);
+  const A = time(url.get("a") || "flamengo"), B = time(url.get("b") || "palmeiras");
+
+  const W = 1080, H = Math.min(2520, Math.max(1920, Math.round(W * innerHeight / innerWidth)));
+  const palco = document.getElementById("palco");
+  palco.style.height = `${H}px`;
+  palco.style.transform = `scale(${Math.min(innerWidth / W, innerHeight / H)})`;
+  if (url.get("faixas") === "1") {
+    for (const [de, ate] of [[0, 0.17], [0.9, 1]]) {
+      const f = document.createElement("div");
+      f.className = "faixa";
+      f.style.top = `${de * 100}%`;
+      f.style.height = `${(ate - de) * 100}%`;
+      palco.appendChild(f);
+    }
+  }
+
+  Cena.montar(document.getElementById("campo"), config);
+  Cena.aplicarFormato(W, H);
+
+  /* Chamadas antes do clássico não podem quebrar. */
+  Cena.festa("flamengo", 1); Cena.confete(null, 3); Cena.toque({ time: "flamengo" }); Cena.quadro(0.016, 0, {});
+
+  const p = new Embaixadinha(config, Math.random);
+  const render = Cena.renderer.render.bind(Cena.renderer);
+  if (momento !== "neutro") Cena.renderer.render = () => {};
+  const vistos = [];
+  const repassar = lista => {
+    for (const a of lista) {
+      vistos.push(a.tipo);
+      const f = {
+        classico: () => Cena.classico(time(a.a), time(a.b)), toque: () => Cena.toque(a), truque: () => Cena.truque(a),
+        marco: () => Cena.marco(a), recorde: () => Cena.recorde(a), caiu: () => Cena.caiu(a), recomecou: () => Cena.recomecou(a),
+        efeito: () => Cena.efeito(a), reforco: () => Cena.reforco(a), fim: () => Cena.fim(a),
+        ocioso: () => Cena.ocioso(true), retomou: () => Cena.ocioso(false),
+      }[a.tipo];
+      if (f) f();
+    }
+  };
+  const gente = ["gabizinha", "joaozin", "mari_10", "zeca", "dudinha", "lucas.fla", "bia", "rafa_vp", "teteu", "nanda"];
+  let vez = 0;
+  /* `torcer`: a torcida comenta sem parar, a bola não cai. */
+  const passo = 1 / 60;
+  const andar = (s, { ate = null, torcer = true } = {}) => {
+    for (let i = 0; i < Math.round(s / passo); i++) {
+      if (torcer && p.fase === "jogo" && i % 20 === 0) {
+        const n = gente[vez++ % gente.length];
+        repassar(p.comentario({ id: n, nome: n }, vez % 2 ? B.apelidos[0] : A.apelidos[0]));
+      }
+      const lista = p.passo(passo);
+      repassar(lista);
+      Cena.quadro(passo, 0, { alfa: p.alfa, jogo: p.jogo, fase: p.fase, t: p.t });
+      if (ate && lista.some(ate)) return true;
+    }
+    return false;
+  };
+  if (momento !== "neutro") {
+    gente.forEach((n, i) => p.comentario({ id: n, nome: n }, i % 2 ? B.apelidos[0] : A.apelidos[0]));
+    repassar(p.passo(0));
+    andar(config.tempos.aquecimento + config.tempos.abertura + 0.5);
+  }
+
+  const doador = { id: "gabizinha", nome: "gabizinha" };
+  const presente = faixa => repassar(p.presente(doador, { nome: "Rose", moedas: 1, faixa }));
+  const padrao = { jogo: 5, truque: 0.7, reforco: 2.5, brilho: 0.6, lento: 1.5, vento: 1.5, fogo: 1.2, show: 2.2, caiu: 0.5, recorde: 0.4, fim: 2.5, ocioso: 2, neutro: 2 };
+  const quando = Number.isFinite(t) ? t : padrao[momento] ?? 1;
+  if (momento === "truque") {
+    andar(3);
+    repassar(p.comentario(doador, url.get("qual") || "lambreta"));
+    andar(5, { ate: a => a.tipo === "truque" });
+  } else if (momento === "reforco") {
+    repassar(p.seguiu(doador));
+  } else if (momento === "brilho") {
+    presente(0);
+    andar(5, { ate: a => a.tipo === "efeito" });
+  } else if (momento === "lento") {
+    presente(1);
+  } else if (momento === "vento") {
+    presente(2);
+  } else if (momento === "fogo") {
+    presente(3);
+  } else if (momento === "show") {
+    presente(4);
+  } else if (momento === "caiu") {
+    andar(60, { ate: a => a.tipo === "caiu", torcer: false });
+  } else if (momento === "recorde") {
+    andar(40, { ate: a => a.tipo === "recorde" });
+  } else if (momento === "fim") {
+    andar(4);
+    p.encerrar();
+    andar(2, { ate: a => a.tipo === "fim" });
+  } else if (momento === "ocioso") {
+    p.ultimoReal = -1000;
+  }
+  if (momento === "neutro") for (let i = 0; i < Math.round(quando / passo); i++) Cena.quadro(passo, 0, {});
+  else andar(quando);
+  Cena.renderer.render = render;
+  Cena.quadro(0.0001, 0, { alfa: p.alfa, jogo: p.jogo, fase: p.fase, t: p.t });
+  const info = Cena.renderer.info.render;
+  const seq = p.jogo ? Object.values(p.jogo.lados).map(l => l.seq).join("x") : "";
+  document.title = `tri=${info.triangles} calls=${info.calls} fase=${p.fase} seq=${seq} eventos=${[...new Set(vistos)].join(",")}`;
+  document.body.dataset.pronto = "1";
+})().catch(e => { document.getElementById("erros").textContent += e.stack + "\n"; document.title = "ERRO " + e.message; });
+</script>
+</body>
+</html>

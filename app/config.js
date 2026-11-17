@@ -29,4 +29,9 @@ const JOGOS = [
   { id: "davigolias", nome: "Davi x Golias", descricao: "O chat carrega a funda e derruba o gigante." },
   { id: "empurra", nome: "Empurra-Empurra", descricao: "O chat empurra os mascotes pra fora do círculo." },
   { id: "torcida", nome: "Maior Torcida do Brasil", descricao: "O chat lota o estádio com a torcida do seu time." },
+  { id: "penaltis", nome: "Pênaltis da Live", descricao: "Cada comentário é uma cobrança pro seu time." },
+  { id: "pebolim", nome: "Pebolim Gigante", descricao: "O chat joga o pebolim: cada comentário chuta a bola." },
+  { id: "embaixadinha", nome: "Embaixadinha Coletiva", descricao: "Cada comentário é um toque: quem deixar cair perde." },
+  { id: "pinball", nome: "Pinball Gigante", descricao: "Comentou, sua bola entra na mesa." },
+  { id: "aquario", nome: "Aquário da Live", descricao: "Comentou, ganhou um peixe com o seu @." },
 ];

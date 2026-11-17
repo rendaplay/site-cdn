@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pinball Gigante · Renda Play</title>
+<link rel="stylesheet" href="pinball.css">
+</head>
+<body>
+<div id="palco" class="palco" aria-live="polite">
+  <canvas id="mesa" aria-hidden="true"></canvas>
+
+  <header class="topo">
+    <div class="jackpot"><i></i><span class="rotulo-jackpot">Jackpot da live</span><b class="valor">0</b></div>
+    <div class="recorde" hidden></div>
+    <div class="linha">
+      <ol class="top3"></ol>
+      <div class="meio">
+        <span class="relogio">3:00</span>
+        <span class="rotulo">Rodada</span>
+        <div class="dobro"><i></i><b>2X</b></div>
+        <span class="contagem"></span>
+      </div>
+    </div>
+  </header>
+
+  <div class="presentes"></div>
+  <div class="faixas"></div>
+  <section class="telao" hidden></section>
+  <div class="resultado" hidden></div>
+  <div class="caidas"></div>
+  <div class="dica"></div>
+
+  <section class="chamada" hidden></section>
+  <section class="podio" hidden></section>
+
+  <div class="sem-sinal" hidden></div>
+  <div class="pausa" hidden>Pausado</div>
+  <form class="painel" hidden></form>
+</div>
+
+<script src="../comum/live.js"></script>
+<script src="../comum/presentes.js"></script>
+<script src="../comum/configurar.js"></script>
+<script src="preset.js"></script>
+<script src="config.js"></script>
+<script src="falas.js"></script>
+<script src="regras.js"></script>
+<script src="hud.js"></script>
+<script src="mesa.js"></script>
+<script src="som.js"></script>
+<script src="painel.js"></script>
+<script src="jogo.js"></script>
+</body>
+</html>

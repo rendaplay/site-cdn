@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teste da cena · Pênaltis</title>
+<style>
+  @font-face { font-family: "Lilita One"; src: url("fontes/LilitaOne-Regular.ttf") format("truetype"); font-display: block; }
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  #palco { position: absolute; left: 0; top: 0; width: 1080px; transform-origin: 0 0; overflow: hidden; }
+  #campo { display: block; }
+  .faixa { position: absolute; left: 0; right: 0; background: rgba(255, 0, 255, .18); border: 2px dashed #f0f; pointer-events: none; }
+  #erros { position: fixed; left: 0; right: 0; bottom: 0; font: 14px monospace; color: #fff; background: #b00; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div id="palco"><canvas id="campo"></canvas></div>
+<pre id="erros"></pre>
+<script>
+  /* ?momento=prepara|voo|gol|defesa|trave|frango|fogo|placa|fim&t=segundos
+     &faixas=1 marca as áreas do placar e do rodapé. Sorteio com semente fixa,
+     pra repetir a mesma foto. */
+  const erros = document.getElementById("erros");
+  addEventListener("error", e => { erros.textContent += `${e.message} (${e.filename}:${e.lineno})\n`; });
+  let semente = 7;
+  Math.random = () => ((semente = (semente * 16807) % 2147483647) - 1) / 2147483646;
+</script>
+<script src="vendor/three.min.js"></script>
+<script src="preset.js"></script>
+<script src="personagens.js"></script>
+<script src="cena.js"></script>
+<script>
+(async () => {
+  try { await document.fonts.load('40px "Lilita One"'); } catch (e) { /* segue com a fonte reserva */ }
+  const url = new URLSearchParams(location.search);
+  const momento = url.get("momento") || "prepara";
+  const t = Number(url.get("t") ?? NaN);
+  const config = JSON.parse(JSON.stringify(PENALTIS_PRESETS.brasileirao));
+  const time = id => config.times.find(x => x.id === id);
+  const A = time(url.get("a") || "flamengo"), B = time(url.get("b") || "corinthians");
+
+  const W = 1080, H = Math.min(2520, Math.max(1920, Math.round(W * innerHeight / innerWidth)));
+  const palco = document.getElementById("palco");
+  palco.style.height = `${H}px`;
+  palco.style.transform = `scale(${Math.min(innerWidth / W, innerHeight / H)})`;
+  if (url.get("faixas") === "1") {
+    for (const [de, ate] of [[0, 0.17], [0.82, 1], [0.35, 0.62]]) {
+      const f = document.createElement("div");
+      f.className = "faixa";
+      f.style.top = `${de * 100}%`;
+      f.style.height = `${(ate - de) * 100}%`;
+      palco.appendChild(f);
+    }
+  }
+
+  Cena.montar(document.getElementById("campo"), config);
+  Cena.aplicarFormato(W, H);
+
+  const render = Cena.renderer.render.bind(Cena.renderer);
+  Cena.renderer.render = () => {};
+  const passo = 1 / 60;
+  const andar = s => { for (let i = 0; i < Math.round(s / passo); i++) Cena.quadro(passo, 0, { pressao: { [A.id]: 0.6, [B.id]: 0.3 } }); };
+
+  const lances = {
+    voo: { resultado: "gol", alvo: { col: 1, lin: 1 }, mergulho: { col: -1, lin: 0 } },
+    gol: { resultado: "gol", alvo: { col: -1, lin: 1 }, mergulho: { col: 1, lin: 0 } },
+    defesa: { resultado: "defesa", alvo: { col: 1, lin: 0 }, mergulho: { col: 1, lin: 0 } },
+    trave: { resultado: "trave", alvo: { col: -1, lin: 1 }, mergulho: { col: 1, lin: 1 } },
+    frango: { resultado: "gol", alvo: { col: 0, lin: 0 }, mergulho: { col: -1, lin: 0 }, frango: true, efeito: "frango" },
+    fogo: { resultado: "gol", alvo: { col: 1, lin: 1 }, mergulho: { col: -1, lin: 0 }, efeito: "fogo" },
+    placa: { resultado: "gol", alvo: { col: -1, lin: 1 }, mergulho: { col: 1, lin: 1 }, efeito: "placa" },
+    fora: { resultado: "fora", alvo: { col: 0, lin: 1 }, mergulho: { col: 1, lin: 0 } },
+    paredao: { resultado: "defesa", alvo: { col: -1, lin: 1 }, mergulho: { col: -1, lin: 1 }, paredao: true },
+  };
+  const padrao = { prepara: 2.6, voo: 0.62, gol: 1.15, defesa: 1.0, trave: 0.98, frango: 1.0, fogo: 0.62, placa: 2.6, fora: 0.95, paredao: 1.0, fim: 3, ocioso: 4 };
+  const quando = Number.isFinite(t) ? t : padrao[momento] ?? 1;
+
+  /* Chamadas antes do clássico não podem quebrar. */
+  Cena.festa("flamengo", 1); Cena.chute(null); Cena.nervoso("x"); Cena.confete(null, 3);
+
+  Cena.classico(A, B);
+  andar(1.5);
+  const batedor = { nome: url.get("nome") || "@gabizinha", numero: 9, craque: url.get("craque") === "1" || momento === "prepara" };
+  const lance = lances[momento];
+  const efeito = url.get("efeito") || (lance && lance.efeito) || null;
+  if (momento === "ocioso") {
+    Cena.ocioso(true);
+    andar(quando);
+  } else if (momento === "fim") {
+    Cena.fim({ vencedor: A.id, perdedor: B.id });
+    andar(quando);
+  } else {
+    Cena.batedor({ time: A.id, rival: B.id, batedor, efeito: efeito ? { efeito, de: "@fulano" } : null });
+    if (!lance) andar(quando);
+    else {
+      andar(config.tempos.prepara);
+      const ev = { time: A.id, rival: B.id, batedor, efeito, nervoso: false, paredao: false, frango: false, cavadinha: false, ...lance };
+      Cena.chute(ev);
+      document.title = `resultado em ${Cena.tempoAteOResultado(ev).toFixed(2)} s`;
+      andar(quando);
+    }
+  }
+  Cena.renderer.render = render;
+  Cena.quadro(0.0001, 0, {});
+  if (url.get("perto")) {
+    const alvo = url.get("perto") === "goleiro" ? Cena.goleiroM : Cena.batedorM;
+    const cam = new THREE.PerspectiveCamera(30, Cena.camera.aspect, 0.1, 300);
+    const lado = alvo === Cena.goleiroM ? 1 : -1;
+    cam.position.copy(alvo.position).add(new THREE.Vector3(0.3, 1.5, lado * -3.2));
+    cam.lookAt(alvo.position.clone().add(new THREE.Vector3(0, 1.2, 0)));
+    render(Cena.scene, cam);
+  }
+  document.body.dataset.pronto = "1";
+})().catch(e => { document.getElementById("erros").textContent += e.stack + "\n"; });
+</script>
+</body>
+</html>

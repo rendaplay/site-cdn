@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pebolim Gigante · Renda Play</title>
+<link rel="stylesheet" href="pebolim.css">
+</head>
+<body>
+<div id="palco" class="palco" aria-live="polite">
+  <canvas id="campo" aria-hidden="true"></canvas>
+  <div class="rotulos" hidden></div>
+
+  <header class="placar" hidden>
+    <div class="lado a"><span class="chip"></span><span class="sigla"></span><b class="gols">0</b></div>
+    <div class="meio"><span class="relogio">3:00</span><span class="rotulo"></span></div>
+    <div class="lado b"><b class="gols">0</b><span class="sigla"></span><span class="chip"></span></div>
+    <div class="pressao a"><i></i><span>PRESSÃO</span></div>
+    <div class="pressao b"><i></i><span>PRESSÃO</span></div>
+    <div class="pronto a" hidden></div>
+    <div class="pronto b" hidden></div>
+  </header>
+
+  <div class="faixas"></div>
+  <div class="presentes"></div>
+  <section class="telao" hidden></section>
+  <div class="resultado" hidden></div>
+  <div class="dica"></div>
+
+  <section class="abertura" hidden></section>
+  <section class="chamada" hidden></section>
+  <section class="ranking" hidden></section>
+
+  <div class="sem-sinal" hidden></div>
+  <div class="pausa" hidden>Pausado</div>
+  <form class="painel" hidden></form>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="../comum/live.js"></script>
+<script src="../comum/presentes.js"></script>
+<script src="../comum/configurar.js"></script>
+<script src="preset.js"></script>
+<script src="config.js"></script>
+<script src="falas.js"></script>
+<script src="regras.js"></script>
+<script src="personagens.js"></script>
+<script src="cena.js"></script>
+<script src="hud.js"></script>
+<script src="som.js"></script>
+<script src="painel.js"></script>
+<script src="jogo.js"></script>
+</body>
+</html>
