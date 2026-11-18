@@ -53,6 +53,20 @@ const Jogo = {
       opcoes: () => config.faixas.map(f => f.nome),
       testar: presente => this.presenteTeste(presente),
       avancado: () => Painel.alternar(true),
+      regras: [
+        "Os dois times mais comentados disputam os pênaltis. Comentou o time: entra na fila e bate com o @ na camisa.",
+        "Dá pra pedir o canto: \"esquerda\", \"direita\", \"meio\", \"alto\", \"baixo\" ou \"cavadinha\".",
+        "Curtidas enchem a pressão da torcida e o goleiro rival treme. Quem segue vira reforço.",
+        "Presente vira efeito na próxima cobrança do time. De quem não escolheu time, vai pro time que está perdendo.",
+        "O vencedor fica e pega o time mais comentado de fora.",
+      ],
+      efeitos: () => [
+        "bola brilhante na cobrança",
+        "fura a fila e bate com efeito",
+        "o goleiro rival toma um frango",
+        "chute de fogo, gol garantido",
+        "gol de placa em câmera lenta e goleiro paredão na próxima do rival",
+      ],
     });
     this.aplicarFormato(true);
 

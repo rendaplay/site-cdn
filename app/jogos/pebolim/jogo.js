@@ -56,6 +56,20 @@ const Jogo = {
       opcoes: () => config.faixas.map(f => f.nome),
       testar: presente => this.presenteTeste(presente),
       avancado: () => Painel.alternar(true),
+      regras: [
+        "Os dois times mais comentados jogam o pebolim. Comentou o time: ganha um boneco com o @ na mesa.",
+        "O último boneco a tocar na bola leva o gol com o @.",
+        "Escreveu \"chuta\" ou \"bomba\": o próximo chute do time sai mais forte.",
+        "Curtidas enchem a pressão, que cheia vira turbo. Quem segue vira craque dourado.",
+        "Partida até 5 gols ou 3 min, empate vai pro gol de ouro. O vencedor fica e pega o time mais comentado de fora.",
+      ],
+      efeitos: () => [
+        "bola brilhante",
+        "canhão: chute mais forte",
+        "congela o goleiro rival",
+        "bola de fogo, gol garantido",
+        "chuva de bolas e goleiro paredão",
+      ],
     });
     this.aplicarFormato(true);
 

@@ -56,6 +56,20 @@ const Jogo = {
       opcoes: () => config.faixas.map(f => f.nome),
       testar: presente => this.presenteTeste(presente),
       avancado: () => Painel.alternar(true),
+      regras: [
+        "Cada time tem um craque fazendo embaixadinha. Comentou o time: é um toque, e o @ salta da bola.",
+        "O fôlego cai sozinho, mais rápido quanto maior a sequência. Zerou, a bola cai e recomeça do zero.",
+        "Escreveu \"lambreta\", \"chapéu\", \"bicicleta\", \"calcanhar\" ou \"ombro\": truque que vale +5.",
+        "Curtidas enchem o fôlego. Quem segue traz um reforço e cada toque vale 2.",
+        "Rodada de 2 min: a maior sequência vence e pega o time mais comentado de fora.",
+      ],
+      efeitos: () => [
+        "bola brilhante, +3 toques",
+        "câmera lenta: não perde fôlego",
+        "vento no rival: o fôlego dele cai em dobro",
+        "bola de fogo, +25 toques",
+        "show do craque: +50 e bola blindada",
+      ],
     });
     this.aplicarFormato(true);
 
