@@ -47,6 +47,20 @@ const Jogo = {
       opcoes: () => config.faixas.map(f => f.nome),
       testar: presente => this.presenteTeste(presente),
       avancado: () => Painel.alternar(true),
+      regras: [
+        "Comentou o nome ou o apelido do time: o mascote arranca e empurra o rival mais perto. Curtida dá um empurrão fraco.",
+        "Quem passa da borda cambaleia: um comentário do time ainda pode salvar, senão cai.",
+        "O juiz corre de tempos em tempos até quem mais empurrou: dá um empurrão forte ou cartão amarelo.",
+        "Presente vira golpe do último time que a pessoa comentou. Sem time, ajuda o mascote mais perto da borda.",
+        "Ganha o último em pé, ou quem estiver mais perto do centro no fim do tempo. Quem mais empurrou pelo time leva a coroa.",
+      ],
+      efeitos: () => [
+        "ombrada no rival mais perto",
+        "carrinho que varre quem está na frente",
+        "voadora em câmera lenta, e traz de volta o time que caiu",
+        "cartão vermelho do juiz no rival mais perto",
+        "terremoto: os rivais quicam pra borda e o time cresce",
+      ],
     });
     this.aplicarFormato(true);
 

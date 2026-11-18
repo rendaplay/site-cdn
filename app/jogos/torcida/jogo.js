@@ -43,6 +43,20 @@ const Jogo = {
       opcoes: () => config.faixas.map(f => f.nome),
       testar: presente => this.presenteTeste(presente),
       avancado: () => Painel.alternar(true),
+      regras: [
+        "Comentou o nome ou o apelido do time: ganha um torcedor com a camisa e o @ no setor. Um por pessoa.",
+        "Comentar de novo faz o torcedor pular. Comentar outro time troca de setor. Curtida faz acenar.",
+        "Comentário, curtida e presente viram barulho: a torcida levanta, pula e faz a ola.",
+        "Presente vai pro último time que a pessoa comentou. Sem time, vai pro setor mais vazio.",
+        "Quem mais doou pro time vira o presidente, de coroa na frente do setor. No fim da rodada, o setor mais cheio é a maior torcida.",
+      ],
+      efeitos: () => [
+        "sinalizador no setor",
+        "bandeirão cobrindo a torcida",
+        "mosaico com o @ de quem mandou",
+        "caravana: ônibus com mais torcedores pro setor",
+        "show lendário: apagão, holofote, fogos e o @ no telão",
+      ],
     });
     this.aplicarFormato(true);
 
