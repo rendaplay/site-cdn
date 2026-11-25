@@ -155,7 +155,8 @@ function comRef(href, ref) {
 
 document.addEventListener('click', (e) => {
   const link = e.target.closest('a[href*="wa.me/"]');
-  if (!link || !CONFIG.leadRef) return;
+  // defaultPrevented: o clique só abriu a escolha de setor (zap.js), o código vai no link escolhido.
+  if (!link || e.defaultPrevented || !CONFIG.leadRef) return;
   // Qualquer falha aqui abre o wa.me como estava: o clique nunca trava.
   try {
     const ref = novoRef();
